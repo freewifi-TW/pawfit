@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -12,34 +11,32 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
-
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'google_id' => (string) fake()->unique()->numerify('1############'),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'name' => fake()->name(),
+            'pawfit_id' => Str::lower(fake()->unique()->lexify('user_?????')),
+            'display_name' => fake()->firstName(),
+            'nsfw_pref' => 'hide',
+            'tos_accepted_at' => now(),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
+    /** 尚未完成 onboarding。 */
+    public function fresh(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(fn () => ['pawfit_id' => null, 'tos_accepted_at' => null]);
+    }
+
+    public function adult(string $pref = 'show'): static
+    {
+        return $this->state(fn () => ['adult_confirmed_at' => now(), 'nsfw_pref' => $pref]);
+    }
+
+    public function banned(): static
+    {
+        return $this->state(fn () => ['is_banned' => true]);
     }
 }

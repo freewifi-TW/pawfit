@@ -7,43 +7,33 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * users 即 SASD 的 profiles：認證欄位 + 業務欄位放同一張表。
      */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
+            $table->uuid('id')->primary();
+            // 認證
+            $table->string('google_id')->nullable()->unique();
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('name')->nullable();          // Google 回傳的名稱
+            $table->string('google_avatar_url')->nullable();
             $table->rememberToken();
-            $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+            // 業務
+            $table->string('pawfit_id', 20)->nullable()->unique();
+            $table->string('display_name', 40)->nullable();
+            $table->uuid('avatar_media_id')->nullable();  // FK 於 media 建表後補上
+            $table->string('nsfw_pref', 8)->default('hide'); // hide / blur / show
+            $table->timestampTz('adult_confirmed_at')->nullable();
+            $table->timestampTz('tos_accepted_at')->nullable();
+            $table->boolean('is_banned')->default(false);
+            $table->timestampTz('last_login_at')->nullable();
+            $table->timestampsTz();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
     }
 };

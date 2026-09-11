@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+class Fursona extends Model
+{
+    use HasFactory, HasUuids;
+
+    public const VISIBILITIES = ['public', 'unlisted', 'private']; // Phase 2 增列 friends
+
+    protected $fillable = [
+        'owner_id', 'name', 'species', 'bio', 'tags', 'palette',
+        'visibility', 'is_nsfw', 'is_representative', 'avatar_media_id', 'removed_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'tags' => 'array',
+            'palette' => 'array',
+            'is_nsfw' => 'boolean',
+            'is_representative' => 'boolean',
+            'removed_at' => 'datetime',
+        ];
+    }
+
+    public function isRemoved(): bool
+    {
+        return $this->removed_at !== null;
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function media(): HasMany
+    {
+        return $this->hasMany(Media::class)->orderBy('sort_order')->orderBy('created_at');
+    }
+
+    public function avatarMedia(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'avatar_media_id');
+    }
+
+    /** 目前有效（未撤銷）的分享連結，每隻獸設同時只有一條。 */
+    public function shareLink(): HasOne
+    {
+        return $this->hasOne(ShareLink::class)->whereNull('revoked_at')->latest();
+    }
+
+    public function shareLinks(): HasMany
+    {
+        return $this->hasMany(ShareLink::class);
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->visibility === 'public';
+    }
+
+    public function isPrivate(): bool
+    {
+        return $this->visibility === 'private';
+    }
+}
