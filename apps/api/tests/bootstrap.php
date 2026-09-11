@@ -14,7 +14,7 @@ require __DIR__.'/../vendor/autoload.php';
 
 foreach ([
     'APP_ENV', 'DB_CONNECTION', 'DB_DATABASE', 'DB_URL',
-    'CACHE_STORE', 'SESSION_DRIVER', 'QUEUE_CONNECTION', 'MAIL_MAILER', 'BROADCAST_CONNECTION',
+    'CACHE_STORE', 'SESSION_DRIVER', 'QUEUE_CONNECTION', 'MAIL_MAILER', 'BROADCAST_CONNECTION', 'LOG_CHANNEL',
 ] as $key) {
     if (array_key_exists($key, $_ENV)) {
         $_SERVER[$key] = $_ENV[$key];

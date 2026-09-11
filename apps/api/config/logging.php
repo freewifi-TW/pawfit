@@ -1,5 +1,6 @@
 <?php
 
+use App\Logging\JsonLineFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -19,6 +20,18 @@ return [
     */
 
     'default' => env('LOG_CHANNEL', 'stack'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Service Name（統一 log 格式的 service 欄位）
+    |--------------------------------------------------------------------------
+    |
+    | api 與 worker 共用同一份程式碼與映像，由 compose 的環境變數區分。
+    | 見 docs/logging.md。
+    |
+    */
+
+    'service' => env('LOG_SERVICE', 'api'),
 
     /*
     |--------------------------------------------------------------------------
@@ -109,7 +122,8 @@ return [
             'handler_with' => [
                 'stream' => 'php://stderr',
             ],
-            'formatter' => env('LOG_STDERR_FORMATTER'),
+            // 預設輸出統一 JSON 格式（App\Logging\JsonLineFormatter）；要看純文字可設 LOG_STDERR_FORMATTER=Monolog\Formatter\LineFormatter
+            'formatter' => env('LOG_STDERR_FORMATTER', JsonLineFormatter::class),
             'processors' => [PsrLogMessageProcessor::class],
         ],
 

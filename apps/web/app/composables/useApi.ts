@@ -1,26 +1,38 @@
 import type { FetchError } from 'ofetch'
 import { appendResponseHeader } from 'h3'
+import { levelForStatus, logServer, pathOnly } from '#shared/utils/log'
 import type { ApiError } from '~/types/api'
+import type { ClientLog } from '~/plugins/03.client-log.client'
 
 /**
  * 呼叫 Laravel API 的 $fetch 實例。
  * - 瀏覽器端：same-domain 相對路徑 /api，帶 cookie；寫入類請求自動附 XSRF token。
- * - SSR 端：直接打容器內的 Laravel，轉送瀏覽器 cookie 與 Referer（Sanctum stateful 判斷用），
- *   並把 Laravel 回的 Set-Cookie 轉回瀏覽器。
+ *   5xx 或斷線會透過 $clientLog 回報（service=browser, event=client.api_error）。
+ * - SSR 端：直接打容器內的 Laravel，轉送瀏覽器 cookie、Referer（Sanctum stateful 判斷用）與
+ *   X-Request-Id（讓 Laravel 的 log 跟這次頁面請求串起來），並把 Laravel 回的 Set-Cookie 轉回瀏覽器。
+ *   每次呼叫記一筆 http.outbound（docs/logging.md）。
  */
 export function useApi() {
   const config = useRuntimeConfig()
   const requestHeaders = useRequestHeaders(['cookie'])
   const event = useRequestEvent()
+  const requestId = event?.context.requestId
+  const clientLog = import.meta.client ? (useNuxtApp().$clientLog as ClientLog | undefined) : undefined
 
   const api = $fetch.create({
     baseURL: import.meta.server ? config.apiInternalBase : config.public.apiBase,
     credentials: 'include',
     headers: import.meta.server
-      ? { cookie: requestHeaders.cookie ?? '', referer: `${config.public.siteUrl}/`, accept: 'application/json' }
+      ? {
+          cookie: requestHeaders.cookie ?? '',
+          referer: `${config.public.siteUrl}/`,
+          accept: 'application/json',
+          ...(requestId ? { 'x-request-id': requestId } : {})
+        }
       : { accept: 'application/json' },
     retry: 0,
     async onRequest({ options }) {
+      startedAt.set(options, performance.now())
       if (import.meta.client) {
         const method = (options.method ?? 'GET').toUpperCase()
         if (method !== 'GET' && method !== 'HEAD') {
@@ -33,21 +45,70 @@ export function useApi() {
         }
       }
     },
-    onResponse({ response }) {
-      if (import.meta.server && event) {
-        const setCookie = response.headers.getSetCookie?.() ?? []
-        for (const c of setCookie) appendResponseHeader(event, 'set-cookie', c)
+    onResponse({ request, options, response }) {
+      if (import.meta.server) {
+        if (event) {
+          const setCookie = response.headers.getSetCookie?.() ?? []
+          for (const c of setCookie) appendResponseHeader(event, 'set-cookie', c)
+        }
+        logServer(levelForStatus(response.status), 'http.outbound', `outbound ${(options.method ?? 'GET').toUpperCase()} api`, {
+          request_id: requestId ?? null,
+          user_id: event?.context.userId ?? null,
+          context: {
+            client: 'api',
+            method: (options.method ?? 'GET').toUpperCase(),
+            path: apiPath(request),
+            status: response.status,
+            duration_ms: durationSince(options)
+          }
+        })
       }
     },
-    onResponseError({ request, response }) {
-      // SSR 端的 API 失敗只會變成頁面 404/500，這裡留一行 log 方便追查
-      if (import.meta.server && response.status !== 401) {
-        console.warn(`[api] ${String(request)} → ${response.status}`, response._data?.message ?? '')
+    onRequestError({ request, options, error }) {
+      const method = (options.method ?? 'GET').toUpperCase()
+      if (import.meta.server) {
+        logServer('error', 'http.outbound', `outbound ${method} api failed`, {
+          request_id: requestId ?? null,
+          context: { client: 'api', method, path: apiPath(request), status: null, duration_ms: durationSince(options) },
+          error
+        })
+      } else {
+        clientLog?.('api_error', 'error', `API ${method} ${apiPath(request)} 連線失敗`, {
+          method,
+          path: apiPath(request),
+          status: 0
+        }, error)
+      }
+    },
+    onResponseError({ request, options, response }) {
+      // 瀏覽器端：4xx 是正常業務流程（未登入、驗證失敗），只回報 5xx
+      if (import.meta.client && response.status >= 500) {
+        const method = (options.method ?? 'GET').toUpperCase()
+        clientLog?.('api_error', 'error', `API ${method} ${apiPath(request)} → ${response.status}`, {
+          method,
+          path: apiPath(request),
+          status: response.status,
+          api_request_id: response.headers.get('x-request-id')
+        })
       }
     }
   })
 
   return api
+}
+
+/** 只留路徑：去掉 SSR 的 http://api:8080 前綴與 query string */
+function apiPath(request: unknown): string {
+  return pathOnly(String(request)).replace(/^https?:\/\/[^/]+/, '')
+}
+
+/** 每次呼叫的開始時間（key 是 ofetch 的 options 物件，onRequest → onResponse 之間同一個） */
+const startedAt = new WeakMap<object, number>()
+
+function durationSince(options: object): number | null {
+  const t = startedAt.get(options)
+  startedAt.delete(options)
+  return typeof t === 'number' ? Math.round(performance.now() - t) : null
 }
 
 function readCookie(name: string): string | null {
