@@ -20,13 +20,15 @@ services:
       - api
 
   web:
-    image: node:20-alpine
+    image: node:22-alpine
     working_dir: /app
     command: sh -c "npm install -g pnpm@latest >/dev/null 2>&1 && pnpm install && pnpm dev --host 0.0.0.0 --port 3000"
     environment:
       NUXT_PUBLIC_API_BASE: /api
       NUXT_API_INTERNAL_BASE: http://api:8080/api   # SSR 端在容器網路內直接打 Laravel
       NUXT_PUBLIC_SITE_URL: ${APP_URL:-http://localhost:8080}
+      NUXT_PUBLIC_DEV_LOGIN: "true"                # 登入頁顯示 email 直接登入（對應 api 的 FEATURE_DEV_LOGIN）
+      NUXT_PUBLIC_DEMO_SLUG: demoEmber1            # 首頁「看示範分享頁」（DemoSeeder）
       CHOKIDAR_USEPOLLING: "true"                  # Windows bind mount 需要 polling 才能熱更新
     volumes:
       - ./apps/web:/app

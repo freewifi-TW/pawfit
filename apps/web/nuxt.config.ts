@@ -9,13 +9,16 @@ export default defineNuxtConfig({
     enabled: true
   },
 
-  css: ['~/assets/css/main.css'],
-
   app: {
     head: {
       htmlAttrs: { lang: 'zh-Hant-TW' },
       titleTemplate: '%s · Pawfit 爪搭',
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'theme-color', content: '#ff7a59' }
+      ],
       link: [
+        { rel: 'icon', href: '/favicon.ico' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
@@ -26,13 +29,19 @@ export default defineNuxtConfig({
     }
   },
 
+  css: ['~/assets/css/main.css'],
+
   runtimeConfig: {
     // 僅 server 端：SSR 在容器網路內直接呼叫 Laravel
     apiInternalBase: 'http://api:8080/api',
     public: {
       // 瀏覽器端：same-domain 相對路徑，經 Caddy 轉到 Laravel
       apiBase: '/api',
-      siteUrl: 'http://localhost:8080'
+      siteUrl: 'http://localhost:8080',
+      // 本機沒有 Google 憑證時，登入頁顯示 email 直接登入（對應 API 的 FEATURE_DEV_LOGIN）
+      devLogin: false,
+      // 首頁「看示範分享頁」連到的 slug（DemoSeeder 建立）
+      demoSlug: ''
     }
   },
 
