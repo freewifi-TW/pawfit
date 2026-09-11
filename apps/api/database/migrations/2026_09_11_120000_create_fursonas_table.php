@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,9 +25,6 @@ return new class extends Migration
 
             $table->index(['owner_id', 'visibility']);
         });
-
-        // 每個用戶至多一隻代表獸設（partial unique index，Postgres 與 sqlite 皆支援）
-        DB::statement('CREATE UNIQUE INDEX fursonas_one_representative_per_owner ON fursonas (owner_id) WHERE is_representative');
     }
 
     public function down(): void

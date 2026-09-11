@@ -1,47 +1,21 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# apps/api — Laravel 13 API
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+本機**沒有** PHP 與 Composer，所有指令一律透過 Docker 在 `api` 容器內執行（於 repo 根目錄）：
 
-## Prerequisites
-
-Verify that PHP and Composer are available:
-
-```sh
-php -v
-composer -V
+```bash
+docker compose exec api php artisan <cmd>
+docker compose exec api php artisan test --compact
+docker compose exec --user root api ./vendor/bin/pint          # 寫入檔案需 root（Windows bind mount）
+docker compose exec --user root -e COMPOSER_ALLOW_SUPERUSER=1 api composer require <pkg>
 ```
 
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
+不要嘗試在主機安裝 PHP／Composer／Laravel Boost。
 
-macOS:
+## 專案慣例
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
-
-Windows PowerShell:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
-
-Linux:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
-
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
+- 所有內容可見性判斷只能寫在 `app/Services/Visibility.php`（SASD §0.1 原則 3），controller 與前端不得自行判斷。
+- Migration 一律 additive；enum 類欄位用 string，不用 Postgres enum。
+- 圖片只經 `GET /api/img/{media}` 出口（302 簽名 URL），不得直接回傳 R2/MinIO 網址。
+- API Resource 不包 `data` 外層（`JsonResource::withoutWrapping()`）；分頁集合例外。
+- 設定與 feature flag 放 `config/pawfit.php`，以環境變數控制。
+- 測試用 sqlite in-memory（phpunit.xml），`Storage::fake('s3')`、`Queue::fake()`。

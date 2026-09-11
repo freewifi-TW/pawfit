@@ -76,30 +76,37 @@ class ImageProcessor
         $media->forceFill(['watermarked_key' => $key])->save();
     }
 
+    /**
+     * 斜向平鋪文字浮水印。
+     * 每次 text() 都會重新載入字型（約 0.8 秒），所以只畫一塊透明磚，再用 place() 鋪滿整張圖。
+     */
     private function applyWatermark(ImageInterface $image, string $label): void
     {
         $w = $image->width();
         $h = $image->height();
         $size = max(18, (int) round(min($w, $h) / 14));
-        $stepX = $size * 9;
-        $stepY = $size * 5;
+        $tileW = $size * 10;
+        $tileH = $size * 7;
         $font = config('pawfit.media.watermark_font');
 
-        for ($row = 0, $y = -$stepY; $y < $h + $stepY; $y += $stepY, $row++) {
-            $offset = ($row % 2) * (int) ($stepX / 2);
-            for ($x = -$stepX + $offset; $x < $w + $stepX; $x += $stepX) {
-                // Imagick 的 stroke 要求不透明文字色，所以用「深色陰影 + 半透明白字」兩層達到對比
-                foreach ([[1, 1, 'rgba(0,0,0,0.22)'], [0, 0, 'rgba(255,255,255,0.34)']] as [$dx, $dy, $color]) {
-                    $image->text($label, (int) $x + $dx, (int) $y + $dy, function (FontFactory $f) use ($font, $size, $color) {
-                        if (is_file($font)) {
-                            $f->filename($font);
-                        }
-                        $f->size($size);
-                        $f->color($color);
-                        $f->align('center', 'center');
-                        $f->angle(-28);
-                    });
+        $tile = $this->manager->createImage($tileW, $tileH); // 透明畫布
+        // Imagick 的 stroke 要求不透明文字色，所以用「深色陰影 + 半透明白字」兩層達到對比
+        foreach ([[1, 1, 'rgba(0,0,0,0.22)'], [0, 0, 'rgba(255,255,255,0.34)']] as [$dx, $dy, $color]) {
+            $tile->text($label, (int) ($tileW / 2) + $dx, (int) ($tileH / 2) + $dy, function (FontFactory $f) use ($font, $size, $color) {
+                if (is_file($font)) {
+                    $f->filename($font);
                 }
+                $f->size($size);
+                $f->color($color);
+                $f->align('center', 'center');
+                $f->angle(-28);
+            });
+        }
+
+        for ($row = 0, $y = -$tileH; $y < $h + $tileH; $y += $tileH, $row++) {
+            $offset = ($row % 2) * (int) ($tileW / 2);
+            for ($x = -$tileW + $offset; $x < $w + $tileW; $x += $tileW) {
+                $image->insert($tile, (int) $x, (int) $y);
             }
         }
     }

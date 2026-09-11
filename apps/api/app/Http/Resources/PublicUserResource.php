@@ -17,6 +17,7 @@ class PublicUserResource extends JsonResource
         $u = $this->resource;
 
         return [
+            'id' => $u->id, // 檢舉用戶時需要
             'pawfit_id' => $u->pawfit_id,
             'display_name' => $u->display_name ?? $u->name,
             'avatar_url' => MediaResource::avatarUrl($u),
