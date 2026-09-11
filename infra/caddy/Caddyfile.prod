@@ -1,5 +1,12 @@
 # 正式環境 Caddyfile：自動 HTTPS（Let's Encrypt）
 # 以環境變數 SITE_DOMAIN 帶入網域，例如 pawfit.app
+#
+# Logging 與開發環境相同：X-Request-Id 貫穿三層、JSON access log 到 stdout 交給 Alloy。
+# （不再寫 /data/access.log；容器 stdout 由 Docker json-file 限制大小，Loki 保留 30 天）
+
+(request_id) {
+	header_up X-Request-Id {http.request.uuid}
+}
 
 {$SITE_DOMAIN} {
 	encode zstd gzip
@@ -10,21 +17,29 @@
 		X-Frame-Options SAMEORIGIN
 		Referrer-Policy strict-origin-when-cross-origin
 		-Server
+		>X-Request-Id {http.request.uuid}
 	}
 
 	@api path /api/* /sanctum/* /up
 	handle @api {
-		reverse_proxy api:8080
+		reverse_proxy api:8080 {
+			import request_id
+		}
 	}
 
 	handle {
-		reverse_proxy web:3000
+		reverse_proxy web:3000 {
+			import request_id
+		}
 	}
 
 	log {
-		output file /data/access.log {
-			roll_size 50mb
-			roll_keep 5
+		output stdout
+		format json {
+			time_format rfc3339_nano
+			time_key ts
+			level_key level
+			message_key message
 		}
 	}
 }

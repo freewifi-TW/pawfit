@@ -12,6 +12,7 @@
            ├─ /api/*、/sanctum/*  → apps/api   Laravel 13 / PHP 8.4（Nginx + PHP-FPM）
            └─ 其餘                → apps/web   Nuxt 4 SSR（Node 22）
         Postgres 16 · Redis 7（queue / cache / session）· MinIO（本機模擬 Cloudflare R2）
+        Loki + Alloy + Grafana(:3001)：所有容器 stdout 統一 JSON 格式集中查詢（docs/logging.md）
 ```
 
 Same-domain 路由，前後端共用 cookie（Sanctum stateful），沒有 CORS 問題。圖片一律經 `GET /api/img/:id` 做可見性判斷後 302 到短效簽名 URL；所有可見性邏輯集中在 `apps/api/app/Services/Visibility.php`。
@@ -47,6 +48,7 @@ docker compose logs -f web api              # 看啟動狀況
 | 示範分享頁 | http://localhost:8080/s/demoEmber1（需先跑 DemoSeeder） |
 | API 健康檢查 | http://localhost:8080/up |
 | MinIO 管理介面 | http://localhost:9001（帳密見 .env） |
+| Grafana（所有服務的 log） | http://localhost:3001（開發環境免登入；用法見 `docs/logging.md`） |
 | Postgres | localhost:54329 |
 
 ### 本機登入
@@ -75,10 +77,16 @@ docker compose down -v                                        # 連資料一起�
 ### Windows 注意事項
 
 - Windows 的 bind mount 在容器內固定為 `root:root 0755`，PHP 以 `www-data` 執行時無法寫入。因此 `storage/` 與 `bootstrap/cache` 掛的是 named volume（`api_storage`、`api_bootstrap_cache`），不會出現在本機資料夾。
-- Laravel log 走 `LOG_CHANNEL=stderr`，用 `docker compose logs -f api worker` 看。
+- Laravel log 走 `LOG_CHANNEL=stderr`（統一 JSON 格式），集中在 Grafana 看；臨時要看原始輸出用 `docker compose logs -f api worker`。
 - 會寫入 `vendor/`、`composer.lock` 的指令（`composer require`、`composer update`、`pint`）要加 `--user root`。
 - `AWS_ENDPOINT` 指向 `host.docker.internal:9000`，讓 Laravel 產生的簽名 URL 在容器內與瀏覽器都能使用。
 - worker 是長駐程序：`composer require` 之後要 `docker compose restart worker`，否則新類別找不到。
+
+### Log
+
+所有容器只印 stdout（統一 JSON 格式：`ts / level / service / event / message / request_id / user_id / context / exception`），Alloy 收進 Loki，開 **http://localhost:3001** 用 Grafana 查。
+Caddy 對每個請求產生 `X-Request-Id` 貫穿 web、api、worker 與瀏覽器端錯誤回報，貼上 ID 就能看到同一請求在所有服務的紀錄。
+事件一覽、LogQL 範例、各層怎麼寫 log 見 `docs/logging.md`。
 
 ### 測試
 
@@ -99,13 +107,15 @@ Caddy 會自動申請 Let's Encrypt 憑證；圖片改指向 Cloudflare R2，不
 - `apps/api/.env`：`FEATURE_DEV_LOGIN=false`、`APP_ENV=production`、`SANCTUM_STATEFUL_DOMAINS` 與 `SESSION_DOMAIN` 改成正式網域、`AWS_*` 改成 R2 端點與私有 bucket、`ADMIN_EMAILS` 填站方帳號。
 - R2 bucket 要設定 CORS，允許正式網域對 `PUT` 直傳（`AllowedMethods: PUT`、`AllowedHeaders: Content-Type`）。
 - Google OAuth 用戶端加入正式網域的 callback。
+- `.env`：設定 `GRAFANA_ADMIN_PASSWORD`（正式環境 Grafana 關閉匿名登入，且只綁 127.0.0.1，從外部用 SSH tunnel 連）。
 
 ## 目錄
 
 ```
 apps/web     Nuxt 4 + Nuxt UI（前端，SSR）
 apps/api     Laravel 13（API）— 見 apps/api/CLAUDE.md 的開發慣例
-infra/       Caddyfile、Dockerfile
+infra/       Caddyfile、Dockerfile、observability/（Loki、Alloy、Grafana 設定）
+docs/        logging.md（log 格式、事件、查詢方式）
 design/      設計原型
 compose.yaml            開發環境
 compose.prod.yaml       正式環境覆蓋

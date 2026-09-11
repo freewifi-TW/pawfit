@@ -1,20 +1,39 @@
 # 開發用 Caddyfile：純 HTTP，:80 對外
 # /api/* 與 /sanctum/* → Laravel；其餘 → Nuxt dev server（含 HMR websocket）
+#
+# Logging：
+# - 每個請求產生 X-Request-Id（uuid），往後傳給 web / api，也回給瀏覽器
+# - access log 以 JSON 輸出到 stdout，由 Alloy 收進 Loki（見 infra/observability）
+
+(request_id) {
+	header_up X-Request-Id {http.request.uuid}
+}
 
 :80 {
 	encode zstd gzip
 
+	header >X-Request-Id {http.request.uuid}
+
 	@api path /api/* /sanctum/* /up
 	handle @api {
-		reverse_proxy api:8080
+		reverse_proxy api:8080 {
+			import request_id
+		}
 	}
 
 	handle {
-		reverse_proxy web:3000
+		reverse_proxy web:3000 {
+			import request_id
+		}
 	}
 
 	log {
 		output stdout
-		format console
+		format json {
+			time_format rfc3339_nano
+			time_key ts
+			level_key level
+			message_key message
+		}
 	}
 }

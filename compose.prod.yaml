@@ -58,3 +58,22 @@ services:
     profiles: ["never"]
   minio-init:
     profiles: ["never"]
+
+  # ---------- 觀測 ----------
+  loki:
+    restart: unless-stopped
+
+  alloy:
+    restart: unless-stopped
+
+  grafana:
+    # 只綁 localhost：從外部用 SSH tunnel 連（ssh -L 3001:127.0.0.1:3001 vm），不對公網開
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3001}:3000"
+    environment:
+      GF_SERVER_ROOT_URL: http://localhost:${GRAFANA_PORT:-3001}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_AUTH_DISABLE_LOGIN_FORM: "false"
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?請在 .env 設定 GRAFANA_ADMIN_PASSWORD}
+    restart: unless-stopped

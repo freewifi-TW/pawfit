@@ -1,0 +1,134 @@
+// Alloy：從 Docker 抓所有 pawfit 容器的 stdout/stderr，正規化後送進 Loki。
+//
+// 統一格式（每行一個 JSON，見 docs/logging.md）：
+//   ts, level, service, event, message, request_id, user_id, context{...}, exception{...}
+// - api / worker / web / browser 由應用程式直接輸出統一格式
+// - caddy 輸出原生 JSON access log，這裡包成統一格式（原生欄位放進 context）
+// - 其他非 JSON 的行（pnpm、nginx 啟動訊息…）保留原文，event=raw
+
+logging {
+  level  = "warn"
+  format = "logfmt"
+}
+
+discovery.docker "pawfit" {
+  host = "unix:///var/run/docker.sock"
+  filter {
+    name   = "label"
+    values = ["com.docker.compose.project=pawfit"]
+  }
+}
+
+discovery.relabel "pawfit" {
+  targets = discovery.docker.pawfit.targets
+
+  // 預設 service = compose 服務名；應用程式若在 JSON 內給了 service（例如 browser）會在 process 階段覆蓋
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+  // 觀測用容器與一次性 init 容器不收
+  rule {
+    source_labels = ["service"]
+    regex         = "loki|alloy|grafana|minio-init"
+    action        = "drop"
+  }
+}
+
+loki.source.docker "pawfit" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.pawfit.output
+  forward_to = [loki.process.normalize.receiver]
+  labels     = { source = "docker" }
+}
+
+loki.process "normalize" {
+  forward_to = [loki.write.local.receiver]
+
+  // ---- Caddy：原生 access log → 統一格式 ----
+  stage.match {
+    // 只處理 access log；Caddy 自身的啟動/錯誤訊息（logger != http.log.access）維持原樣
+    selector = "{service=\"caddy\"} |= \"\\\"logger\\\":\\\"http.log.access\""
+
+    stage.json {
+      expressions = {
+        ts         = "ts",
+        level      = "level",
+        message    = "message",
+        request_id = "resp_headers.\"X-Request-Id\"[0]",
+      }
+    }
+    stage.template {
+      source   = "event"
+      template = "http.access"
+    }
+    // 原生欄位（request、status、duration、resp_headers…）整包放進 context
+    stage.template {
+      source   = "unified"
+      template = "{\"ts\":{{ .ts | printf \"%q\" }},\"level\":{{ .level | printf \"%q\" }},\"service\":\"caddy\",\"event\":\"http.access\",\"message\":{{ .message | printf \"%q\" }},\"request_id\":{{ if .request_id }}{{ .request_id | printf \"%q\" }}{{ else }}null{{ end }},\"context\":{{ .Entry }}}"
+    }
+    stage.output {
+      source = "unified"
+    }
+  }
+
+  // ---- 所有服務：抽出共同欄位 ----
+  stage.json {
+    expressions = {
+      ts         = "ts",
+      level      = "level",
+      svc        = "service",
+      event      = "event",
+      request_id = "request_id",
+      user_id    = "user_id",
+    }
+  }
+
+  // level 正規化：小寫、warn → warning（Caddy）、非 JSON 行沒有 level → info
+  stage.template {
+    source   = "level"
+    template = "{{ if .level }}{{ $l := .level | ToLower }}{{ if eq $l \"warn\" }}warning{{ else }}{{ $l }}{{ end }}{{ else }}info{{ end }}"
+  }
+  // event：JSON 行沒給 → log；非 JSON 行 → raw
+  stage.template {
+    source   = "event"
+    template = "{{ if .event }}{{ .event }}{{ else if .ts }}log{{ else }}raw{{ end }}"
+  }
+
+  // label 只留低基數的 service / level
+  stage.labels {
+    values = {
+      level   = "",
+      service = "svc",
+    }
+  }
+  // 高基數欄位走 structured metadata，查詢時可直接 | event="http.response"
+  stage.structured_metadata {
+    values = {
+      event      = "",
+      request_id = "",
+      user_id    = "",
+      container  = "",
+    }
+  }
+  stage.label_drop {
+    values = ["container"]
+  }
+
+  stage.timestamp {
+    source            = "ts"
+    format            = "RFC3339Nano"
+    action_on_failure = "fudge"
+  }
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

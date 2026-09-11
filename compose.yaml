@@ -4,12 +4,23 @@
 #
 # 路由：Caddy :80 → /api/* 轉 Laravel（api）、其餘轉 Nuxt（web）
 # same-domain，前端與 API 共用 cookie，無 CORS 問題。
+#
+# Logging：所有容器只印 stdout（統一 JSON 格式，見 docs/logging.md），
+# Alloy 從 Docker 收進 Loki，Grafana（http://localhost:3001）查詢。
 
 name: pawfit
+
+# 容器 stdout 大小上限（Alloy 透過 Docker API 讀 json-file，超過就輪替）
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "20m"
+    max-file: "5"
 
 services:
   caddy:
     image: caddy:2-alpine
+    logging: *default-logging
     ports:
       - "${APP_PORT:-8080}:80"
     volumes:
@@ -21,6 +32,7 @@ services:
 
   web:
     image: node:22-alpine
+    logging: *default-logging
     working_dir: /app
     command: sh -c "npm install -g pnpm@latest >/dev/null 2>&1 && pnpm install && pnpm dev --host 0.0.0.0 --port 3000"
     environment:
@@ -41,12 +53,19 @@ services:
       context: ./apps/api
       dockerfile: ../../infra/api/Dockerfile
       target: dev
+    logging: *default-logging
     environment:
       PHP_OPCACHE_ENABLE: "0"
+      LOG_SERVICE: api                 # 統一 log 格式的 service 欄位
+      NGINX_ACCESS_LOG: /dev/null      # 存取紀錄由 Caddy（http.access）與 Laravel（http.request/response）負責，Nginx 不重複印
       AUTORUN_ENABLED: "true"          # 容器啟動時自動跑 migrate
       AUTORUN_LARAVEL_MIGRATION: "true"
       AUTORUN_LARAVEL_STORAGE_LINK: "false"
-      AUTORUN_LARAVEL_OPTIMIZE: "false"   # 開發環境不要快取 config/route/view
+      # 開發環境不要快取 config/route/view/event（快取後 phpunit.xml 的環境變數會失效，測試會打到 Postgres）
+      AUTORUN_LARAVEL_CONFIG_CACHE: "false"
+      AUTORUN_LARAVEL_ROUTE_CACHE: "false"
+      AUTORUN_LARAVEL_VIEW_CACHE: "false"
+      AUTORUN_LARAVEL_EVENT_CACHE: "false"
     env_file:
       - ./apps/api/.env
     volumes:
@@ -68,6 +87,9 @@ services:
       dockerfile: ../../infra/api/Dockerfile
       target: dev
     command: ["php", "/var/www/html/artisan", "queue:work", "--tries=3", "--timeout=120", "--sleep=2"]
+    logging: *default-logging
+    environment:
+      LOG_SERVICE: worker
     env_file:
       - ./apps/api/.env
     volumes:
@@ -83,6 +105,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    logging: *default-logging
     environment:
       POSTGRES_DB: ${DB_DATABASE:-pawfit}
       POSTGRES_USER: ${DB_USERNAME:-pawfit}
@@ -99,6 +122,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    logging: *default-logging
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redis_data:/data
@@ -106,6 +130,7 @@ services:
   # 本機模擬 Cloudflare R2（S3 相容）。正式環境不啟動此服務，直接指向 R2。
   minio:
     image: minio/minio:latest
+    logging: *default-logging
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${R2_ACCESS_KEY_ID:-pawfit}
@@ -130,6 +155,57 @@ services:
       exit 0;
       "
 
+  # ---------- 觀測：Loki（log 儲存）+ Alloy（收集）+ Grafana（查詢） ----------
+  loki:
+    image: grafana/loki:3.5.5
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    volumes:
+      - ./infra/observability/loki/loki.yaml:/etc/loki/loki.yaml:ro
+      - loki_data:/loki
+    expose:
+      - "3100"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3100/ready | grep -q ready"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
+  alloy:
+    image: grafana/alloy:v1.11.0
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./infra/observability/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro   # 讀所有容器的 stdout（唯讀）
+      - alloy_data:/var/lib/alloy/data
+    depends_on:
+      loki:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:12.2.0
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    environment:
+      GF_SERVER_ROOT_URL: http://localhost:${GRAFANA_PORT:-3001}
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_USERS_DEFAULT_THEME: light
+      # 開發環境免登入直接進（正式環境由 compose.prod.yaml 關閉並設密碼）
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./infra/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      loki:
+        condition: service_healthy
+
 volumes:
   caddy_data:
   web_node_modules:
@@ -138,3 +214,6 @@ volumes:
   pg_data:
   redis_data:
   minio_data:
+  loki_data:
+  alloy_data:
+  grafana_data:
