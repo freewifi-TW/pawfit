@@ -4,6 +4,7 @@ import type { PaletteEntry } from '~/types/api'
 /** 色票編輯（FR-2.2）：hex、名稱、部位備註、拖曳排序、一鍵複製。 */
 const palette = defineModel<PaletteEntry[]>({ default: () => [] })
 const props = withDefaults(defineProps<{ max?: number }>(), { max: 24 })
+const { t } = useI18n()
 const notify = useNotify()
 
 function add() {
@@ -26,12 +27,12 @@ function onHexText(i: number, v: string) {
 }
 
 async function copyAll() {
-  const text = palette.value.map(p => `${p.hex}${p.name ? ` ${p.name}` : ''}${p.note ? `（${p.note}）` : ''}`).join('\n')
+  const text = palette.value.map(p => `${p.hex}${p.name ? ` ${p.name}` : ''}${p.note ? t('fursona.palette.noteWrap', { note: p.note }) : ''}`).join('\n')
   try {
     await navigator.clipboard.writeText(text)
-    notify.ok(`已複製 ${palette.value.length} 筆色碼`)
+    notify.ok(t('fursona.palette.copied', { n: palette.value.length }))
   } catch {
-    notify.err('無法存取剪貼簿')
+    notify.err(t('fursona.palette.clipboardError'))
   }
 }
 
@@ -61,19 +62,19 @@ function drop(to: number) {
     >
       <span
         class="handle"
-        title="拖曳排序"
+        :title="t('fursona.palette.dragHandle')"
       >⋮⋮</span>
       <input
         type="color"
         :value="p.hex"
-        :aria-label="`顏色 ${i + 1}`"
+        :aria-label="t('fursona.palette.colorLabel', { n: i + 1 })"
         @input="onHexInput(i, ($event.target as HTMLInputElement).value)"
       >
       <input
         type="text"
         :value="p.name"
         maxlength="40"
-        placeholder="名稱（如：主毛色）"
+        :placeholder="t('fursona.palette.namePlaceholder')"
         @input="update(i, { name: ($event.target as HTMLInputElement).value })"
       >
       <input
@@ -81,7 +82,7 @@ function drop(to: number) {
         class="note"
         :value="p.note"
         maxlength="80"
-        placeholder="部位備註"
+        :placeholder="t('fursona.palette.notePlaceholder')"
         @input="update(i, { note: ($event.target as HTMLInputElement).value })"
       >
       <input
@@ -90,13 +91,13 @@ function drop(to: number) {
         :value="p.hex"
         maxlength="7"
         style="width:76px;color:var(--ink-2)"
-        aria-label="色碼"
+        :aria-label="t('fursona.palette.hexLabel')"
         @change="onHexText(i, ($event.target as HTMLInputElement).value)"
       >
       <button
         class="btn sm ghost"
         type="button"
-        aria-label="移除"
+        :aria-label="t('fursona.palette.remove')"
         @click="remove(i)"
       >
         ✕
@@ -106,7 +107,7 @@ function drop(to: number) {
       v-if="!palette.length"
       class="empty"
     >
-      還沒有色票。加入主毛色、腹毛、眼睛…讓繪師一鍵複製。
+      {{ t('fursona.palette.empty') }}
     </div>
     <div class="row">
       <button
@@ -115,7 +116,7 @@ function drop(to: number) {
         :disabled="palette.length >= max"
         @click="add"
       >
-        ＋ 新增顏色
+        {{ t('fursona.palette.add') }}
       </button>
       <button
         class="btn sm ghost"
@@ -123,13 +124,13 @@ function drop(to: number) {
         :disabled="!palette.length"
         @click="copyAll"
       >
-        複製全部色碼
+        {{ t('fursona.palette.copyAll') }}
       </button>
       <span class="sp" />
       <span
         class="muted"
         style="font-size:12px"
-      >{{ palette.length }} / {{ max }} 色</span>
+      >{{ t('fursona.palette.count', { n: palette.length, max }) }}</span>
     </div>
   </div>
 </template>

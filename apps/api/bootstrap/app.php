@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureNotBanned;
 use App\Http\Middleware\EnsureOnboarded;
 use App\Http\Middleware\RequestLogging;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // 純 API，沒有 login 頁：未登入一律丟 AuthenticationException（→ JSON 401），
         // 不要導向不存在的 route('login')（否則沒帶 Accept: application/json 的請求會變 500）
         $middleware->redirectGuestsTo(fn () => null);
+
+        // 回應語言：users.locale → Accept-Language → 預設（放在 api 群組尾端，此時 session 使用者已可解析）
+        $middleware->api(append: [SetLocale::class]);
 
         $middleware->alias([
             'onboarded' => EnsureOnboarded::class,

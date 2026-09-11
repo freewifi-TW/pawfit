@@ -1,0 +1,134 @@
+{
+  "fursona": {
+    "notFound": "Fursona not found",
+    "seoTitle": "Edit {name}",
+    "unnamed": "Untitled",
+    "actions": {
+      "save": "Save",
+      "saved": "Saved",
+      "cancel": "Cancel"
+    },
+    "header": {
+      "representative": "★ Main fursona",
+      "removed": "Removed by moderators",
+      "updatedAt": "Last updated",
+      "previewShare": "Preview share page",
+      "removedNotice": "This fursona has been removed by moderators and is only visible to you. If you have questions, appeal via the contact details in the footer."
+    },
+    "tabs": {
+      "basic": "Basics",
+      "gallery": "Gallery",
+      "palette": "Palette",
+      "tags": "Tags",
+      "privacy": "Privacy & sharing"
+    },
+    "basic": {
+      "title": "Basics",
+      "name": "Name",
+      "nameRequired": "Name can't be empty.",
+      "species": "Species",
+      "bio": "Bio",
+      "bioHint": "Shown in the \"About\" section of the share page. Line breaks are supported."
+    },
+    "avatar": {
+      "title": "Avatar & main fursona",
+      "pickFromGallery": "Pick from gallery",
+      "hint": "In the gallery, click \"Edit\" → \"Set as fursona avatar\". Avatars are cropped to Pawfit's rounded shape.",
+      "representative": "Set as main fursona",
+      "representativeHint": " (shown on your profile)"
+    },
+    "rating": {
+      "title": "Content rating",
+      "nsfw": "This fursona is NSFW",
+      "hint": "When checked, the whole fursona is hidden from visitors and from users who haven't enabled adult content. Per-image NSFW flags are set separately at upload."
+    },
+    "gallery": {
+      "upload": "⬆ Upload images",
+      "empty": "No images yet. Upload front and back reference sheets and commissioned art. Kind and rating are required."
+    },
+    "palette": {
+      "title": "Palette",
+      "subtitle": "Drag the handle on the left to reorder · the share page follows this order",
+      "dragHandle": "Drag to reorder",
+      "colorLabel": "Color {n}",
+      "namePlaceholder": "Name (e.g. main fur)",
+      "notePlaceholder": "Body part note",
+      "hexLabel": "Hex code",
+      "remove": "Remove",
+      "empty": "No colors yet. Add main fur, belly, eyes… so artists can copy them in one click.",
+      "add": "＋ Add color",
+      "copyAll": "Copy all hex codes",
+      "count": "{n} / {max} colors",
+      "noteWrap": " ({note})",
+      "copied": "Copied {n} hex codes",
+      "clipboardError": "Couldn't access the clipboard"
+    },
+    "tags": {
+      "title": "Fursona tags",
+      "subtitle": "Added automatically when posting (Phase 2)",
+      "remove": "Remove {tag}",
+      "placeholder": "Type a tag and press Enter, e.g. long tail, heterochromia",
+      "hint": "Used for browsing and search. Species, build and age group are all worth filling in. {n} / {max}",
+      "suggestionsTitle": "Common tags",
+      "suggestionsHint": "Click to add",
+      "suggestions": ["Canine", "Feline", "Dragon", "Avian", "Winged", "Chubby", "Muscular", "Slim", "Average build", "Adult", "Big tail", "Heterochromia", "Cybernetic limbs"]
+    },
+    "privacy": {
+      "title": "Who can see this fursona",
+      "hints": {
+        "public": "Shown on your profile; anyone can view it.",
+        "unlisted": "Only people with the link can view it. Hidden from your profile and search.",
+        "private": "Only you can see it. The share link is disabled automatically."
+      },
+      "friendsOnly": "Friends only",
+      "phase2": "Coming in Phase 2",
+      "friendsHint": "Available once the friends system launches.",
+      "note": "Individual images can override privacy in the gallery. Remember to hit \"Save\" in the top right when you're done."
+    },
+    "delete": {
+      "title": "Delete fursona",
+      "warning": "Deletes all original images and derived versions. The share link stops working immediately. This can't be undone.",
+      "button": "Delete this fursona",
+      "confirm": "Confirm delete {name}"
+    },
+    "notify": {
+      "saved": "Changes saved",
+      "saveFailed": "Save failed",
+      "leaveConfirm": "You have unsaved changes. Leave anyway?",
+      "avatarUpdated": "Fursona avatar updated",
+      "updateFailed": "Update failed",
+      "reorderFailed": "Order not saved",
+      "deleted": "Fursona deleted",
+      "deleteFailed": "Delete failed"
+    },
+    "share": {
+      "title": "Share link",
+      "privateNotice": "This fursona is currently \"Private\", so its share link is disabled. It comes back once you switch to Public or Link only.",
+      "urlLabel": "Share link",
+      "copy": "Copy",
+      "open": "Open ↗",
+      "watermark": "Use watermarked images on the share page",
+      "regenerate": "Regenerate link",
+      "regenerateAsk": "The old link stops working immediately. Continue?",
+      "regenerateConfirm": "Yes, regenerate",
+      "revoke": "Disable link",
+      "revokeConfirm": "Yes, disable",
+      "regenerateNote": "Regenerating invalidates the old link immediately",
+      "ogTitle": "Discord / Twitter preview card",
+      "ogStats": "{palette} colors · {media} reference images",
+      "ogNoImage": "The preview uses the first SFW image in the gallery; there's none available yet.",
+      "empty": "No share link yet. Once created, paste it into Discord or Twitter or send it to an artist — they'll see the full reference and palette.",
+      "create": "Create share link",
+      "notify": {
+        "created": "Share link created",
+        "regenerated": "Link regenerated. The old URL no longer works",
+        "watermarkOn": "Watermark enabled. Generating watermarked versions of existing images",
+        "watermarkOff": "Watermark disabled",
+        "revoked": "Link disabled. The old URL no longer works",
+        "copied": "Share link copied",
+        "clipboardError": "Couldn't access the clipboard",
+        "failed": "Something went wrong"
+      }
+    }
+  }
+}

@@ -12,7 +12,7 @@ class EnsureNotBanned
     {
         if ($request->user()?->is_banned) {
             return response()->json([
-                'message' => '此帳號已被停權。',
+                'message' => __('messages.auth.banned'),
                 'code' => 'banned',
             ], 403);
         }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useI18n()
 const { me, isAdmin, logout } = useAuth()
 const menuOpen = ref(false)
 </script>
@@ -9,27 +10,28 @@ const menuOpen = ref(false)
       <PawLogo />
       <nav>
         <NuxtLink to="/">
-          首頁
+          {{ t('common.nav.home') }}
         </NuxtLink>
         <template v-if="me?.is_onboarded">
           <NuxtLink to="/dashboard">
-            我的獸設
+            {{ t('common.nav.dashboard') }}
           </NuxtLink>
           <NuxtLink :to="`/u/${me.pawfit_id}`">
-            個人主頁
+            {{ t('common.nav.profile') }}
           </NuxtLink>
           <NuxtLink to="/settings">
-            設定
+            {{ t('common.nav.settings') }}
           </NuxtLink>
           <NuxtLink
             v-if="isAdmin"
             to="/admin"
           >
-            管理
+            {{ t('common.nav.admin') }}
           </NuxtLink>
         </template>
       </nav>
       <span class="sp" />
+      <LocaleSwitcher />
       <UColorModeButton
         color="neutral"
         variant="ghost"
@@ -46,7 +48,7 @@ const menuOpen = ref(false)
               :size="26"
               variant="user"
             />
-            <span>{{ me.pawfit_id ? `@${me.pawfit_id}` : (me.display_name || '未設定 ID') }}</span>
+            <span>{{ me.pawfit_id ? `@${me.pawfit_id}` : (me.display_name || t('common.nav.noId')) }}</span>
           </button>
           <template #content>
             <div
@@ -59,41 +61,41 @@ const menuOpen = ref(false)
                 style="justify-content:flex-start"
                 to="/dashboard"
                 @click="menuOpen = false"
-              >我的獸設</NuxtLink>
+              >{{ t('common.nav.dashboard') }}</NuxtLink>
               <NuxtLink
                 v-if="me.is_onboarded"
                 class="btn ghost"
                 style="justify-content:flex-start"
                 :to="`/u/${me.pawfit_id}`"
                 @click="menuOpen = false"
-              >個人主頁</NuxtLink>
+              >{{ t('common.nav.profile') }}</NuxtLink>
               <NuxtLink
                 v-else
                 class="btn ghost"
                 style="justify-content:flex-start"
                 to="/onboarding"
                 @click="menuOpen = false"
-              >完成設定</NuxtLink>
+              >{{ t('common.nav.finishSetup') }}</NuxtLink>
               <NuxtLink
                 class="btn ghost"
                 style="justify-content:flex-start"
                 to="/settings"
                 @click="menuOpen = false"
-              >設定</NuxtLink>
+              >{{ t('common.nav.settings') }}</NuxtLink>
               <NuxtLink
                 v-if="isAdmin"
                 class="btn ghost"
                 style="justify-content:flex-start"
                 to="/admin"
                 @click="menuOpen = false"
-              >管理後台</NuxtLink>
+              >{{ t('common.nav.adminPanel') }}</NuxtLink>
               <button
                 class="btn ghost"
                 style="justify-content:flex-start;color:var(--danger)"
                 type="button"
                 @click="menuOpen = false; logout()"
               >
-                登出
+                {{ t('common.nav.logout') }}
               </button>
             </div>
           </template>
@@ -104,7 +106,7 @@ const menuOpen = ref(false)
         class="btn sm primary"
         to="/login"
       >
-        登入
+        {{ t('common.nav.login') }}
       </NuxtLink>
     </div>
   </header>

@@ -2,7 +2,9 @@
 import type { Me } from '~/types/api'
 
 definePageMeta({ middleware: 'guest' })
-useSeoMeta({ title: '登入' })
+
+const { t } = useI18n()
+useSeoMeta({ title: () => t('auth.login.title') })
 
 const config = useRuntimeConfig()
 const route = useRoute()
@@ -15,15 +17,15 @@ const next = computed(() => (typeof route.query.next === 'string' && route.query
 
 const errorText = computed(() => {
   switch (route.query.error) {
-    case 'banned': return '此帳號已被停權。'
-    case 'oauth': return 'Google 登入沒有完成，請再試一次。'
+    case 'banned': return t('auth.login.errorBanned')
+    case 'oauth': return t('auth.login.errorOauth')
     default: return ''
   }
 })
 
 function google() {
   if (!tos.value) {
-    notify.err('請先勾選同意服務條款與社群守則')
+    notify.err(t('auth.login.tosRequired'))
     return
   }
   // OAuth 流程由 Laravel 處理；完成後依 onboarding 狀態轉址
@@ -35,7 +37,7 @@ const devEmail = ref('demo@pawfit.local')
 const devBusy = ref(false)
 async function devLogin() {
   if (!tos.value) {
-    notify.err('請先勾選同意服務條款與社群守則')
+    notify.err(t('auth.login.tosRequired'))
     return
   }
   devBusy.value = true
@@ -44,7 +46,7 @@ async function devLogin() {
     const me = await fetchMe(true)
     await navigateTo(next.value || (me?.is_onboarded ? '/dashboard' : '/onboarding'))
   } catch (e) {
-    notify.err('登入失敗', apiError(e).message)
+    notify.err(t('auth.login.failed'), apiError(e).message)
   } finally {
     devBusy.value = false
   }
@@ -55,13 +57,13 @@ async function devLogin() {
   <section class="wrap narrow auth">
     <div class="card">
       <h1 class="disp">
-        歡迎回來
+        {{ t('auth.login.welcome') }}
       </h1>
       <p
         class="sub"
         style="margin:0 0 22px"
       >
-        Pawfit 只用 Google 帳號登入，不用再記一組密碼。
+        {{ t('auth.login.lead') }}
       </p>
 
       <p
@@ -93,7 +95,7 @@ async function devLogin() {
           fill="#34A853"
           d="M24 48c6.2 0 11.6-2 15.4-5.6l-7.5-5.8c-2 1.4-4.7 2.3-7.9 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6C6.5 42.6 14.6 48 24 48z"
         /></svg>
-        使用 Google 帳號繼續
+        {{ t('auth.login.google') }}
       </button>
 
       <div style="height:16px" />
@@ -102,19 +104,29 @@ async function devLogin() {
           v-model="tos"
           type="checkbox"
         >
-        <span>我已閱讀並同意 <NuxtLink
-          class="link"
-          to="/terms"
-        >服務條款</NuxtLink> 與 <NuxtLink
-          class="link"
-          to="/guidelines"
-        >社群守則</NuxtLink>，並了解本站含有成人內容分級機制。</span>
+        <i18n-t
+          keypath="auth.login.agree"
+          tag="span"
+        >
+          <template #terms>
+            <NuxtLink
+              class="link"
+              to="/terms"
+            >{{ t('common.legal.terms') }}</NuxtLink>
+          </template>
+          <template #guidelines>
+            <NuxtLink
+              class="link"
+              to="/guidelines"
+            >{{ t('common.legal.guidelines') }}</NuxtLink>
+          </template>
+        </i18n-t>
       </label>
       <p
         class="muted"
         style="font-size:12px;margin:18px 0 0"
       >
-        Apple 登入尚未提供。登入即代表你同意我們記錄同意時間以符合法規。
+        {{ t('auth.login.appleNote') }}
       </p>
 
       <div
@@ -122,10 +134,10 @@ async function devLogin() {
         style="margin-top:26px;padding-top:18px;border-top:2px dashed var(--line)"
       >
         <div class="row">
-          <span class="pill warn">開發模式</span><span
+          <span class="pill warn">{{ t('auth.login.dev.badge') }}</span><span
             class="muted"
             style="font-size:12px"
-          >沒有 Google 憑證時，用 email 直接登入</span>
+          >{{ t('auth.login.dev.hint') }}</span>
         </div>
         <form
           class="row"
@@ -145,15 +157,22 @@ async function devLogin() {
             type="submit"
             :disabled="devBusy"
           >
-            登入
+            {{ t('auth.login.dev.submit') }}
           </button>
         </form>
-        <p
+        <i18n-t
+          keypath="auth.login.dev.note"
+          tag="p"
           class="muted"
           style="font-size:12px;margin:8px 0 0"
         >
-          <span class="mono">demo@pawfit.local</span> 是示範帳號；<span class="mono">admin@pawfit.local</span> 有管理後台。
-        </p>
+          <template #demo>
+            <span class="mono">demo@pawfit.local</span>
+          </template>
+          <template #admin>
+            <span class="mono">admin@pawfit.local</span>
+          </template>
+        </i18n-t>
       </div>
     </div>
   </section>

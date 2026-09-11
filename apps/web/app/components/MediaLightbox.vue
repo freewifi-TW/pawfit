@@ -2,6 +2,7 @@
 import type { Media } from '~/types/api'
 
 const media = defineModel<Media | null>({ default: null })
+const { t } = useI18n()
 
 function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape') media.value = null
@@ -17,7 +18,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
       class="lightbox"
       role="dialog"
       aria-modal="true"
-      :aria-label="media.caption || '圖片'"
+      :aria-label="media.caption || t('media.common.image')"
       @click="media = null"
     >
       <img

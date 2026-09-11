@@ -1,0 +1,48 @@
+{
+  "enums": {
+    "visibility": {
+      "public": "公開",
+      "unlisted": "連結可見",
+      "private": "私人"
+    },
+    "kind": {
+      "art2d": "2D",
+      "model3d": "3D",
+      "photo": "實體"
+    },
+    "kindLong": {
+      "art2d": "2D 平面作品",
+      "model3d": "3D 模型",
+      "photo": "實體照片"
+    },
+    "creditPrefix": {
+      "art2d": "繪師",
+      "model3d": "製作",
+      "photo": "工作室"
+    },
+    "reason": {
+      "illegal": "非法內容",
+      "untagged_nsfw": "未標記 NSFW",
+      "copyright": "侵權 / 盜圖",
+      "harassment": "騷擾",
+      "other": "其他"
+    },
+    "adminAction": {
+      "remove_media": "下架圖片",
+      "purge_media": "緊急刪除圖片",
+      "restore_media": "還原圖片",
+      "mark_nsfw": "改標 NSFW",
+      "remove_fursona": "下架獸設",
+      "restore_fursona": "還原獸設",
+      "ban_user": "停權帳號",
+      "unban_user": "解除停權",
+      "resolve_report": "結案",
+      "dismiss_report": "駁回"
+    },
+    "nsfwPref": {
+      "hide": "完全隱藏",
+      "blur": "模糊顯示",
+      "show": "直接顯示"
+    }
+  }
+}

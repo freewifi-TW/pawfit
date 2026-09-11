@@ -5,6 +5,7 @@ import type { Fursona, ShareLink } from '~/types/api'
 const props = defineProps<{ fursona: Fursona }>()
 const emit = defineEmits<{ change: [link: ShareLink | null] }>()
 
+const { t } = useI18n()
 const api = useApi()
 const notify = useNotify()
 const config = useRuntimeConfig()
@@ -19,7 +20,7 @@ const isPrivate = computed(() => props.fursona.visibility === 'private')
 const ogImage = computed(() => props.fursona.cover_url)
 const ogDescription = computed(() => {
   const bio = (props.fursona.bio ?? '').split('\n')[0]?.trim() ?? ''
-  const parts = [bio, `${props.fursona.palette_count} 色色票 · ${props.fursona.media_count ?? 0} 張設定圖`].filter(Boolean)
+  const parts = [bio, t('fursona.share.ogStats', { palette: props.fursona.palette_count, media: props.fursona.media_count ?? 0 })].filter(Boolean)
   return `${parts.join(' ')} — Pawfit`
 })
 
@@ -31,10 +32,10 @@ async function create(watermark?: boolean) {
       body: watermark === undefined ? {} : { watermark }
     })
     emit('change', created)
-    notify.ok(link.value ? '已重新生成連結，舊網址立即失效' : '已產生分享連結')
+    notify.ok(link.value ? t('fursona.share.notify.regenerated') : t('fursona.share.notify.created'))
     confirmRegen.value = false
   } catch (e) {
-    notify.err('操作失敗', apiError(e).message)
+    notify.err(t('fursona.share.notify.failed'), apiError(e).message)
   } finally {
     busy.value = false
   }
@@ -46,9 +47,9 @@ async function toggleWatermark(v: boolean) {
   try {
     const updated = await api<ShareLink>(`/share-links/${link.value.id}`, { method: 'PATCH', body: { watermark: v } })
     emit('change', updated)
-    notify.ok(v ? '已開啟浮水印，正在替既有圖片產生浮水印版' : '已關閉浮水印')
+    notify.ok(v ? t('fursona.share.notify.watermarkOn') : t('fursona.share.notify.watermarkOff'))
   } catch (e) {
-    notify.err('操作失敗', apiError(e).message)
+    notify.err(t('fursona.share.notify.failed'), apiError(e).message)
   } finally {
     busy.value = false
   }
@@ -60,10 +61,10 @@ async function revoke() {
   try {
     await api(`/share-links/${link.value.id}`, { method: 'DELETE' })
     emit('change', null)
-    notify.ok('連結已停用，舊網址立即失效')
+    notify.ok(t('fursona.share.notify.revoked'))
     confirmRevoke.value = false
   } catch (e) {
-    notify.err('操作失敗', apiError(e).message)
+    notify.err(t('fursona.share.notify.failed'), apiError(e).message)
   } finally {
     busy.value = false
   }
@@ -73,9 +74,9 @@ async function copy() {
   if (!link.value) return
   try {
     await navigator.clipboard.writeText(link.value.url)
-    notify.ok('已複製分享連結')
+    notify.ok(t('fursona.share.notify.copied'))
   } catch {
-    notify.err('無法存取剪貼簿')
+    notify.err(t('fursona.share.notify.clipboardError'))
   }
 }
 
@@ -85,7 +86,7 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
 <template>
   <div class="card">
     <h2 class="disp">
-      分享連結
+      {{ t('fursona.share.title') }}
     </h2>
     <div class="sharebox">
       <p
@@ -93,7 +94,7 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
         class="visitor-note"
         style="margin:0"
       >
-        這隻獸設目前是「私人」，分享連結自動停用；改回公開或連結可見後就會恢復。
+        {{ t('fursona.share.privateNotice') }}
       </p>
 
       <template v-if="link">
@@ -102,7 +103,7 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
             class="input mono"
             :value="displayUrl"
             readonly
-            aria-label="分享連結"
+            :aria-label="t('fursona.share.urlLabel')"
             @focus="($event.target as HTMLInputElement).select()"
           >
           <button
@@ -110,14 +111,14 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
             type="button"
             @click="copy"
           >
-            複製
+            {{ t('fursona.share.copy') }}
           </button>
           <NuxtLink
             class="btn ghost"
             :to="`/s/${link.slug}`"
             target="_blank"
           >
-            開啟 ↗
+            {{ t('fursona.share.open') }}
           </NuxtLink>
         </div>
         <label class="switch">
@@ -126,7 +127,7 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
             :checked="link.watermark"
             :disabled="busy"
             @change="toggleWatermark(($event.target as HTMLInputElement).checked)"
-          > 分享頁使用浮水印版圖檔
+          > {{ t('fursona.share.watermark') }}
         </label>
         <div class="row">
           <template v-if="!confirmRegen">
@@ -136,28 +137,28 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
               :disabled="busy"
               @click="confirmRegen = true"
             >
-              重新生成連結
+              {{ t('fursona.share.regenerate') }}
             </button>
           </template>
           <template v-else>
             <span
               class="muted"
               style="font-size:12px"
-            >舊連結會立即失效，確定？</span>
+            >{{ t('fursona.share.regenerateAsk') }}</span>
             <button
               class="btn sm primary"
               type="button"
               :disabled="busy"
               @click="create()"
             >
-              確定重新生成
+              {{ t('fursona.share.regenerateConfirm') }}
             </button>
             <button
               class="btn sm ghost"
               type="button"
               @click="confirmRegen = false"
             >
-              取消
+              {{ t('fursona.actions.cancel') }}
             </button>
           </template>
           <template v-if="!confirmRevoke && !confirmRegen">
@@ -167,7 +168,7 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
               :disabled="busy"
               @click="confirmRevoke = true"
             >
-              停用連結
+              {{ t('fursona.share.revoke') }}
             </button>
           </template>
           <template v-else-if="confirmRevoke">
@@ -177,28 +178,28 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
               :disabled="busy"
               @click="revoke"
             >
-              確定停用
+              {{ t('fursona.share.revokeConfirm') }}
             </button>
             <button
               class="btn sm ghost"
               type="button"
               @click="confirmRevoke = false"
             >
-              取消
+              {{ t('fursona.actions.cancel') }}
             </button>
           </template>
           <span class="sp" />
           <span
             class="muted"
             style="font-size:12px"
-          >重新生成後舊連結立即失效</span>
+          >{{ t('fursona.share.regenerateNote') }}</span>
         </div>
         <div>
           <div
             class="muted"
             style="font-size:12px;margin-bottom:8px"
           >
-            Discord / Twitter 預覽卡
+            {{ t('fursona.share.ogTitle') }}
           </div>
           <div class="og">
             <div class="img">
@@ -218,7 +219,7 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
             class="muted"
             style="font-size:12px;margin:8px 0 0"
           >
-            預覽圖會使用圖庫中第一張 SFW 圖；目前還沒有可用的圖。
+            {{ t('fursona.share.ogNoImage') }}
           </p>
           <p
             v-else-if="absoluteOg"
@@ -235,7 +236,7 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
           class="sub"
           style="margin:0"
         >
-          還沒有分享連結。產生後可以貼到 Discord、Twitter 或傳給繪師，對方會看到完整設定與色票。
+          {{ t('fursona.share.empty') }}
         </p>
         <div class="row">
           <button
@@ -244,7 +245,7 @@ const absoluteOg = computed(() => ogImage.value ? `${config.public.siteUrl}${ogI
             :disabled="busy"
             @click="create(false)"
           >
-            產生分享連結
+            {{ t('fursona.share.create') }}
           </button>
         </div>
       </template>

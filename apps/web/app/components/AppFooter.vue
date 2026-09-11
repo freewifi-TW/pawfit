@@ -1,17 +1,22 @@
+<script setup lang="ts">
+const { t } = useI18n()
+const year = new Date().getFullYear()
+</script>
+
 <template>
   <footer class="foot">
-    <span>© {{ new Date().getFullYear() }} Pawfit 爪搭</span>
+    <span>© {{ year }} {{ t('common.brand') }}</span>
     <NuxtLink to="/terms">
-      服務條款
+      {{ t('common.legal.terms') }}
     </NuxtLink>
     <NuxtLink to="/guidelines">
-      社群守則
+      {{ t('common.legal.guidelines') }}
     </NuxtLink>
     <NuxtLink to="/privacy">
-      隱私權政策
+      {{ t('common.legal.privacy') }}
     </NuxtLink>
-    <a href="mailto:hello@pawfit.app">聯絡我們</a>
+    <a href="mailto:hello@pawfit.app">{{ t('common.footer.contact') }}</a>
     <span class="sp" />
-    <span>Phase 1 · 獸設檔案庫與分享包</span>
+    <span>{{ t('common.footer.phase') }}</span>
   </footer>
 </template>

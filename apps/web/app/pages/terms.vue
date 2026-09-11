@@ -1,68 +1,50 @@
 <script setup lang="ts">
-useSeoMeta({ title: '服務條款', description: 'Pawfit 爪搭服務條款' })
+const { t, tm, rt } = useI18n()
+
+interface LinkParagraph { before: string, text: string, after: string, to: string }
+interface Section { title: string, paragraphs?: string[], items?: string[], link?: LinkParagraph }
+
+const sections = computed(() => tm('legal.terms.sections') as Section[])
+
+useSeoMeta({ title: () => t('legal.terms.title'), description: () => t('legal.terms.description') })
 </script>
 
 <template>
   <article class="prose-page">
     <h1 class="disp">
-      服務條款
+      {{ t('legal.terms.title') }}
     </h1>
     <p class="muted">
-      版本 0.1（草稿）· 最後更新 2026-09-11 · 正式上線前將由站方定稿（SASD R-5）
+      {{ t('legal.terms.meta') }}
     </p>
 
-    <h2 class="disp">
-      1. 服務內容
-    </h2>
-    <p>Pawfit（爪搭，以下稱「本站」）提供獸設（fursona）資料的整理、儲存與分享服務。你可以建立獸設檔案、上傳圖片、管理色票與標籤，並以分享連結對外展示。</p>
-
-    <h2 class="disp">
-      2. 帳號
-    </h2>
-    <ul>
-      <li>本站僅提供 Google 帳號登入。你需年滿 13 歲才能註冊；瀏覽成人內容需年滿 18 歲並完成自我聲明。</li>
-      <li>Pawfit ID 為全站唯一識別；更名政策確定前不開放更改。</li>
-      <li>你須對帳號下的所有活動負責。</li>
-    </ul>
-
-    <h2 class="disp">
-      3. 你上傳的內容
-    </h2>
-    <ul>
-      <li>你保有上傳內容的所有權利。你授予本站為提供服務所需的儲存、縮圖、加浮水印與傳輸之非專屬授權。</li>
-      <li>上傳委託作品時，你聲明已取得原創作者允許以此方式展示，並應正確標記創作者（credit）。</li>
-      <li>成人內容必須在上傳時標記為 NSFW。未標記者經檢舉會被改標或下架。</li>
-      <li>禁止任何涉及未成年者的性相關內容、真實暴力、非自願拍攝內容，以及其他違法內容。此類內容將被立即刪除並保留紀錄，帳號將被停權。</li>
-    </ul>
-
-    <h2 class="disp">
-      4. 隱私與可見性
-    </h2>
-    <p>
-      你可以將獸設與單張圖片設為公開、連結可見或私人。本站以簽名網址提供圖片存取，並依你的設定與瀏覽者的成人內容偏好決定顯示方式。詳見 <NuxtLink
-        class="link"
-        to="/privacy"
-      >隱私權政策</NuxtLink>。
-    </p>
-
-    <h2 class="disp">
-      5. 檢舉與管理
-    </h2>
-    <p>
-      本站提供檢舉機制。站方得依 <NuxtLink
-        class="link"
-        to="/guidelines"
-      >社群守則</NuxtLink> 下架內容、改標分級或停權帳號，並保留操作紀錄。被下架的內容於申訴期間保留，紅線內容則直接刪除。
-    </p>
-
-    <h2 class="disp">
-      6. 服務變更與終止
-    </h2>
-    <p>本站可能隨時調整功能、配額或條款；重大變更會於站內公告。你可隨時停止使用並要求刪除帳號。</p>
-
-    <h2 class="disp">
-      7. 免責
-    </h2>
-    <p>本站以現狀提供服務，不對內容之正確性、服務不中斷或資料不遺失作保證。請自行保留原始檔案備份。</p>
+    <template
+      v-for="(s, i) in sections"
+      :key="i"
+    >
+      <h2 class="disp">
+        {{ rt(s.title) }}
+      </h2>
+      <p
+        v-for="(p, j) in s.paragraphs"
+        :key="j"
+      >
+        {{ rt(p) }}
+      </p>
+      <ul v-if="s.items">
+        <li
+          v-for="(item, j) in s.items"
+          :key="j"
+        >
+          {{ rt(item) }}
+        </li>
+      </ul>
+      <p v-if="s.link">
+        {{ rt(s.link.before) }}<NuxtLink
+          class="link"
+          :to="rt(s.link.to)"
+        >{{ rt(s.link.text) }}</NuxtLink>{{ rt(s.link.after) }}
+      </p>
+    </template>
   </article>
 </template>

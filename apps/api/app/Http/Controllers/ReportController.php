@@ -29,7 +29,7 @@ class ReportController extends Controller
             'profile' => User::whereKey($data['target_id'])->exists(),
         };
         if (! $exists) {
-            throw ValidationException::withMessages(['target_id' => '找不到檢舉目標。']);
+            throw ValidationException::withMessages(['target_id' => __('messages.report.target_not_found')]);
         }
 
         // 同一人對同一目標的未處理檢舉只留一筆

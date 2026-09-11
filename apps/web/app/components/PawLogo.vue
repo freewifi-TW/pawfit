@@ -1,8 +1,12 @@
+<script setup lang="ts">
+const { t } = useI18n()
+</script>
+
 <template>
   <NuxtLink
     to="/"
     class="logo disp"
-    aria-label="Pawfit 首頁"
+    :aria-label="t('common.logo.ariaLabel')"
   >
     <svg
       viewBox="0 0 24 24"

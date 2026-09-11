@@ -1,0 +1,103 @@
+{
+  "media": {
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "untitled": "Untitled",
+      "image": "Image"
+    },
+    "upload": {
+      "title": "Upload images",
+      "description": "Originals go straight to storage; display and thumbnail versions are generated shortly after.",
+      "dropTitle": "Drag images here, or click to choose",
+      "dropHint": "jpg / png / webp, up to {size} each. You can pick several at once.",
+      "unsupportedFormat": "{name} is not a supported format",
+      "unsupportedFormatHint": "Only jpg / png / webp are accepted.",
+      "tooLarge": "{name} is too large",
+      "tooLargeHint": "Max {size} per file.",
+      "putFailedStatus": "Direct upload failed ({status})",
+      "putFailedNetwork": "Direct upload failed. Check your connection or the storage CORS settings.",
+      "errors": {
+        "files": "Choose at least one image first.",
+        "kind": "Pick a category.",
+        "nsfw": "Set a content rating.",
+        "creditUrl": "Link must start with http(s)://."
+      },
+      "queued": "Added to the processing queue",
+      "queuedHint": "Images will appear in the gallery once display and thumbnail versions are ready.",
+      "failedCount": "{n} upload failed | {n} uploads failed",
+      "failedHint": "Fix the issue and hit Upload again; successful files won't be re-sent.",
+      "uploadedProcessing": "Uploaded, processing",
+      "remove": "Remove",
+      "kind": "Category",
+      "required": "Required",
+      "rating": "Content rating",
+      "ratingHint": "Cannot be skipped. Untagged NSFW content may be re-tagged or taken down after a report.",
+      "credit": "Artist / maker",
+      "creditPlaceholder": "e.g. {'@'}kuro_lines",
+      "creditUrl": "Creator link (optional)",
+      "caption": "Caption",
+      "captionPlaceholder": "e.g. Front reference sheet, 2026 edition",
+      "captionMultiHint": "The same caption is applied to every image in this batch; you can edit each one later.",
+      "visibility": "Visibility of this image",
+      "inherit": "Inherit from fursona ({visibility})",
+      "uploading": "Uploading…",
+      "submit": "Upload",
+      "submitCount": "Upload {n}"
+    },
+    "edit": {
+      "title": "Edit image",
+      "processingNote": "This image is still processing, but you can edit its details now.",
+      "caption": "Caption",
+      "credit": "Artist / maker",
+      "creditUrl": "Creator link",
+      "kind": "Category",
+      "rating": "Content rating",
+      "visibility": "Visibility of this image",
+      "inherit": "Inherit from fursona ({visibility})",
+      "isAvatar": "Current avatar",
+      "setAvatar": "Set as fursona avatar",
+      "delete": "Delete image",
+      "deleteWarning": "The original and all derived versions will be deleted. This cannot be undone.",
+      "confirmDelete": "Confirm delete",
+      "saved": "Saved",
+      "saveFailed": "Save failed",
+      "deleted": "Image deleted",
+      "deleteFailed": "Delete failed"
+    },
+    "card": {
+      "processing": "Processing",
+      "processingHint": "Generating display and thumbnail versions",
+      "failed": "Processing failed",
+      "failedHint": "Delete and upload again",
+      "unlock": "Click to reveal",
+      "openAria": "View {name} full size",
+      "dragSort": "Drag to reorder",
+      "inheritVisibility": "Inherited",
+      "edit": "Edit"
+    },
+    "grid": {
+      "filterAll": "All",
+      "count": "{n} image | {n} images",
+      "ownerHint": "Drag cards to reorder · Owners always see their own content",
+      "hiddenNsfw": "{n} adult image hidden. | {n} adult images hidden.",
+      "nsfwHint": "Sign in and complete the 18+ declaration in Settings to choose how they're shown.",
+      "empty": "No images in this category yet."
+    },
+    "palette": {
+      "copied": "Copied {hex}",
+      "clipboardError": "Clipboard is not available",
+      "copyTitle": "Copy {hex}"
+    },
+    "fursonaCard": {
+      "representative": "Main",
+      "removed": "Removed by moderators",
+      "mediaCount": "{n} image | {n} images",
+      "paletteCount": "{n} color | {n} colors",
+      "edit": "Edit",
+      "sharePage": "Share page",
+      "privateDisabled": "Private (link disabled)",
+      "noLink": "No link yet"
+    }
+  }
+}

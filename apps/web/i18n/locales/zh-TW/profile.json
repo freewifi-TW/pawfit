@@ -1,0 +1,40 @@
+{
+  "profile": {
+    "notFound": "找不到這位用戶",
+    "seo": {
+      "title": "{name}（{'@'}{id}）",
+      "description": "{name} 在 Pawfit 的獸設：{list}",
+      "listSeparator": "、",
+      "noPublic": "尚未公開任何獸設",
+      "ogTitle": "{name} · Pawfit"
+    },
+    "header": {
+      "joined": "{month}加入",
+      "statsOwner": "{total} 隻獸設（{publicCount} 隻公開）",
+      "statsPublic": "{n} 隻公開獸設"
+    },
+    "actions": {
+      "manage": "管理我的獸設",
+      "friendsSoon": "好友功能將於 Phase 2 推出",
+      "addFriend": "＋ 加好友",
+      "report": "檢舉"
+    },
+    "rep": {
+      "badge": "★ 代表獸設",
+      "moreColors": "＋{n} 色",
+      "viewFull": "看完整設定",
+      "createShareLink": "產生分享連結",
+      "mediaCount": "{n} 張設定圖"
+    },
+    "list": {
+      "title": "公開獸設",
+      "hint": "私人與連結可見的獸設不會列在這裡",
+      "view": "看設定",
+      "edit": "編輯",
+      "noSharePage": "尚未開放分享頁",
+      "emptyOwner": "你還沒有公開的獸設。到「我的獸設」把隱私改成公開，就會出現在這裡。",
+      "emptyVisitor": "這位用戶還沒有公開的獸設。"
+    },
+    "reportTarget": "用戶 {'@'}{id}"
+  }
+}

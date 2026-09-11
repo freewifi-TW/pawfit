@@ -4,21 +4,22 @@ import { tagStyle } from '~/utils/labels'
 /** 獸設標籤（FR-2.3）：Enter 新增、點 × 移除、常用標籤一鍵加入。 */
 const tags = defineModel<string[]>({ default: () => [] })
 const props = withDefaults(defineProps<{ max?: number }>(), { max: 30 })
+const { t, tm, rt } = useI18n()
 
 const input = ref('')
-const suggestions = ['犬科', '貓科', '龍', '鳥類', '有翼', '多肉', '壯碩', '纖瘦', '標準體型', '成年', '大尾', '異色瞳', '機械義肢']
+const suggestions = computed<string[]>(() => (tm('fursona.tags.suggestions') as unknown[]).map(s => rt(s as string)))
 
 function add(raw: string) {
-  const t = raw.trim().replace(/\s+/g, ' ').slice(0, 20)
-  if (!t || tags.value.includes(t) || tags.value.length >= props.max) return
-  tags.value = [...tags.value, t]
+  const tag = raw.trim().replace(/\s+/g, ' ').slice(0, 20)
+  if (!tag || tags.value.includes(tag) || tags.value.length >= props.max) return
+  tags.value = [...tags.value, tag]
 }
 function submit() {
   input.value.split(/[,，]/).forEach(add)
   input.value = ''
 }
-function remove(t: string) {
-  tags.value = tags.value.filter(x => x !== t)
+function remove(tag: string) {
+  tags.value = tags.value.filter(x => x !== tag)
 }
 </script>
 
@@ -26,23 +27,23 @@ function remove(t: string) {
   <div class="ed-grid">
     <div class="card">
       <div class="hd">
-        <span class="disp">獸設標籤</span><em>發文時會自動帶入（Phase 2）</em>
+        <span class="disp">{{ t('fursona.tags.title') }}</span><em>{{ t('fursona.tags.subtitle') }}</em>
       </div>
       <div
         v-if="tags.length"
         class="tagbox"
       >
         <span
-          v-for="(t, i) in tags"
-          :key="t"
+          v-for="(tag, i) in tags"
+          :key="tag"
           class="tag"
           :class="tagStyle(i).class"
           :style="tagStyle(i).style"
-        >{{ t }} <button
+        >{{ tag }} <button
           class="x"
           type="button"
-          :aria-label="`移除 ${t}`"
-          @click="remove(t)"
+          :aria-label="t('fursona.tags.remove', { tag })"
+          @click="remove(tag)"
         >×</button></span>
       </div>
       <div class="bd">
@@ -50,7 +51,7 @@ function remove(t: string) {
           v-model="input"
           class="input"
           maxlength="60"
-          placeholder="輸入標籤後按 Enter，例如：長尾、異色瞳"
+          :placeholder="t('fursona.tags.placeholder')"
           :disabled="tags.length >= max"
           @keydown.enter.prevent="submit"
         >
@@ -58,20 +59,20 @@ function remove(t: string) {
           class="hint muted"
           style="font-size:12px;margin-top:6px"
         >
-          用來分類與被搜尋。物種、體型、年齡段建議都填。{{ tags.length }} / {{ max }}
+          {{ t('fursona.tags.hint', { n: tags.length, max }) }}
         </div>
       </div>
     </div>
     <div class="card">
       <h2 class="disp">
-        常用標籤
+        {{ t('fursona.tags.suggestionsTitle') }}
       </h2>
       <div class="bd">
         <p
           class="muted"
           style="font-size:12px;margin:0 0 12px"
         >
-          點一下加入
+          {{ t('fursona.tags.suggestionsHint') }}
         </p>
         <div
           class="row"

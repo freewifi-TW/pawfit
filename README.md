@@ -81,6 +81,11 @@ docker compose down -v                                        # 連資料一起�
 - `AWS_ENDPOINT` 指向 `host.docker.internal:9000`，讓 Laravel 產生的簽名 URL 在容器內與瀏覽器都能使用。
 - worker 是長駐程序：`composer require` 之後要 `docker compose restart worker`，否則新類別找不到。
 
+### 多語系
+
+目前支援繁體中文（預設）與英文。前端用 `@nuxtjs/i18n`（語言檔 `apps/web/i18n/locales/<code>/*.json`，網址不帶語言前綴，記在 cookie），登入者的偏好存在 `users.locale`；後端依 `users.locale` → `Accept-Language` 回對應語言的訊息（`apps/api/lang/<code>/messages.php`）。
+新增語言的步驟、語言檔結構與寫法見 `docs/i18n.md`。
+
 ### Log
 
 所有容器只印 stdout（統一 JSON 格式：`ts / level / service / event / message / request_id / user_id / context / exception`），Alloy 收進 Loki，開 **http://localhost:3001** 用 Grafana 查。
@@ -114,7 +119,7 @@ Caddy 會自動申請 Let's Encrypt 憑證；圖片改指向 Cloudflare R2，不
 apps/web     Nuxt 4 + Nuxt UI（前端，SSR）
 apps/api     Laravel 13（API）— 見 apps/api/CLAUDE.md 的開發慣例
 infra/       Caddyfile、Dockerfile、observability/（Loki、Alloy、Grafana 設定）
-docs/        需求（Pawfit (爪搭).md）、各階段設計（SASD-Phase*.md）、logging.md
+docs/        需求（Pawfit (爪搭).md）、各階段設計（SASD-Phase*.md）、logging.md、i18n.md
 compose.yaml            開發環境
 compose.prod.yaml       正式環境覆蓋
 ```

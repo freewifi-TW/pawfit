@@ -90,7 +90,7 @@ class FursonaController extends Controller
 
         $owned = $fursona->media()->pluck('id')->all();
         if (array_diff($data['ids'], $owned)) {
-            throw ValidationException::withMessages(['ids' => '包含不屬於這隻獸設的圖片。']);
+            throw ValidationException::withMessages(['ids' => __('messages.fursona.media_not_owned')]);
         }
 
         DB::transaction(function () use ($data) {
@@ -121,7 +121,7 @@ class FursonaController extends Controller
             'is_representative' => ['sometimes', 'boolean'],
             'avatar_media_id' => ['sometimes', 'nullable', 'uuid'],
         ], [
-            'palette.*.hex.regex' => '色碼格式需為 #RRGGBB。',
+            'palette.*.hex.regex' => __('messages.fursona.palette_hex_format'),
         ]);
 
         if (isset($data['tags'])) {
@@ -138,7 +138,7 @@ class FursonaController extends Controller
         if (array_key_exists('avatar_media_id', $data) && $data['avatar_media_id'] !== null) {
             $ok = $existing && Media::where('fursona_id', $existing->id)->where('status', 'active')->where('id', $data['avatar_media_id'])->exists();
             if (! $ok) {
-                throw ValidationException::withMessages(['avatar_media_id' => '頭像必須是這隻獸設圖庫中已處理完成的圖片。']);
+                throw ValidationException::withMessages(['avatar_media_id' => __('messages.fursona.avatar_not_in_gallery')]);
             }
         }
 

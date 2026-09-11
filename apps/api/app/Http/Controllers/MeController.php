@@ -35,10 +35,15 @@ class MeController extends Controller
             'adult_confirmed' => ['sometimes', 'boolean'],
             'tos_accepted' => ['sometimes', 'accepted'],
             'avatar_media_id' => ['sometimes', 'nullable', 'uuid'],
+            'locale' => ['sometimes', 'nullable', Rule::in(config('pawfit.locales.supported'))],
         ], [
-            'pawfit_id.regex' => 'Pawfit ID 只能用 3 到 20 個英數字與底線。',
-            'pawfit_id.not_in' => '這個 Pawfit ID 是保留字，換一個吧。',
+            'pawfit_id.regex' => __('messages.me.pawfit_id_format'),
+            'pawfit_id.not_in' => __('messages.me.pawfit_id_reserved'),
         ]);
+
+        if (array_key_exists('locale', $data)) {
+            $user->locale = $data['locale'];
+        }
 
         if (array_key_exists('pawfit_id', $data)) {
             $this->assignPawfitId($user, $data['pawfit_id']);
@@ -56,7 +61,7 @@ class MeController extends Controller
         }
         if (array_key_exists('nsfw_pref', $data)) {
             if ($data['nsfw_pref'] !== 'hide' && ! $user->hasConfirmedAdult()) {
-                throw ValidationException::withMessages(['nsfw_pref' => '請先完成 18 歲聲明，才能切換成人內容的顯示方式。']);
+                throw ValidationException::withMessages(['nsfw_pref' => __('messages.me.nsfw_pref_requires_adult')]);
             }
             $user->nsfw_pref = $data['nsfw_pref'];
         }
@@ -86,11 +91,11 @@ class MeController extends Controller
     {
         if ($user->pawfit_id !== null && strcasecmp($user->pawfit_id, $pawfitId) !== 0) {
             // R-2 更名政策尚未拍板：Phase 1 先鎖定不可更名
-            throw ValidationException::withMessages(['pawfit_id' => 'Pawfit ID 目前不開放更改。']);
+            throw ValidationException::withMessages(['pawfit_id' => __('messages.me.pawfit_id_locked')]);
         }
         $taken = User::whereRaw('lower(pawfit_id) = ?', [strtolower($pawfitId)])->where('id', '!=', $user->id)->exists();
         if ($taken) {
-            throw ValidationException::withMessages(['pawfit_id' => '這個 Pawfit ID 已經有人用了。']);
+            throw ValidationException::withMessages(['pawfit_id' => __('messages.me.pawfit_id_taken')]);
         }
         $user->pawfit_id = $pawfitId;
     }
@@ -104,7 +109,7 @@ class MeController extends Controller
         }
         $media = Media::where('owner_id', $user->id)->where('status', 'active')->find($mediaId);
         if (! $media) {
-            throw ValidationException::withMessages(['avatar_media_id' => '找不到這張圖，或它還在處理中。']);
+            throw ValidationException::withMessages(['avatar_media_id' => __('messages.me.avatar_not_found')]);
         }
         $user->avatar_media_id = $media->id;
     }

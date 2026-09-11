@@ -1,0 +1,88 @@
+{
+  "admin": {
+    "title": "Admin",
+    "subtitle": "Moderation queue and action log · staff only",
+    "stats": {
+      "open": "Open reports",
+      "openIllegal": "Illegal content (priority)",
+      "resolvedThisWeek": "Resolved this week",
+      "bannedUsers": "Banned accounts"
+    },
+    "queue": {
+      "title": "Moderation queue",
+      "hint": "Illegal content first, then by time",
+      "empty": "No matching reports."
+    },
+    "status": {
+      "open": "Open",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed",
+      "all": "All"
+    },
+    "table": {
+      "target": "Target",
+      "reason": "Reason",
+      "reporter": "Reporter",
+      "time": "Time",
+      "status": "Status"
+    },
+    "target": {
+      "deleted": "(target deleted)",
+      "media": "Image · {label}",
+      "mediaWithFursona": "Image · {label} ({fursona})",
+      "fursona": "Fursona · {label}",
+      "user": "User · {label}",
+      "owner": "Owner",
+      "removed": "Removed",
+      "banned": "Banned",
+      "detailQuote": "“{detail}”"
+    },
+    "actions": {
+      "preview": "Preview",
+      "markNsfw": "Mark NSFW",
+      "remove": "Remove",
+      "purge": "Purge",
+      "view": "View",
+      "ban": "Ban",
+      "dismiss": "Dismiss",
+      "resolve": "Resolve"
+    },
+    "notes": {
+      "purge": "Emergency removal of illegal content",
+      "targetGone": "Target no longer exists"
+    },
+    "resolvedBy": "by @{id}",
+    "log": {
+      "title": "Action log",
+      "note": " ({note})",
+      "empty": "No actions yet."
+    },
+    "preview": {
+      "title": "Content preview",
+      "close": "Close"
+    },
+    "notify": {
+      "done": "Done: {action}",
+      "failed": "Action failed"
+    },
+    "report": {
+      "title": "Report {target}",
+      "description": "Reports are reviewed manually by staff; abusive reports may lead to a ban.",
+      "hints": {
+        "illegal": "Content involving minors, real violence or other hard limits. Handled first.",
+        "untaggedNsfw": "Adult content tagged as SFW.",
+        "copyright": "Someone else's work used without permission."
+      },
+      "detailLabel": "Details (optional)",
+      "detailPlaceholder": "Links or context help us act faster",
+      "cancel": "Cancel",
+      "submit": "Submit report",
+      "loginToReport": "Sign in to report",
+      "notify": {
+        "sent": "Report submitted",
+        "sentHint": "Staff will review it as soon as possible.",
+        "failed": "Submission failed"
+      }
+    }
+  }
+}

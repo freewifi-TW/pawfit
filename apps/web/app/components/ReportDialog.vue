@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ReportReason, ReportTargetType } from '~/types/api'
-import { REASON_LABEL } from '~/utils/labels'
 
 /** 檢舉對話框（FR-5.1）；未登入者導向登入。 */
 const open = defineModel<boolean>('open', { default: false })
@@ -10,6 +9,8 @@ const props = defineProps<{
   targetLabel: string
 }>()
 
+const { t } = useI18n()
+const { reasonLabel } = useLabels()
 const api = useApi()
 const notify = useNotify()
 const { me } = useAuth()
@@ -19,12 +20,12 @@ const reason = ref<ReportReason>('illegal')
 const detail = ref('')
 const busy = ref(false)
 
-const reasons: Array<{ value: ReportReason, hint: string }> = [
-  { value: 'illegal', hint: '涉及未成年、真實暴力等紅線內容，會優先處理。' },
-  { value: 'untagged_nsfw', hint: '成人內容但標為 SFW。' },
-  { value: 'copyright', hint: '未經授權使用他人作品。' },
-  { value: 'harassment', hint: '' },
-  { value: 'other', hint: '' }
+const reasons: Array<{ value: ReportReason, hintKey?: string }> = [
+  { value: 'illegal', hintKey: 'admin.report.hints.illegal' },
+  { value: 'untagged_nsfw', hintKey: 'admin.report.hints.untaggedNsfw' },
+  { value: 'copyright', hintKey: 'admin.report.hints.copyright' },
+  { value: 'harassment' },
+  { value: 'other' }
 ]
 
 async function submit() {
@@ -38,11 +39,11 @@ async function submit() {
       method: 'POST',
       body: { target_type: props.targetType, target_id: props.targetId, reason_code: reason.value, detail: detail.value || null }
     })
-    notify.ok('已送出檢舉', '站方會盡快處理。')
+    notify.ok(t('admin.report.notify.sent'), t('admin.report.notify.sentHint'))
     open.value = false
     detail.value = ''
   } catch (e) {
-    notify.err('送出失敗', apiError(e).message)
+    notify.err(t('admin.report.notify.failed'), apiError(e).message)
   } finally {
     busy.value = false
   }
@@ -52,8 +53,8 @@ async function submit() {
 <template>
   <PawDialog
     v-model:open="open"
-    :title="`檢舉${targetLabel}`"
-    description="檢舉會由站方人工審核；惡意檢舉可能導致停權。"
+    :title="t('admin.report.title', { target: targetLabel })"
+    :description="t('admin.report.description')"
   >
     <div
       class="radio-list"
@@ -71,8 +72,8 @@ async function submit() {
           :value="r.value"
         >
         <span>
-          <b>{{ REASON_LABEL[r.value] }}</b>
-          <small v-if="r.hint">{{ r.hint }}</small>
+          <b>{{ reasonLabel(r.value) }}</b>
+          <small v-if="r.hintKey">{{ t(r.hintKey) }}</small>
         </span>
       </label>
     </div>
@@ -80,14 +81,14 @@ async function submit() {
       class="field"
       style="margin:0"
     >
-      <label for="report-detail">補充說明（選填）</label>
+      <label for="report-detail">{{ t('admin.report.detailLabel') }}</label>
       <textarea
         id="report-detail"
         v-model="detail"
         class="input"
         style="min-height:72px"
         maxlength="2000"
-        placeholder="提供連結或說明有助於加速處理"
+        :placeholder="t('admin.report.detailPlaceholder')"
       />
     </div>
     <template #footer>
@@ -96,7 +97,7 @@ async function submit() {
         type="button"
         @click="open = false"
       >
-        取消
+        {{ t('admin.report.cancel') }}
       </button>
       <button
         class="btn primary"
@@ -104,7 +105,7 @@ async function submit() {
         :disabled="busy"
         @click="submit"
       >
-        {{ me ? '送出檢舉' : '登入後檢舉' }}
+        {{ me ? t('admin.report.submit') : t('admin.report.loginToReport') }}
       </button>
     </template>
   </PawDialog>

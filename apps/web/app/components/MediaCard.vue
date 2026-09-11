@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Media } from '~/types/api'
-import { CREDIT_PREFIX, KIND_LABEL, VISIBILITY_LABEL, VISIBILITY_PILL } from '~/utils/labels'
+import { VISIBILITY_PILL } from '~/utils/labels'
 
 /**
  * 單張圖卡。NSFW 顯示矩陣由後端決定 state（show / blur），
@@ -19,6 +19,9 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{ open: [media: Media], edit: [media: Media] }>()
 
+const { t } = useI18n()
+const { creditPrefix, kindLabel, visibilityLabel } = useLabels()
+
 const unlocked = ref(false)
 const isBlur = computed(() => props.media.state === 'blur' && !unlocked.value && !props.owner)
 const processing = computed(() => props.media.status === 'processing')
@@ -34,18 +37,18 @@ const credit = computed(() => props.media.credit_name?.trim() || '')
     <div class="art">
       <template v-if="processing">
         <div>
-          ⏳ 處理中<br><span
+          ⏳ {{ t('media.card.processing') }}<br><span
             class="muted"
             style="font-weight:400"
-          >正在產生展示版與縮圖</span>
+          >{{ t('media.card.processingHint') }}</span>
         </div>
       </template>
       <template v-else-if="failed">
         <div style="color:var(--danger)">
-          ⚠ 處理失敗<br><span
+          ⚠ {{ t('media.card.failed') }}<br><span
             class="muted"
             style="font-weight:400"
-          >{{ media.status_note || '請刪除後重新上傳' }}</span>
+          >{{ media.status_note || t('media.card.failedHint') }}</span>
         </div>
       </template>
       <template v-else>
@@ -62,19 +65,19 @@ const credit = computed(() => props.media.credit_name?.trim() || '')
           type="button"
           @click="unlocked = true"
         >
-          <b>NSFW</b>點擊解鎖觀看
+          <b>NSFW</b>{{ t('media.card.unlock') }}
         </button>
         <button
           v-else
           class="open"
           type="button"
-          :aria-label="`放大檢視 ${media.caption || '圖片'}`"
+          :aria-label="t('media.card.openAria', { name: media.caption || t('media.common.image') })"
           @click="emit('open', media)"
         />
       </template>
     </div>
 
-    <span class="kind">{{ KIND_LABEL[media.kind] }}</span>
+    <span class="kind">{{ kindLabel(media.kind) }}</span>
     <span
       v-if="media.is_nsfw && (owner || showMeta)"
       class="badge-nsfw"
@@ -83,18 +86,18 @@ const credit = computed(() => props.media.credit_name?.trim() || '')
     <span
       v-if="draggable"
       class="drag"
-      title="拖曳排序"
+      :title="t('media.card.dragSort')"
     >⋮⋮</span>
 
     <figcaption class="cap">
       <div class="t">
-        {{ media.caption || '未命名' }}
+        {{ media.caption || t('media.common.untitled') }}
       </div>
       <div
         v-if="credit"
         class="c"
       >
-        {{ CREDIT_PREFIX[media.kind] }}
+        {{ creditPrefix(media.kind) }}
         <a
           v-if="media.credit_url"
           :href="media.credit_url"
@@ -112,7 +115,7 @@ const credit = computed(() => props.media.credit_name?.trim() || '')
         <span
           class="pill"
           :class="media.visibility_override ? VISIBILITY_PILL[media.visibility_override] : ''"
-        >{{ media.visibility_override ? VISIBILITY_LABEL[media.visibility_override] : '繼承隱私' }}</span>
+        >{{ media.visibility_override ? visibilityLabel(media.visibility_override) : t('media.card.inheritVisibility') }}</span>
         <span
           class="pill"
           :class="media.is_nsfw ? 'accent' : ''"
@@ -123,7 +126,7 @@ const credit = computed(() => props.media.credit_name?.trim() || '')
           type="button"
           @click="emit('edit', media)"
         >
-          編輯
+          {{ t('media.card.edit') }}
         </button>
       </div>
     </figcaption>

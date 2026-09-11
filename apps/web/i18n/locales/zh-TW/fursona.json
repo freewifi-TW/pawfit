@@ -1,0 +1,134 @@
+{
+  "fursona": {
+    "notFound": "找不到這隻獸設",
+    "seoTitle": "編輯 {name}",
+    "unnamed": "未命名",
+    "actions": {
+      "save": "儲存",
+      "saved": "已儲存",
+      "cancel": "取消"
+    },
+    "header": {
+      "representative": "★ 代表獸設",
+      "removed": "已被站方下架",
+      "updatedAt": "最後更新",
+      "previewShare": "預覽分享頁",
+      "removedNotice": "這隻獸設已被站方下架，目前只有你看得到。如有疑問請透過頁尾聯絡方式申訴。"
+    },
+    "tabs": {
+      "basic": "基本資料",
+      "gallery": "圖庫",
+      "palette": "色票",
+      "tags": "標籤",
+      "privacy": "隱私與分享"
+    },
+    "basic": {
+      "title": "基本資料",
+      "name": "名字",
+      "nameRequired": "名字不能空白。",
+      "species": "物種",
+      "bio": "簡介",
+      "bioHint": "會顯示在分享頁「關於」區塊，支援換行。"
+    },
+    "avatar": {
+      "title": "頭像與代表",
+      "pickFromGallery": "從圖庫選擇",
+      "hint": "在圖庫點「編輯」→「設為獸設頭像」。頭像會裁成 Pawfit 的圓潤形狀。",
+      "representative": "設為代表獸設",
+      "representativeHint": "（顯示於個人主頁）"
+    },
+    "rating": {
+      "title": "內容分級",
+      "nsfw": "這隻獸設本身為 NSFW",
+      "hint": "勾選後，整隻獸設對訪客與未開啟成人內容的用戶隱藏。單張圖的 NSFW 標記在上傳時另外設定。"
+    },
+    "gallery": {
+      "upload": "⬆ 上傳圖片",
+      "empty": "還沒有圖片。上傳正面、背面設定圖與委託成品，分類與分級為必填。"
+    },
+    "palette": {
+      "title": "色票",
+      "subtitle": "拖曳左側把手排序 · 分享頁會照這個順序顯示",
+      "dragHandle": "拖曳排序",
+      "colorLabel": "顏色 {n}",
+      "namePlaceholder": "名稱（如：主毛色）",
+      "notePlaceholder": "部位備註",
+      "hexLabel": "色碼",
+      "remove": "移除",
+      "empty": "還沒有色票。加入主毛色、腹毛、眼睛…讓繪師一鍵複製。",
+      "add": "＋ 新增顏色",
+      "copyAll": "複製全部色碼",
+      "count": "{n} / {max} 色",
+      "noteWrap": "（{note}）",
+      "copied": "已複製 {n} 筆色碼",
+      "clipboardError": "無法存取剪貼簿"
+    },
+    "tags": {
+      "title": "獸設標籤",
+      "subtitle": "發文時會自動帶入（Phase 2）",
+      "remove": "移除 {tag}",
+      "placeholder": "輸入標籤後按 Enter，例如：長尾、異色瞳",
+      "hint": "用來分類與被搜尋。物種、體型、年齡段建議都填。{n} / {max}",
+      "suggestionsTitle": "常用標籤",
+      "suggestionsHint": "點一下加入",
+      "suggestions": ["犬科", "貓科", "龍", "鳥類", "有翼", "多肉", "壯碩", "纖瘦", "標準體型", "成年", "大尾", "異色瞳", "機械義肢"]
+    },
+    "privacy": {
+      "title": "誰看得到這隻獸設",
+      "hints": {
+        "public": "出現在你的個人主頁，任何人都能看。",
+        "unlisted": "知道連結的人才能看，不出現在主頁與搜尋。",
+        "private": "只有你看得到，分享連結自動停用。"
+      },
+      "friendsOnly": "限好友",
+      "phase2": "Phase 2 推出",
+      "friendsHint": "好友系統上線後開放。",
+      "note": "單張圖可以在圖庫中個別覆寫隱私。改完記得按右上角「儲存」。"
+    },
+    "delete": {
+      "title": "刪除獸設",
+      "warning": "會一併刪除所有圖片原檔與衍生版本，分享連結立即失效，無法復原。",
+      "button": "刪除這隻獸設",
+      "confirm": "確認刪除 {name}"
+    },
+    "notify": {
+      "saved": "已儲存變更",
+      "saveFailed": "儲存失敗",
+      "leaveConfirm": "有尚未儲存的變更，確定要離開？",
+      "avatarUpdated": "已更新獸設頭像",
+      "updateFailed": "更新失敗",
+      "reorderFailed": "排序未儲存",
+      "deleted": "已刪除獸設",
+      "deleteFailed": "刪除失敗"
+    },
+    "share": {
+      "title": "分享連結",
+      "privateNotice": "這隻獸設目前是「私人」，分享連結自動停用；改回公開或連結可見後就會恢復。",
+      "urlLabel": "分享連結",
+      "copy": "複製",
+      "open": "開啟 ↗",
+      "watermark": "分享頁使用浮水印版圖檔",
+      "regenerate": "重新生成連結",
+      "regenerateAsk": "舊連結會立即失效，確定？",
+      "regenerateConfirm": "確定重新生成",
+      "revoke": "停用連結",
+      "revokeConfirm": "確定停用",
+      "regenerateNote": "重新生成後舊連結立即失效",
+      "ogTitle": "Discord / Twitter 預覽卡",
+      "ogStats": "{palette} 色色票 · {media} 張設定圖",
+      "ogNoImage": "預覽圖會使用圖庫中第一張 SFW 圖；目前還沒有可用的圖。",
+      "empty": "還沒有分享連結。產生後可以貼到 Discord、Twitter 或傳給繪師，對方會看到完整設定與色票。",
+      "create": "產生分享連結",
+      "notify": {
+        "created": "已產生分享連結",
+        "regenerated": "已重新生成連結，舊網址立即失效",
+        "watermarkOn": "已開啟浮水印，正在替既有圖片產生浮水印版",
+        "watermarkOff": "已關閉浮水印",
+        "revoked": "連結已停用，舊網址立即失效",
+        "copied": "已複製分享連結",
+        "clipboardError": "無法存取剪貼簿",
+        "failed": "操作失敗"
+      }
+    }
+  }
+}

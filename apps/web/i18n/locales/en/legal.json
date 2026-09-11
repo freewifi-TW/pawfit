@@ -1,0 +1,158 @@
+{
+  "legal": {
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Pawfit Terms of Service",
+      "meta": "Version 0.1 (draft) · Last updated 2026-09-11 · To be finalized by the site operators before official launch (SASD R-5)",
+      "sections": [
+        {
+          "title": "1. The Service",
+          "paragraphs": [
+            "Pawfit (hereinafter \"the Site\") provides a service for organizing, storing, and sharing fursona profiles. You can create fursona profiles, upload images, manage color palettes and tags, and showcase them to others through share links."
+          ]
+        },
+        {
+          "title": "2. Accounts",
+          "items": [
+            "The Site supports sign-in with a Google account only. You must be at least 13 years old to register; viewing adult content requires that you are at least 18 years old and have completed the age confirmation.",
+            "Your Pawfit ID is a unique identifier across the Site and cannot be changed until a renaming policy has been finalized.",
+            "You are responsible for all activity that occurs under your account."
+          ]
+        },
+        {
+          "title": "3. Content You Upload",
+          "items": [
+            "You retain all rights to the content you upload. You grant the Site a non-exclusive license to store, generate thumbnails of, watermark, and transmit that content as required to provide the service.",
+            "When uploading commissioned artwork, you confirm that the original artist has permitted it to be displayed in this way, and you must credit the creator correctly.",
+            "Adult content must be marked as NSFW at the time of upload. Unmarked content that is reported may be relabeled or taken down.",
+            "Any sexual content involving minors, real violence, non-consensual recordings, or other illegal content is prohibited. Such content will be removed immediately with records retained, and the account will be banned."
+          ]
+        },
+        {
+          "title": "4. Privacy and Visibility",
+          "link": {
+            "before": "You can set a fursona or an individual image to public, link-only, or private. The Site serves images through signed URLs and determines how they are displayed based on your settings and the viewer's adult content preference. See the ",
+            "text": "Privacy Policy",
+            "after": " for details.",
+            "to": "/privacy"
+          }
+        },
+        {
+          "title": "5. Reports and Moderation",
+          "link": {
+            "before": "The Site provides a reporting mechanism. In accordance with the ",
+            "text": "Community Guidelines",
+            "after": ", the site operators may take down content, relabel its rating, or suspend accounts, and will keep a record of these actions. Content that has been taken down is retained during the appeal period; content that crosses a hard line is deleted outright.",
+            "to": "/guidelines"
+          }
+        },
+        {
+          "title": "6. Changes and Termination",
+          "paragraphs": [
+            "The Site may adjust its features, quotas, or these terms at any time; significant changes will be announced on the Site. You may stop using the service at any time and request that your account be deleted."
+          ]
+        },
+        {
+          "title": "7. Disclaimer",
+          "paragraphs": [
+            "The service is provided as is. The Site makes no guarantee as to the accuracy of content, uninterrupted service, or the absence of data loss. Please keep your own backups of your original files."
+          ]
+        }
+      ]
+    },
+    "guidelines": {
+      "title": "Community Guidelines",
+      "description": "Pawfit Community Guidelines",
+      "meta": "Version 0.1 (draft) · Last updated 2026-09-11",
+      "sections": [
+        {
+          "title": "Adult Content (NSFW)",
+          "items": [
+            "The Site has supported adult content from day one, but by default it is hidden from everyone. You must honestly mark your uploads as SFW or NSFW.",
+            "What counts as NSFW: nudity, sexual suggestion, depictions of sexual acts, gore, or disturbing content. When in doubt, mark it NSFW.",
+            "If a fursona's concept is itself adult-oriented, check the NSFW option at the fursona level."
+          ]
+        },
+        {
+          "title": "Hard Lines (Immediate Removal and Ban)",
+          "items": [
+            "Any sexual content involving minors, including characters whose appearance, backstory, or explicit description indicates they are underage.",
+            "Non-consensual sexual content involving real people, or imagery of real violence or abuse.",
+            "Any other content that violates the laws of Taiwan or of the jurisdiction where our servers are located."
+          ]
+        },
+        {
+          "title": "Respect for Creators",
+          "items": [
+            "When uploading commissioned artwork, credit the artist or maker and include a link.",
+            "Do not upload other people's work without permission, or remove someone else's signature before uploading.",
+            "Watermarks are for protecting your own work, not for covering up someone else's signature."
+          ]
+        },
+        {
+          "title": "Interactions",
+          "items": [
+            "No harassment, no doxxing, and no sharing of other people's private information.",
+            "Malicious reporting is treated as harassment."
+          ]
+        },
+        {
+          "title": "Enforcement",
+          "paragraphs": [
+            "Depending on the severity of a violation, the site operators will: relabel the rating → take down the content (retained for appeal) → suspend the account. Content that crosses a hard line is deleted without warning. Every action is logged."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "Pawfit Privacy Policy",
+      "meta": "Version 0.1 (draft) · Last updated 2026-09-11",
+      "sections": [
+        {
+          "title": "What We Collect",
+          "terms": [
+            { "label": "Account data", "body": ": the email address, name, and avatar from your Google account (used for sign-in and display)." },
+            { "label": "Content you provide", "body": ": fursona profiles, images, color palettes, tags, and sharing settings." },
+            { "label": "Compliance records", "body": ": timestamps of your acceptance of the Terms of Service and of your age confirmation (18+)." },
+            { "label": "Technical data", "body": ": IP addresses and request logs, used for abuse prevention and debugging and retained only for a short period." }
+          ]
+        },
+        {
+          "title": "How Images Are Stored and Served",
+          "items": [
+            "All images are stored in private object storage (Cloudflare R2); there are no public permanent URLs.",
+            "Every image access goes through a permission check and is then served via a short-lived signed URL; private and link-only content cannot be accessed by unauthorized parties.",
+            "We automatically generate display and thumbnail versions, plus a watermarked version when watermarking is enabled. The original file is kept intact."
+          ]
+        },
+        {
+          "title": "What We Will Not Do",
+          "items": [
+            "We do not sell or share your personal data with third parties.",
+            "We do not use the content you upload to train AI models.",
+            "We do not place ads on, or publicly index, content you have set to private or link-only."
+          ]
+        },
+        {
+          "title": "Cookies",
+          "paragraphs": [
+            "The Site uses a session cookie to keep you signed in and a CSRF protection cookie. We do not use third-party tracking cookies."
+          ]
+        },
+        {
+          "title": "Your Rights",
+          "paragraphs": [
+            "You can delete individual images or an entire fursona at any time. Account deletion and data export will be available in a future release; for now, you can request them by email using the contact information in the footer."
+          ]
+        },
+        {
+          "title": "Data Retention and Backups",
+          "paragraphs": [
+            "The database is backed up daily to separate storage. Content taken down by the site operators is retained during the appeal period; content that crosses a hard line is deleted outright, although the moderation record is kept."
+          ]
+        }
+      ]
+    }
+  }
+}

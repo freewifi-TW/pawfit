@@ -1,0 +1,48 @@
+{
+  "home": {
+    "seo": {
+      "title": "Your fursona, organised into one link",
+      "description": "Reference sheets, exact color palettes, artist credits and commissions, all on one page. Pawfit: the fursona archive built for the furry community."
+    },
+    "banned": {
+      "title": "This account has been suspended",
+      "hint": "Contact the site team if you have questions."
+    },
+    "hero": {
+      "title": "Your fursona,{br}organised into {mark}.",
+      "titleMark": "one link",
+      "lead": "Reference sheets, exact color palettes, artist credits and commissions, all on one page. Send it to artists, fursuit makers or friends instead of digging through chat logs for your refs.",
+      "ctaEnter": "Go to my fursonas",
+      "ctaStart": "Start with Google",
+      "ctaDemo": "See a demo share page"
+    },
+    "demo": {
+      "sticker": "Demo fursona",
+      "name": "Ember",
+      "meta": "Red fox · Adult · Average build",
+      "tagCanine": "Canine",
+      "tagFox": "Red fox",
+      "tagBuild": "Average build",
+      "refCount": "5 reference images",
+      "creditCount": "4 artist credits"
+    },
+    "features": {
+      "collect": {
+        "title": "Everything in one place",
+        "body": "Multiple fursonas and multi-angle galleries, with 2D art, 3D models and real-life photos kept strictly separate. Commissions can go into a private collection too."
+      },
+      "palette": {
+        "title": "Palettes that are exact",
+        "body": "Every color has a name, a body-part note and a hex code. Artists copy it in one click instead of color-picking from screenshots."
+      },
+      "share": {
+        "title": "One-click share kit",
+        "body": "Generate a share link that unfurls into a preview card on Discord or Twitter. Turn on watermarks or disable the link at any time."
+      }
+    },
+    "notice": {
+      "title": "Adult content is supported from day one, but hidden by default.",
+      "body": "Every upload must be tagged SFW or NSFW. Viewers must complete age confirmation and choose how it is shown; guests never see NSFW content."
+    }
+  }
+}

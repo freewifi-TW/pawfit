@@ -1,0 +1,58 @@
+{
+  "settings": {
+    "title": "設定",
+    "subtitle": "帳號、內容顯示與隱私",
+    "nav": {
+      "nsfw": "內容顯示",
+      "language": "介面語言",
+      "account": "帳號",
+      "data": "資料與儲存"
+    },
+    "nsfw": {
+      "heading": "成人內容（NSFW）顯示方式",
+      "confirmedAt": "已於 {date} 完成 18 歲聲明",
+      "notConfirmed": "尚未完成 18 歲聲明",
+      "declare": "我聲明我已年滿 18 歲，並自願瀏覽成人內容。",
+      "declareNote": "我們會記錄聲明時間。未完成聲明前，下列選項鎖定為「完全隱藏」。",
+      "options": {
+        "hide": {
+          "title": "完全隱藏",
+          "hint": "NSFW 內容完全不出現，如同不存在。（預設）"
+        },
+        "blur": {
+          "title": "防雷模糊",
+          "hint": "以模糊縮圖顯示，點擊後才解鎖觀看。"
+        },
+        "show": {
+          "title": "直接顯示",
+          "hint": "與一般內容相同方式顯示。"
+        }
+      },
+      "applyNote": "這個設定會立即套用到全站，包含分享頁與日後的社群河道。",
+      "confirmed": "已記錄 18 歲聲明",
+      "unconfirmed": "已取消聲明，顯示方式改為完全隱藏",
+      "prefUpdated": "已更新顯示方式，全站立即套用"
+    },
+    "language": {
+      "heading": "介面語言",
+      "hint": "切換後立即套用；登入狀態下會記住你的選擇，下次在任何裝置登入都沿用。"
+    },
+    "account": {
+      "heading": "帳號",
+      "googleLinked": "已綁定 Google",
+      "idNote": "更名政策確定前不開放更改。",
+      "idUnset": "尚未設定 →",
+      "displayName": "顯示名稱",
+      "save": "儲存",
+      "nameEmpty": "顯示名稱不能空白",
+      "nameUpdated": "已更新顯示名稱"
+    },
+    "data": {
+      "heading": "資料與儲存",
+      "storage": "儲存空間",
+      "uploadsToday": "今日上傳",
+      "uploadsCount": "{used} / {limit} 張",
+      "note": "匯出全部資料與刪除帳號功能將於後續版本提供；如需刪除帳號請透過頁尾聯絡方式來信。"
+    }
+  }
+}

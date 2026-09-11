@@ -1,0 +1,43 @@
+{
+  "share": {
+    "notFound": "連結可能已停用或獸設已設為私人",
+    "seo": {
+      "titleWithSpecies": "{name} · {species}",
+      "ogTitle": "{title} — Pawfit 獸設分享",
+      "paletteCount": "{n} 色色票",
+      "mediaCount": "{n} 張設定圖",
+      "summary": "{palette} · {media} — Pawfit"
+    },
+    "header": {
+      "avatarAlt": "{name} 的頭像",
+      "ownerFursona": "{'@'}{id} 的獸設"
+    },
+    "about": {
+      "title": "關於{name}"
+    },
+    "palette": {
+      "title": "色票",
+      "hint": "點一下複製色碼"
+    },
+    "emptyBioPalette": "還沒有簡介與色票。",
+    "gallery": {
+      "title": "圖庫",
+      "empty": "目前沒有可顯示的圖片。"
+    },
+    "nsfw": {
+      "guest": "登入並在設定中完成 18 歲聲明後即可選擇顯示方式。",
+      "unconfirmed": "到「設定」完成 18 歲聲明後即可選擇顯示方式。",
+      "hidden": "你的顯示偏好為「完全隱藏」，可在「設定」中調整。"
+    },
+    "footer": {
+      "shareLink": "🔗 分享連結",
+      "watermark": "浮水印",
+      "on": "開啟",
+      "off": "關閉",
+      "publicOnProfile": "{visibility} · 顯示於個人主頁",
+      "manage": "管理連結",
+      "report": "檢舉此頁"
+    },
+    "reportTarget": "獸設「{name}」"
+  }
+}

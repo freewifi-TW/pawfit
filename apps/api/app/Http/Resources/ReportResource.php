@@ -38,7 +38,7 @@ class ReportResource extends JsonResource
     {
         return match ($r->target_type) {
             'media' => ($m = Media::with('fursona.owner')->find($r->target_id)) ? [
-                'label' => $m->caption ?: '未命名圖片',
+                'label' => $m->caption ?: __('messages.report.untitled_media'),
                 'fursona_name' => $m->fursona?->name,
                 'fursona_id' => $m->fursona_id,
                 'owner_pawfit_id' => $m->fursona?->owner?->pawfit_id,
@@ -54,7 +54,7 @@ class ReportResource extends JsonResource
                 'removed_at' => $f->removed_at,
             ] : null,
             'profile' => ($u = User::find($r->target_id)) ? [
-                'label' => '@'.($u->pawfit_id ?? '未設定'),
+                'label' => '@'.($u->pawfit_id ?? __('messages.report.no_pawfit_id')),
                 'owner_pawfit_id' => $u->pawfit_id,
                 'is_banned' => $u->is_banned,
             ] : null,

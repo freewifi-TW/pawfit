@@ -2,20 +2,21 @@
 import type { NuxtError } from '#app'
 
 const props = defineProps<{ error: NuxtError }>()
+const { t } = useI18n()
 
 const title = computed(() => {
   switch (props.error.statusCode) {
-    case 404: return '找不到這一頁'
-    case 403: return '沒有權限'
-    default: return '出了點問題'
+    case 404: return t('common.errorPage.notFound')
+    case 403: return t('common.errorPage.forbidden')
+    default: return t('common.errorPage.generic')
   }
 })
 const hint = computed(() => {
-  if (props.error.statusCode === 404) return '連結可能已停用、獸設被設為私人，或這頁本來就不存在。'
-  return props.error.statusMessage || props.error.message || '請稍後再試一次。'
+  if (props.error.statusCode === 404) return t('common.errorPage.notFoundHint')
+  return props.error.statusMessage || props.error.message || t('common.errorPage.retryHint')
 })
 
-useHead({ title: title.value })
+useHead({ title })
 </script>
 
 <template>
@@ -43,7 +44,7 @@ useHead({ title: title.value })
             class="btn primary"
             @click="clearError({ redirect: '/' })"
           >
-            回首頁
+            {{ t('common.errorPage.backHome') }}
           </button>
         </div>
       </div>

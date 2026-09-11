@@ -17,7 +17,10 @@ export function useApi() {
   const requestHeaders = useRequestHeaders(['cookie'])
   const event = useRequestEvent()
   const requestId = event?.context.requestId
-  const clientLog = import.meta.client ? (useNuxtApp().$clientLog as ClientLog | undefined) : undefined
+  const nuxtApp = useNuxtApp()
+  const clientLog = import.meta.client ? (nuxtApp.$clientLog as ClientLog | undefined) : undefined
+  // 讓 Laravel 用同一種語言回訊息（驗證錯誤、業務錯誤）
+  const acceptLanguage = () => nuxtApp.$i18n?.locale.value ?? 'zh-TW'
 
   const api = $fetch.create({
     baseURL: import.meta.server ? config.apiInternalBase : config.public.apiBase,
@@ -33,6 +36,9 @@ export function useApi() {
     retry: 0,
     async onRequest({ options }) {
       startedAt.set(options, performance.now())
+      const headers = new Headers(options.headers as HeadersInit)
+      headers.set('Accept-Language', acceptLanguage())
+      options.headers = headers
       if (import.meta.client) {
         const method = (options.method ?? 'GET').toUpperCase()
         if (method !== 'GET' && method !== 'HEAD') {
@@ -137,15 +143,38 @@ export function apiError(e: unknown): { status: number, message: string, code?: 
   }
   let message = data?.message || ''
   if (!message) {
-    message = status === 401
-      ? '請先登入。'
+    const key = status === 401
+      ? 'unauthorized'
       : status === 403
-        ? '沒有權限執行這個操作。'
+        ? 'forbidden'
         : status === 404
-          ? '找不到資料。'
+          ? 'notFound'
           : status === 429
-            ? '操作太頻繁，稍後再試。'
-            : status >= 500 ? '伺服器發生錯誤，請稍後再試。' : '發生錯誤，請再試一次。'
+            ? 'tooMany'
+            : status >= 500 ? 'server' : 'generic'
+    message = translateApiMessage(key)
   }
   return { status, message, code: data?.code, errors }
+}
+
+type ApiMessageKey = 'unauthorized' | 'forbidden' | 'notFound' | 'tooMany' | 'server' | 'generic'
+
+/** 沒有 Nuxt context（setup 之外、測試）時退回的預設文字，正常情況走 common.api.* 語言檔。 */
+const API_MESSAGE_FALLBACK: Record<ApiMessageKey, string> = {
+  unauthorized: '請先登入。',
+  forbidden: '沒有權限執行這個操作。',
+  notFound: '找不到資料。',
+  tooMany: '操作太頻繁，稍後再試。',
+  server: '伺服器發生錯誤，請稍後再試。',
+  generic: '發生錯誤，請再試一次。'
+}
+
+function translateApiMessage(key: ApiMessageKey): string {
+  const i18nKey = `common.api.${key}`
+  try {
+    const translated = useNuxtApp().$i18n.t(i18nKey)
+    return translated && translated !== i18nKey ? translated : API_MESSAGE_FALLBACK[key]
+  } catch {
+    return API_MESSAGE_FALLBACK[key]
+  }
 }

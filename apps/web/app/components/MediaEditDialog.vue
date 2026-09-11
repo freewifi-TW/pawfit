@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Media, MediaKind, Visibility } from '~/types/api'
-import { KIND_LABEL_LONG, VISIBILITY_LABEL } from '~/utils/labels'
 
 /** 單張圖的編輯：說明、credit、分類、分級、隱私覆寫、設為頭像、刪除。 */
 const media = defineModel<Media | null>({ default: null })
@@ -9,6 +8,11 @@ const emit = defineEmits<{ updated: [media: Media], deleted: [id: string], avata
 
 const api = useApi()
 const notify = useNotify()
+const { t } = useI18n()
+const { kindLabelLong, visibilityLabel } = useLabels()
+
+const KINDS: MediaKind[] = ['art2d', 'model3d', 'photo']
+const VISIBILITIES: Visibility[] = ['public', 'unlisted', 'private']
 
 const form = reactive({
   caption: '',
@@ -58,12 +62,12 @@ async function save() {
       }
     })
     emit('updated', updated)
-    notify.ok('已儲存')
+    notify.ok(t('media.edit.saved'))
     media.value = null
   } catch (e) {
     const err = apiError(e)
     errors.value = err.errors
-    notify.err('儲存失敗', err.message)
+    notify.err(t('media.edit.saveFailed'), err.message)
   } finally {
     busy.value = false
   }
@@ -75,10 +79,10 @@ async function remove() {
   try {
     await api(`/media/${media.value.id}`, { method: 'DELETE' })
     emit('deleted', media.value.id)
-    notify.ok('已刪除圖片')
+    notify.ok(t('media.edit.deleted'))
     media.value = null
   } catch (e) {
-    notify.err('刪除失敗', apiError(e).message)
+    notify.err(t('media.edit.deleteFailed'), apiError(e).message)
   } finally {
     busy.value = false
   }
@@ -88,8 +92,8 @@ async function remove() {
 <template>
   <PawDialog
     v-model:open="open"
-    title="編輯圖片"
-    :description="media?.status === 'processing' ? '這張圖還在處理中，仍可先編輯資料。' : ''"
+    :title="t('media.edit.title')"
+    :description="media?.status === 'processing' ? t('media.edit.processingNote') : ''"
   >
     <template v-if="media">
       <div
@@ -106,7 +110,7 @@ async function remove() {
           class="field"
           style="flex:1;margin:0"
         >
-          <label for="me-caption">說明文字</label>
+          <label for="me-caption">{{ t('media.edit.caption') }}</label>
           <input
             id="me-caption"
             v-model="form.caption"
@@ -124,7 +128,7 @@ async function remove() {
           class="field"
           style="margin:0"
         >
-          <label for="me-credit">繪師 / 製作者</label>
+          <label for="me-credit">{{ t('media.edit.credit') }}</label>
           <input
             id="me-credit"
             v-model="form.credit_name"
@@ -136,7 +140,7 @@ async function remove() {
           class="field"
           style="margin:0"
         >
-          <label for="me-credit-url">作者連結</label>
+          <label for="me-credit-url">{{ t('media.edit.creditUrl') }}</label>
           <input
             id="me-credit-url"
             v-model="form.credit_url"
@@ -157,10 +161,10 @@ async function remove() {
         class="field"
         style="margin-top:14px"
       >
-        <span class="lbl">分類</span>
+        <span class="lbl">{{ t('media.edit.kind') }}</span>
         <div class="seg">
           <label
-            v-for="(label, k) in KIND_LABEL_LONG"
+            v-for="k in KINDS"
             :key="k"
           >
             <input
@@ -168,12 +172,12 @@ async function remove() {
               type="radio"
               name="me-kind"
               :value="k"
-            >{{ label }}
+            >{{ kindLabelLong(k) }}
           </label>
         </div>
       </div>
       <div class="field">
-        <span class="lbl">內容分級</span>
+        <span class="lbl">{{ t('media.edit.rating') }}</span>
         <div class="seg">
           <label><input
             v-model="form.is_nsfw"
@@ -190,21 +194,21 @@ async function remove() {
         </div>
       </div>
       <div class="field">
-        <label for="me-vis">這張圖的隱私</label>
+        <label for="me-vis">{{ t('media.edit.visibility') }}</label>
         <select
           id="me-vis"
           v-model="form.visibility_override"
           class="input"
         >
           <option value="">
-            繼承獸設設定（{{ VISIBILITY_LABEL[fursonaVisibility] }}）
+            {{ t('media.edit.inherit', { visibility: visibilityLabel(fursonaVisibility) }) }}
           </option>
           <option
-            v-for="(label, v) in VISIBILITY_LABEL"
+            v-for="v in VISIBILITIES"
             :key="v"
             :value="v"
           >
-            {{ label }}
+            {{ visibilityLabel(v) }}
           </option>
         </select>
       </div>
@@ -220,7 +224,7 @@ async function remove() {
           :disabled="isAvatar"
           @click="emit('avatar', media.id)"
         >
-          {{ isAvatar ? '目前是頭像' : '設為獸設頭像' }}
+          {{ isAvatar ? t('media.edit.isAvatar') : t('media.edit.setAvatar') }}
         </button>
         <span class="sp" />
         <button
@@ -229,20 +233,20 @@ async function remove() {
           type="button"
           @click="confirmDelete = true"
         >
-          刪除圖片
+          {{ t('media.edit.delete') }}
         </button>
         <template v-else>
           <span
             class="muted"
             style="font-size:12px"
-          >原檔與衍生版會一起刪除，無法復原。</span>
+          >{{ t('media.edit.deleteWarning') }}</span>
           <button
             class="btn sm danger"
             type="button"
             :disabled="busy"
             @click="remove"
           >
-            確認刪除
+            {{ t('media.edit.confirmDelete') }}
           </button>
         </template>
       </div>
@@ -253,7 +257,7 @@ async function remove() {
         type="button"
         @click="media = null"
       >
-        取消
+        {{ t('media.common.cancel') }}
       </button>
       <button
         class="btn primary"
@@ -261,7 +265,7 @@ async function remove() {
         :disabled="busy"
         @click="save"
       >
-        儲存
+        {{ t('media.common.save') }}
       </button>
     </template>
   </PawDialog>

@@ -1,0 +1,103 @@
+{
+  "media": {
+    "common": {
+      "save": "儲存",
+      "cancel": "取消",
+      "untitled": "未命名",
+      "image": "圖片"
+    },
+    "upload": {
+      "title": "上傳圖片",
+      "description": "原檔會直接上傳到儲存空間，展示版與縮圖稍後自動產生。",
+      "dropTitle": "拖曳圖片到這裡，或點擊選擇",
+      "dropHint": "jpg / png / webp，單檔 {size} 以內，可一次選多張。",
+      "unsupportedFormat": "{name} 不是支援的格式",
+      "unsupportedFormatHint": "只接受 jpg / png / webp。",
+      "tooLarge": "{name} 太大",
+      "tooLargeHint": "單檔上限 {size}。",
+      "putFailedStatus": "直傳失敗（{status}）",
+      "putFailedNetwork": "直傳失敗，請確認網路或儲存服務的 CORS 設定",
+      "errors": {
+        "files": "請先選擇圖片。",
+        "kind": "請選擇分類。",
+        "nsfw": "請標記內容分級。",
+        "creditUrl": "連結需以 http(s):// 開頭。"
+      },
+      "queued": "已加入處理佇列",
+      "queuedHint": "展示版與縮圖產生完成後會自動出現在圖庫。",
+      "failedCount": "{n} 張上傳失敗",
+      "failedHint": "可以修正後再按一次上傳，成功的不會重傳。",
+      "uploadedProcessing": "已上傳，處理中",
+      "remove": "移除",
+      "kind": "分類",
+      "required": "必填",
+      "rating": "內容分級",
+      "ratingHint": "不可略過。未標記的 NSFW 內容經檢舉會被改標或下架。",
+      "credit": "繪師 / 製作者",
+      "creditPlaceholder": "例如 {'@'}kuro_lines",
+      "creditUrl": "作者連結（選填）",
+      "caption": "說明文字",
+      "captionPlaceholder": "例如：正面設定圖，2026 年版",
+      "captionMultiHint": "多張同時上傳時會套用同一段說明，之後可逐張編輯。",
+      "visibility": "這張圖的隱私",
+      "inherit": "繼承獸設設定（{visibility}）",
+      "uploading": "上傳中…",
+      "submit": "上傳",
+      "submitCount": "上傳 {n} 張"
+    },
+    "edit": {
+      "title": "編輯圖片",
+      "processingNote": "這張圖還在處理中，仍可先編輯資料。",
+      "caption": "說明文字",
+      "credit": "繪師 / 製作者",
+      "creditUrl": "作者連結",
+      "kind": "分類",
+      "rating": "內容分級",
+      "visibility": "這張圖的隱私",
+      "inherit": "繼承獸設設定（{visibility}）",
+      "isAvatar": "目前是頭像",
+      "setAvatar": "設為獸設頭像",
+      "delete": "刪除圖片",
+      "deleteWarning": "原檔與衍生版會一起刪除，無法復原。",
+      "confirmDelete": "確認刪除",
+      "saved": "已儲存",
+      "saveFailed": "儲存失敗",
+      "deleted": "已刪除圖片",
+      "deleteFailed": "刪除失敗"
+    },
+    "card": {
+      "processing": "處理中",
+      "processingHint": "正在產生展示版與縮圖",
+      "failed": "處理失敗",
+      "failedHint": "請刪除後重新上傳",
+      "unlock": "點擊解鎖觀看",
+      "openAria": "放大檢視 {name}",
+      "dragSort": "拖曳排序",
+      "inheritVisibility": "繼承隱私",
+      "edit": "編輯"
+    },
+    "grid": {
+      "filterAll": "全部",
+      "count": "{n} 張",
+      "ownerHint": "拖曳卡片可排序 · 擁有者永遠看得到自己的內容",
+      "hiddenNsfw": "有 {n} 張成人內容未顯示。",
+      "nsfwHint": "登入並在設定中完成 18 歲聲明後即可選擇顯示方式。",
+      "empty": "這個分類還沒有圖片。"
+    },
+    "palette": {
+      "copied": "已複製 {hex}",
+      "clipboardError": "無法存取剪貼簿",
+      "copyTitle": "複製 {hex}"
+    },
+    "fursonaCard": {
+      "representative": "代表",
+      "removed": "已被站方下架",
+      "mediaCount": "{n} 張圖",
+      "paletteCount": "{n} 色",
+      "edit": "編輯",
+      "sharePage": "分享頁",
+      "privateDisabled": "私人（連結停用）",
+      "noLink": "未產生連結"
+    }
+  }
+}

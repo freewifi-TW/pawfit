@@ -70,7 +70,7 @@ class ActionController extends Controller
         switch ($action) {
             case 'remove_media':
                 $m = $this->media($targetId);
-                $m->forceFill(['status' => 'removed', 'status_note' => $note ?? '由站方下架'])->save();
+                $m->forceFill(['status' => 'removed', 'status_note' => $note ?? __('messages.admin.removed_by_staff')])->save();
 
                 return ['media', $note];
 
@@ -78,16 +78,16 @@ class ActionController extends Controller
                 $m = $this->media($targetId);
                 $this->storage->deleteAll($m);
                 $m->forceFill([
-                    'status' => 'removed', 'status_note' => $note ?? '紅線內容，物件已刪除',
+                    'status' => 'removed', 'status_note' => $note ?? __('messages.admin.purged_red_line'),
                     'display_key' => null, 'thumb_key' => null, 'watermarked_key' => null,
                 ])->save();
 
-                return ['media', ($note ? $note.'；' : '').'R2 物件已刪除'];
+                return ['media', ($note ? $note.'；' : '').__('messages.admin.object_deleted')];
 
             case 'restore_media':
                 $m = $this->media($targetId);
                 if (! $m->display_key) {
-                    throw ValidationException::withMessages(['action' => '物件已被刪除，無法還原。']);
+                    throw ValidationException::withMessages(['action' => __('messages.admin.cannot_restore_purged')]);
                 }
                 $m->forceFill(['status' => 'active', 'status_note' => null])->save();
 
@@ -97,13 +97,13 @@ class ActionController extends Controller
                 $m = $this->media($targetId);
                 $m->forceFill(['is_nsfw' => true])->save();
 
-                return ['media', $note ?? '改標為 NSFW'];
+                return ['media', $note ?? __('messages.admin.marked_nsfw')];
 
             case 'remove_fursona':
                 $f = Fursona::findOrFail($targetId);
                 $f->forceFill(['removed_at' => now()])->save();
 
-                return ['fursona', $note ?? '由站方下架'];
+                return ['fursona', $note ?? __('messages.admin.removed_by_staff')];
 
             case 'restore_fursona':
                 $f = Fursona::findOrFail($targetId);
@@ -114,7 +114,7 @@ class ActionController extends Controller
             case 'ban_user':
                 $u = User::findOrFail($targetId);
                 if ($u->isAdmin()) {
-                    throw ValidationException::withMessages(['action' => '不能停權管理員。']);
+                    throw ValidationException::withMessages(['action' => __('messages.admin.cannot_ban_admin')]);
                 }
                 $u->forceFill(['is_banned' => true])->save();
 
@@ -137,7 +137,7 @@ class ActionController extends Controller
                 return ['report', $note];
         }
 
-        throw ValidationException::withMessages(['action' => '未知的操作。']);
+        throw ValidationException::withMessages(['action' => __('messages.admin.unknown_action')]);
     }
 
     private function media(string $id): Media

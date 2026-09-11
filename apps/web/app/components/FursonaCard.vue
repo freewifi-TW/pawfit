@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Fursona } from '~/types/api'
-import { paletteGradient, VISIBILITY_LABEL, VISIBILITY_PILL } from '~/utils/labels'
+import { paletteGradient, VISIBILITY_PILL } from '~/utils/labels'
 
 /** 獸設卡：儀表板（擁有者）與個人主頁（公開）共用。 */
 withDefaults(defineProps<{
@@ -9,6 +9,9 @@ withDefaults(defineProps<{
 }>(), {
   owner: false
 })
+
+const { t } = useI18n()
+const { visibilityLabel } = useLabels()
 </script>
 
 <template>
@@ -27,7 +30,7 @@ withDefaults(defineProps<{
         v-if="fursona.is_representative"
         class="badge-nsfw"
         style="background:var(--butter);color:var(--ink)"
-      >★ 代表</span>
+      >★ {{ t('media.fursonaCard.representative') }}</span>
       <span
         v-else-if="fursona.is_nsfw && owner"
         class="badge-nsfw"
@@ -48,13 +51,13 @@ withDefaults(defineProps<{
           v-if="owner"
           class="pill"
           :class="VISIBILITY_PILL[fursona.visibility]"
-        >{{ VISIBILITY_LABEL[fursona.visibility] }}</span>
+        >{{ visibilityLabel(fursona.visibility) }}</span>
         <span
           v-if="owner && fursona.removed_at"
           class="pill danger"
-        >已被站方下架</span>
-        <span class="pill">{{ fursona.media_count ?? 0 }} 張圖</span>
-        <span class="pill">{{ fursona.palette_count }} 色</span>
+        >{{ t('media.fursonaCard.removed') }}</span>
+        <span class="pill">{{ t('media.fursonaCard.mediaCount', fursona.media_count ?? 0) }}</span>
+        <span class="pill">{{ t('media.fursonaCard.paletteCount', fursona.palette_count) }}</span>
       </div>
       <div class="acts">
         <template v-if="owner">
@@ -62,14 +65,14 @@ withDefaults(defineProps<{
             class="btn sm"
             :to="`/fursona/${fursona.id}`"
           >
-            編輯
+            {{ t('media.fursonaCard.edit') }}
           </NuxtLink>
           <NuxtLink
             v-if="fursona.share_link && fursona.visibility !== 'private'"
             class="btn sm ghost"
             :to="`/s/${fursona.share_link.slug}`"
           >
-            分享頁 ↗
+            {{ t('media.fursonaCard.sharePage') }} ↗
           </NuxtLink>
           <button
             v-else
@@ -77,7 +80,7 @@ withDefaults(defineProps<{
             type="button"
             disabled
           >
-            {{ fursona.visibility === 'private' ? '私人（連結停用）' : '未產生連結' }}
+            {{ fursona.visibility === 'private' ? t('media.fursonaCard.privateDisabled') : t('media.fursonaCard.noLink') }}
           </button>
         </template>
         <template v-else>

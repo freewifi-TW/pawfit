@@ -3,7 +3,10 @@ import type { Fursona } from '~/types/api'
 import { formatBytes } from '~/utils/labels'
 
 definePageMeta({ middleware: 'onboarded' })
-useSeoMeta({ title: '我的獸設' })
+
+const { t } = useI18n()
+
+useSeoMeta({ title: () => t('dashboard.title') })
 
 const api = useApi()
 const notify = useNotify()
@@ -29,13 +32,13 @@ onMounted(() => {
 async function create() {
   errors.value = {}
   if (!form.name.trim()) {
-    errors.value.name = '請填名字。'
+    errors.value.name = t('dashboard.errors.nameRequired')
     return
   }
   busy.value = true
   try {
     const f = await api<Fursona>('/fursonas', { method: 'POST', body: { name: form.name.trim(), species: form.species.trim() || null } })
-    notify.ok(`已建立 ${f.name}`, '接著上傳設定圖、填色票吧。')
+    notify.ok(t('dashboard.notify.created', { name: f.name }), t('dashboard.notify.createdHint'))
     creating.value = false
     form.name = ''
     form.species = ''
@@ -45,7 +48,7 @@ async function create() {
   } catch (e) {
     const err = apiError(e)
     errors.value = err.errors
-    if (!Object.keys(err.errors).length) notify.err('建立失敗', err.message)
+    if (!Object.keys(err.errors).length) notify.err(t('dashboard.errors.createFailed'), err.message)
   } finally {
     busy.value = false
   }
@@ -57,9 +60,9 @@ async function create() {
     <div class="pagehd">
       <div>
         <h1 class="disp">
-          我的獸設
+          {{ t('dashboard.title') }}
         </h1>
-        <p>{{ fursonas.length }} 隻獸設 · 代表獸設會顯示在你的個人主頁</p>
+        <p>{{ t('dashboard.subtitle', fursonas.length) }}</p>
       </div>
       <span class="sp" />
       <button
@@ -67,7 +70,7 @@ async function create() {
         type="button"
         @click="creating = true"
       >
-        ＋ 新增獸設
+        {{ t('dashboard.createButton') }}
       </button>
     </div>
 
@@ -86,10 +89,10 @@ async function create() {
         <div>
           <b>＋</b>
           <div style="margin-top:8px;font-weight:700;color:var(--ink-2)">
-            新增獸設
+            {{ t('dashboard.newCard.title') }}
           </div>
           <div style="font-size:12px">
-            名字、物種、色票，兩分鐘搞定
+            {{ t('dashboard.newCard.hint') }}
           </div>
         </div>
       </button>
@@ -101,7 +104,7 @@ async function create() {
     >
       <div class="card">
         <div class="hd">
-          <span class="disp">儲存空間</span><em class="mono">{{ formatBytes(quota.storage_used) }} / {{ formatBytes(quota.storage_limit) }}</em>
+          <span class="disp">{{ t('dashboard.storage.title') }}</span><em class="mono">{{ formatBytes(quota.storage_used) }} / {{ formatBytes(quota.storage_limit) }}</em>
         </div>
         <div class="bd">
           <div class="bar">
@@ -111,13 +114,13 @@ async function create() {
             class="muted"
             style="font-size:12px;margin:8px 0 0"
           >
-            原檔會完整保留，展示版與縮圖不計入配額。
+            {{ t('dashboard.storage.hint') }}
           </p>
         </div>
       </div>
       <div class="card">
         <div class="hd">
-          <span class="disp">今日上傳</span><em class="mono">{{ quota.uploads_today }} / {{ quota.daily_limit }} 張</em>
+          <span class="disp">{{ t('dashboard.daily.title') }}</span><em class="mono">{{ t('dashboard.daily.count', { used: quota.uploads_today, limit: quota.daily_limit }) }}</em>
         </div>
         <div class="bd">
           <div class="bar">
@@ -127,7 +130,7 @@ async function create() {
             class="muted"
             style="font-size:12px;margin:8px 0 0"
           >
-            每日上限用來防止濫用，午夜重置。
+            {{ t('dashboard.daily.hint') }}
           </p>
         </div>
       </div>
@@ -135,22 +138,22 @@ async function create() {
 
     <PawDialog
       v-model:open="creating"
-      title="新增獸設"
-      description="先給名字就好，其他資料進編輯器再慢慢補。"
+      :title="t('dashboard.dialog.title')"
+      :description="t('dashboard.dialog.description')"
     >
       <form
         id="create-fursona"
         @submit.prevent="create"
       >
         <div class="field">
-          <label for="nf-name">名字</label>
+          <label for="nf-name">{{ t('dashboard.dialog.name') }}</label>
           <input
             id="nf-name"
             v-model="form.name"
             class="input"
             :class="{ 'is-invalid': errors.name }"
             maxlength="60"
-            placeholder="阿燼 Ember"
+            :placeholder="t('dashboard.dialog.namePlaceholder')"
             autofocus
           >
           <div
@@ -164,13 +167,13 @@ async function create() {
           class="field"
           style="margin:0"
         >
-          <label for="nf-species">物種（選填）</label>
+          <label for="nf-species">{{ t('dashboard.dialog.species') }}</label>
           <input
             id="nf-species"
             v-model="form.species"
             class="input"
             maxlength="60"
-            placeholder="赤狐"
+            :placeholder="t('dashboard.dialog.speciesPlaceholder')"
           >
         </div>
       </form>
@@ -180,7 +183,7 @@ async function create() {
           type="button"
           @click="creating = false"
         >
-          取消
+          {{ t('dashboard.dialog.cancel') }}
         </button>
         <button
           class="btn primary"
@@ -188,7 +191,7 @@ async function create() {
           form="create-fursona"
           :disabled="busy"
         >
-          建立
+          {{ t('dashboard.dialog.submit') }}
         </button>
       </template>
     </PawDialog>

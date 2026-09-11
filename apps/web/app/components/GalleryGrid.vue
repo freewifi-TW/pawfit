@@ -13,13 +13,16 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{ reorder: [ids: string[]], edit: [media: Media] }>()
 
+const { t } = useI18n()
+const { kindLabel } = useLabels()
+
 const filter = ref<'all' | MediaKind>('all')
-const filters: Array<{ value: 'all' | MediaKind, label: string }> = [
-  { value: 'all', label: '全部' },
-  { value: 'art2d', label: '2D' },
-  { value: 'model3d', label: '3D' },
-  { value: 'photo', label: '實體' }
-]
+const filters = computed<Array<{ value: 'all' | MediaKind, label: string }>>(() => [
+  { value: 'all', label: t('media.grid.filterAll') },
+  { value: 'art2d', label: kindLabel('art2d') },
+  { value: 'model3d', label: kindLabel('model3d') },
+  { value: 'photo', label: kindLabel('photo') }
+])
 
 const shown = computed(() => filter.value === 'all' ? props.media : props.media.filter(m => m.kind === filter.value))
 const lightbox = ref<Media | null>(null)
@@ -65,8 +68,8 @@ function onDrop(target: Media) {
         </button>
       </div>
       <span class="count">
-        {{ shown.length }} 張
-        <template v-if="owner"> · 拖曳卡片可排序 · 擁有者永遠看得到自己的內容</template>
+        {{ t('media.grid.count', shown.length) }}
+        <template v-if="owner"> · {{ t('media.grid.ownerHint') }}</template>
       </span>
     </div>
 
@@ -74,8 +77,8 @@ function onDrop(target: Media) {
       v-if="!owner && hiddenNsfw > 0"
       class="visitor-note"
     >
-      有 {{ hiddenNsfw }} 張成人內容未顯示。<slot name="nsfw-hint">
-        登入並在設定中完成 18 歲聲明後即可選擇顯示方式。
+      {{ t('media.grid.hiddenNsfw', hiddenNsfw) }}<slot name="nsfw-hint">
+        {{ t('media.grid.nsfwHint') }}
       </slot>
     </p>
 
@@ -105,7 +108,7 @@ function onDrop(target: Media) {
       style="margin:16px 22px 22px"
     >
       <slot name="empty">
-        這個分類還沒有圖片。
+        {{ t('media.grid.empty') }}
       </slot>
     </div>
 

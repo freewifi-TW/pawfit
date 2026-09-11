@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "title": "My fursonas",
+    "subtitle": "No fursonas yet · Your primary fursona appears on your profile | 1 fursona · Your primary fursona appears on your profile | {n} fursonas · Your primary fursona appears on your profile",
+    "createButton": "＋ New fursona",
+    "newCard": {
+      "title": "New fursona",
+      "hint": "Name, species, palette — done in two minutes"
+    },
+    "storage": {
+      "title": "Storage",
+      "hint": "Originals are kept in full; display and thumbnail versions don't count toward your quota."
+    },
+    "daily": {
+      "title": "Uploads today",
+      "count": "{used} / {limit}",
+      "hint": "The daily limit prevents abuse and resets at midnight."
+    },
+    "dialog": {
+      "title": "New fursona",
+      "description": "A name is enough for now — fill in the rest in the editor.",
+      "name": "Name",
+      "namePlaceholder": "Ember",
+      "species": "Species (optional)",
+      "speciesPlaceholder": "Red fox",
+      "cancel": "Cancel",
+      "submit": "Create"
+    },
+    "errors": {
+      "nameRequired": "Please enter a name.",
+      "createFailed": "Couldn't create fursona"
+    },
+    "notify": {
+      "created": "Created {name}",
+      "createdHint": "Next, upload reference art and add a palette."
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "common": {
+    "brand": "Pawfit 爪搭",
+    "nav": {
+      "home": "首頁",
+      "dashboard": "我的獸設",
+      "profile": "個人主頁",
+      "settings": "設定",
+      "admin": "管理",
+      "adminPanel": "管理後台",
+      "finishSetup": "完成設定",
+      "logout": "登出",
+      "login": "登入",
+      "noId": "未設定 ID"
+    },
+    "logo": {
+      "ariaLabel": "Pawfit 首頁"
+    },
+    "legal": {
+      "terms": "服務條款",
+      "guidelines": "社群守則",
+      "privacy": "隱私權政策"
+    },
+    "footer": {
+      "contact": "聯絡我們",
+      "phase": "Phase 1 · 獸設檔案庫與分享包"
+    },
+    "errorPage": {
+      "notFound": "找不到這一頁",
+      "forbidden": "沒有權限",
+      "generic": "出了點問題",
+      "notFoundHint": "連結可能已停用、獸設被設為私人，或這頁本來就不存在。",
+      "retryHint": "請稍後再試一次。",
+      "backHome": "回首頁"
+    },
+    "api": {
+      "unauthorized": "請先登入。",
+      "forbidden": "沒有權限執行這個操作。",
+      "notFound": "找不到資料。",
+      "tooMany": "操作太頻繁，稍後再試。",
+      "server": "伺服器發生錯誤，請稍後再試。",
+      "generic": "發生錯誤，請再試一次。"
+    },
+    "locale": {
+      "label": "語言"
+    },
+    "notify": {
+      "saveFailed": "儲存失敗"
+    }
+  }
+}

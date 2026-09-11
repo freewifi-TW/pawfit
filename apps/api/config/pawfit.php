@@ -51,4 +51,11 @@ return [
 
     // 前端網址（分享連結、OAuth 完成後轉址用）
     'frontend_url' => rtrim((string) env('FRONTEND_URL', env('APP_URL', 'http://localhost:8080')), '/'),
+
+    // 多語系（BCP 47）。新增語言：這裡加一個 code，並補 lang/<code 底線版>/ 與前端 i18n/locales/<code>/。
+    // 前端清單在 apps/web/nuxt.config.ts 的 SUPPORTED_LOCALES，兩邊要一致。
+    'locales' => [
+        'supported' => ['zh-TW', 'en'],
+        'default' => 'zh-TW',
+    ],
 ];

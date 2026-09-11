@@ -1,0 +1,48 @@
+{
+  "home": {
+    "seo": {
+      "title": "把你的獸設，整理成一個連結",
+      "description": "三視圖、精準色票、繪師 credit、委託成品，全部收在一頁。Pawfit 爪搭：獸圈用的獸設檔案庫。"
+    },
+    "banned": {
+      "title": "此帳號已被停權",
+      "hint": "如有疑問請聯絡站方。"
+    },
+    "hero": {
+      "title": "把你的獸設，{br}整理成{mark}。",
+      "titleMark": "一個連結",
+      "lead": "三視圖、精準色票、繪師 credit、委託成品，全部收在一頁。傳給繪師、毛裝工作室或朋友，不用再翻聊天紀錄找設定圖。",
+      "ctaEnter": "進入我的獸設",
+      "ctaStart": "用 Google 開始",
+      "ctaDemo": "看示範分享頁"
+    },
+    "demo": {
+      "sticker": "示範獸設",
+      "name": "阿燼 Ember",
+      "meta": "赤狐 · 成年 · 標準體型",
+      "tagCanine": "犬科",
+      "tagFox": "赤狐",
+      "tagBuild": "標準體型",
+      "refCount": "5 張設定圖",
+      "creditCount": "4 位繪師 credit"
+    },
+    "features": {
+      "collect": {
+        "title": "設定資料集中",
+        "body": "多隻獸設、多視角圖庫，強制區分 2D 平面、3D 模型與實體照片，委託成品也能收進私密收藏。"
+      },
+      "palette": {
+        "title": "色票精準到位",
+        "body": "每個顏色都有名稱、部位備註與 hex 色碼，繪師一鍵複製，不再靠截圖取色。"
+      },
+      "share": {
+        "title": "一鍵分享包",
+        "body": "產生分享連結，貼到 Discord 或 Twitter 會展開預覽卡；可開浮水印、可隨時停用。"
+      }
+    },
+    "notice": {
+      "title": "成人內容第一天就支援，但預設看不到。",
+      "body": "上傳時必須標記 SFW 或 NSFW；瀏覽者要完成 18 歲聲明並自行切換顯示方式，訪客永遠看不到 NSFW 內容。"
+    }
+  }
+}

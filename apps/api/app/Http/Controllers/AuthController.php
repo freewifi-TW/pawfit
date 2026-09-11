@@ -25,7 +25,7 @@ class AuthController extends Controller
 
     public function redirectToGoogle(Request $request): RedirectResponse
     {
-        abort_if(blank(config('services.google.client_id')), 503, 'Google 登入尚未設定。');
+        abort_if(blank(config('services.google.client_id')), 503, __('messages.auth.google_not_configured'));
 
         $state = Str::random(40);
         $request->session()->put('oauth_state', $state);

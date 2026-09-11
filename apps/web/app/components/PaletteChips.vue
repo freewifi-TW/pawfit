@@ -4,13 +4,14 @@ import type { PaletteEntry } from '~/types/api'
 /** 分享頁色票：點一下複製色碼。 */
 defineProps<{ palette: PaletteEntry[] }>()
 const notify = useNotify()
+const { t } = useI18n()
 
 async function copy(hex: string) {
   try {
     await navigator.clipboard.writeText(hex)
-    notify.ok(`已複製 ${hex}`)
+    notify.ok(t('media.palette.copied', { hex }))
   } catch {
-    notify.err('無法存取剪貼簿')
+    notify.err(t('media.palette.clipboardError'))
   }
 }
 </script>
@@ -22,11 +23,11 @@ async function copy(hex: string) {
       :key="i"
       class="chip"
       type="button"
-      :title="`複製 ${p.hex}`"
+      :title="t('media.palette.copyTitle', { hex: p.hex })"
       @click="copy(p.hex)"
     >
       <i :style="`background:${p.hex}`" />
-      <span class="n">{{ p.name || '未命名' }}</span>
+      <span class="n">{{ p.name || t('media.common.untitled') }}</span>
       <span class="h mono">{{ p.hex }}</span>
       <span
         v-if="p.note"

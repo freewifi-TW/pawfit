@@ -1,0 +1,51 @@
+{
+  "common": {
+    "brand": "Pawfit",
+    "nav": {
+      "home": "Home",
+      "dashboard": "My Fursonas",
+      "profile": "Profile",
+      "settings": "Settings",
+      "admin": "Admin",
+      "adminPanel": "Admin Panel",
+      "finishSetup": "Finish Setup",
+      "logout": "Log out",
+      "login": "Log in",
+      "noId": "No ID yet"
+    },
+    "logo": {
+      "ariaLabel": "Pawfit home"
+    },
+    "legal": {
+      "terms": "Terms of Service",
+      "guidelines": "Community Guidelines",
+      "privacy": "Privacy Policy"
+    },
+    "footer": {
+      "contact": "Contact us",
+      "phase": "Phase 1 · Fursona archive & share kit"
+    },
+    "errorPage": {
+      "notFound": "Page not found",
+      "forbidden": "No permission",
+      "generic": "Something went wrong",
+      "notFoundHint": "The link may have been disabled, the fursona set to private, or this page never existed.",
+      "retryHint": "Please try again later.",
+      "backHome": "Back to home"
+    },
+    "api": {
+      "unauthorized": "Please log in first.",
+      "forbidden": "You do not have permission to do this.",
+      "notFound": "Not found.",
+      "tooMany": "Too many requests. Please try again later.",
+      "server": "Server error. Please try again later.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "locale": {
+      "label": "Language"
+    },
+    "notify": {
+      "saveFailed": "Save failed"
+    }
+  }
+}

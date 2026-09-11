@@ -2,7 +2,9 @@
 import type { Me } from '~/types/api'
 
 definePageMeta({ middleware: 'auth' })
-useSeoMeta({ title: '設定 Pawfit ID' })
+
+const { t } = useI18n()
+useSeoMeta({ title: () => t('auth.onboarding.title') })
 
 const api = useApi()
 const notify = useNotify()
@@ -47,19 +49,19 @@ watch(pawfitId, (v) => {
 
 const hint = computed(() => {
   switch (availability.value) {
-    case 'checking': return '檢查中…'
-    case 'ok': return '✓ 可以使用'
-    case 'taken': return '這個 Pawfit ID 已經有人用了'
-    case 'invalid': return pawfitId.value ? '3 到 20 字元，英數與底線；部分保留字不可用' : ''
-    default: return '3 到 20 字元，英數與底線。之後更名政策確定前不可更改。'
+    case 'checking': return t('auth.onboarding.idHint.checking')
+    case 'ok': return t('auth.onboarding.idHint.ok')
+    case 'taken': return t('auth.onboarding.idHint.taken')
+    case 'invalid': return pawfitId.value ? t('auth.onboarding.idHint.invalid') : ''
+    default: return t('auth.onboarding.idHint.default')
   }
 })
 
 async function submit() {
   errors.value = {}
-  if (!idValid.value) errors.value.pawfit_id = 'Pawfit ID 格式不正確。'
-  if (!displayName.value.trim()) errors.value.display_name = '請填顯示名稱。'
-  if (!tos.value) errors.value.tos = '需同意服務條款與社群守則才能繼續。'
+  if (!idValid.value) errors.value.pawfit_id = t('auth.onboarding.errors.idFormat')
+  if (!displayName.value.trim()) errors.value.display_name = t('auth.onboarding.errors.displayName')
+  if (!tos.value) errors.value.tos = t('auth.onboarding.errors.tos')
   if (Object.keys(errors.value).length) return
 
   busy.value = true
@@ -74,12 +76,12 @@ async function submit() {
       }
     })
     await fetchMe(true)
-    notify.ok('設定完成！來建立第一隻獸設吧')
+    notify.ok(t('auth.onboarding.done'))
     await navigateTo('/dashboard?new=1')
   } catch (e) {
     const err = apiError(e)
     errors.value = err.errors
-    if (!Object.keys(err.errors).length) notify.err('儲存失敗', err.message)
+    if (!Object.keys(err.errors).length) notify.err(t('common.notify.saveFailed'), err.message)
   } finally {
     busy.value = false
   }
@@ -93,16 +95,16 @@ async function submit() {
       @submit.prevent="submit"
     >
       <div class="steps">
-        <i>✓</i>Google 登入<span>—</span><i class="on">2</i>設定 Pawfit ID<span>—</span><i>3</i>建立第一隻獸設
+        <i>✓</i>{{ t('auth.onboarding.steps.google') }}<span>—</span><i class="on">2</i>{{ t('auth.onboarding.steps.id') }}<span>—</span><i>3</i>{{ t('auth.onboarding.steps.fursona') }}
       </div>
       <h1 class="disp">
-        替自己取個 Pawfit ID
+        {{ t('auth.onboarding.heading') }}
       </h1>
       <p
         class="sub"
         style="margin:0 0 22px"
       >
-        這會成為你的個人主頁網址，也是日後朋友加你好友的方式。
+        {{ t('auth.onboarding.lead') }}
       </p>
 
       <div class="field">
@@ -130,17 +132,17 @@ async function submit() {
       </div>
 
       <div class="field">
-        <label for="dname">顯示名稱</label>
+        <label for="dname">{{ t('auth.onboarding.displayName.label') }}</label>
         <input
           id="dname"
           v-model="displayName"
           class="input"
           :class="{ 'is-invalid': errors.display_name }"
           maxlength="40"
-          placeholder="Ash 灰灰"
+          :placeholder="t('auth.onboarding.displayName.placeholder')"
         >
         <div class="hint">
-          {{ errors.display_name || '顯示在主頁與分享頁，隨時可改。' }}
+          {{ errors.display_name || t('auth.onboarding.displayName.hint') }}
         </div>
       </div>
 
@@ -152,15 +154,25 @@ async function submit() {
           v-model="tos"
           type="checkbox"
         >
-        <span>我已年滿 13 歲，並同意 <NuxtLink
-          class="link"
-          to="/terms"
-          target="_blank"
-        >服務條款</NuxtLink> 與 <NuxtLink
-          class="link"
-          to="/guidelines"
-          target="_blank"
-        >社群守則</NuxtLink>。</span>
+        <i18n-t
+          keypath="auth.onboarding.agree"
+          tag="span"
+        >
+          <template #terms>
+            <NuxtLink
+              class="link"
+              to="/terms"
+              target="_blank"
+            >{{ t('common.legal.terms') }}</NuxtLink>
+          </template>
+          <template #guidelines>
+            <NuxtLink
+              class="link"
+              to="/guidelines"
+              target="_blank"
+            >{{ t('common.legal.guidelines') }}</NuxtLink>
+          </template>
+        </i18n-t>
       </label>
       <div
         v-if="errors.tos"
@@ -177,7 +189,7 @@ async function submit() {
           v-model="adult"
           type="checkbox"
         >
-        <span>我已年滿 18 歲，想要瀏覽成人內容。<span class="muted">（可稍後在設定中完成；聲明時間會被記錄）</span></span>
+        <span>{{ t('auth.onboarding.adult') }}<span class="muted">{{ t('auth.onboarding.adultNote') }}</span></span>
       </label>
 
       <div class="row">
@@ -187,7 +199,7 @@ async function submit() {
           type="submit"
           :disabled="busy || availability === 'taken' || availability === 'checking'"
         >
-          完成，建立第一隻獸設
+          {{ t('auth.onboarding.submit') }}
         </button>
       </div>
     </form>

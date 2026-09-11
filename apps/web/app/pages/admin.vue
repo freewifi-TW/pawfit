@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import type { AdminStats, Paginated, Report, ReportStatus } from '~/types/api'
-import { ADMIN_ACTION_LABEL, formatDate, REASON_LABEL, REASON_PILL } from '~/utils/labels'
+import { REASON_PILL } from '~/utils/labels'
 
 definePageMeta({ middleware: ['auth', 'admin'] })
-useSeoMeta({ title: '管理後台', robots: 'noindex' })
+
+const { t } = useI18n()
+const { adminActionLabel, reasonLabel, formatDate } = useLabels()
+
+useSeoMeta({ title: () => t('admin.title'), robots: 'noindex' })
 
 const api = useApi()
 const notify = useNotify()
@@ -23,22 +27,25 @@ async function act(report: Report, action: string, targetId: string, note?: stri
   busyId.value = report.id
   try {
     await api('/admin/actions', { method: 'POST', body: { action, target_id: targetId, report_id: report.id, note: note ?? null } })
-    notify.ok(`已${ADMIN_ACTION_LABEL[action] ?? action}`)
+    notify.ok(t('admin.notify.done', { action: adminActionLabel(action) }))
     await Promise.all([refreshReports(), refreshStats()])
   } catch (e) {
-    notify.err('操作失敗', apiError(e).message)
+    notify.err(t('admin.notify.failed'), apiError(e).message)
   } finally {
     busyId.value = null
   }
 }
 
 function targetLabel(r: Report): string {
-  const t = r.target
-  if (!t) return '（目標已刪除）'
+  const tg = r.target
+  if (!tg) return t('admin.target.deleted')
   switch (r.target_type) {
-    case 'media': return `圖片 · ${t.label}${t.fursona_name ? `（${t.fursona_name}）` : ''}`
-    case 'fursona': return `獸設 · ${t.label}`
-    default: return `用戶 · ${t.label}`
+    case 'media':
+      return tg.fursona_name
+        ? t('admin.target.mediaWithFursona', { label: tg.label, fursona: tg.fursona_name })
+        : t('admin.target.media', { label: tg.label })
+    case 'fursona': return t('admin.target.fursona', { label: tg.label })
+    default: return t('admin.target.user', { label: tg.label })
   }
 }
 
@@ -57,9 +64,9 @@ void ownerIdOf
     <div class="pagehd">
       <div>
         <h1 class="disp">
-          管理後台
+          {{ t('admin.title') }}
         </h1>
-        <p>檢舉佇列與操作紀錄 · 僅站方可見</p>
+        <p>{{ t('admin.subtitle') }}</p>
       </div>
       <span class="sp" /><span class="pill danger">admin</span>
     </div>
@@ -69,53 +76,53 @@ void ownerIdOf
       class="kpi"
     >
       <div class="card">
-        <b class="disp">{{ stats.open }}</b><span>待處理檢舉</span>
+        <b class="disp">{{ stats.open }}</b><span>{{ t('admin.stats.open') }}</span>
       </div>
       <div class="card">
-        <b class="disp">{{ stats.open_illegal }}</b><span>紅線內容（優先）</span>
+        <b class="disp">{{ stats.open_illegal }}</b><span>{{ t('admin.stats.openIllegal') }}</span>
       </div>
       <div class="card">
-        <b class="disp">{{ stats.resolved_this_week }}</b><span>本週已處理</span>
+        <b class="disp">{{ stats.resolved_this_week }}</b><span>{{ t('admin.stats.resolvedThisWeek') }}</span>
       </div>
       <div class="card">
-        <b class="disp">{{ stats.banned_users }}</b><span>停權帳號</span>
+        <b class="disp">{{ stats.banned_users }}</b><span>{{ t('admin.stats.bannedUsers') }}</span>
       </div>
     </div>
 
     <div class="card">
       <div class="hd">
-        <span class="disp">檢舉佇列</span>
+        <span class="disp">{{ t('admin.queue.title') }}</span>
         <div class="seg sm">
           <button
             type="button"
             :class="{ on: status === 'open' }"
             @click="status = 'open'"
           >
-            待處理
+            {{ t('admin.status.open') }}
           </button>
           <button
             type="button"
             :class="{ on: status === 'resolved' }"
             @click="status = 'resolved'"
           >
-            已處理
+            {{ t('admin.status.resolved') }}
           </button>
           <button
             type="button"
             :class="{ on: status === 'dismissed' }"
             @click="status = 'dismissed'"
           >
-            已駁回
+            {{ t('admin.status.dismissed') }}
           </button>
           <button
             type="button"
             :class="{ on: status === 'all' }"
             @click="status = 'all'"
           >
-            全部
+            {{ t('admin.status.all') }}
           </button>
         </div>
-        <em>紅線內容優先，其餘依時間</em>
+        <em>{{ t('admin.queue.hint') }}</em>
       </div>
       <div class="bd tblwrap">
         <table
@@ -123,7 +130,7 @@ void ownerIdOf
           class="tbl"
         >
           <thead>
-            <tr><th>目標</th><th>原因</th><th>檢舉者</th><th>時間</th><th>狀態</th><th /></tr>
+            <tr><th>{{ t('admin.table.target') }}</th><th>{{ t('admin.table.reason') }}</th><th>{{ t('admin.table.reporter') }}</th><th>{{ t('admin.table.time') }}</th><th>{{ t('admin.table.status') }}</th><th /></tr>
           </thead>
           <tbody>
             <tr
@@ -146,7 +153,7 @@ void ownerIdOf
                   class="muted"
                   style="font-size:11px"
                 >
-                  擁有者 <NuxtLink
+                  {{ t('admin.target.owner') }} <NuxtLink
                     :to="`/u/${r.target.owner_pawfit_id}`"
                     class="link"
                   >@{{ r.target.owner_pawfit_id }}</NuxtLink>
@@ -154,10 +161,10 @@ void ownerIdOf
                     · {{ r.target.is_nsfw ? 'NSFW' : 'SFW' }} · {{ r.target.status }}
                   </template>
                   <template v-if="r.target_type === 'fursona' && r.target.removed_at">
-                    · 已下架
+                    · {{ t('admin.target.removed') }}
                   </template>
                   <template v-if="r.target_type === 'profile' && r.target.is_banned">
-                    · 已停權
+                    · {{ t('admin.target.banned') }}
                   </template>
                 </div>
                 <div
@@ -165,14 +172,14 @@ void ownerIdOf
                   class="sub"
                   style="font-size:12px;max-width:36ch"
                 >
-                  「{{ r.detail }}」
+                  {{ t('admin.target.detailQuote', { detail: r.detail }) }}
                 </div>
               </td>
               <td>
                 <span
                   class="pill"
                   :class="REASON_PILL[r.reason_code]"
-                >{{ REASON_LABEL[r.reason_code] }}</span>
+                >{{ reasonLabel(r.reason_code) }}</span>
               </td>
               <td>@{{ r.reporter?.pawfit_id ?? '?' }}</td>
               <td class="mono">
@@ -182,7 +189,7 @@ void ownerIdOf
                 <span
                   class="pill"
                   :class="r.status === 'open' ? 'warn' : r.status === 'resolved' ? 'ok' : ''"
-                >{{ r.status === 'open' ? '待處理' : r.status === 'resolved' ? '已處理' : '已駁回' }}</span>
+                >{{ t(`admin.status.${r.status}`) }}</span>
               </td>
               <td>
                 <div
@@ -198,7 +205,7 @@ void ownerIdOf
                       :disabled="busyId === r.id"
                       @click="preview = r"
                     >
-                      預覽
+                      {{ t('admin.actions.preview') }}
                     </button>
                     <button
                       v-if="!r.target.is_nsfw"
@@ -207,7 +214,7 @@ void ownerIdOf
                       :disabled="busyId === r.id"
                       @click="act(r, 'mark_nsfw', r.target_id)"
                     >
-                      改標 NSFW
+                      {{ t('admin.actions.markNsfw') }}
                     </button>
                     <button
                       v-if="r.target.status === 'active'"
@@ -216,16 +223,16 @@ void ownerIdOf
                       :disabled="busyId === r.id"
                       @click="act(r, 'remove_media', r.target_id)"
                     >
-                      下架
+                      {{ t('admin.actions.remove') }}
                     </button>
                     <button
                       v-if="r.reason_code === 'illegal'"
                       class="btn sm danger"
                       type="button"
                       :disabled="busyId === r.id"
-                      @click="act(r, 'purge_media', r.target_id, '紅線內容緊急移除')"
+                      @click="act(r, 'purge_media', r.target_id, t('admin.notes.purge'))"
                     >
-                      緊急移除
+                      {{ t('admin.actions.purge') }}
                     </button>
                   </template>
                   <template v-else-if="r.target_type === 'fursona'">
@@ -235,7 +242,7 @@ void ownerIdOf
                       :to="`/fursona/${r.target.fursona_id}`"
                       target="_blank"
                     >
-                      檢視
+                      {{ t('admin.actions.view') }}
                     </NuxtLink>
                     <button
                       v-if="!r.target.removed_at"
@@ -244,7 +251,7 @@ void ownerIdOf
                       :disabled="busyId === r.id"
                       @click="act(r, 'remove_fursona', r.target_id)"
                     >
-                      下架
+                      {{ t('admin.actions.remove') }}
                     </button>
                   </template>
                   <template v-else>
@@ -255,7 +262,7 @@ void ownerIdOf
                       :disabled="busyId === r.id"
                       @click="act(r, 'ban_user', r.target_id)"
                     >
-                      停權
+                      {{ t('admin.actions.ban') }}
                     </button>
                   </template>
                   <button
@@ -264,7 +271,7 @@ void ownerIdOf
                     :disabled="busyId === r.id"
                     @click="act(r, 'dismiss_report', r.id)"
                   >
-                    駁回
+                    {{ t('admin.actions.dismiss') }}
                   </button>
                 </div>
                 <div
@@ -272,7 +279,7 @@ void ownerIdOf
                   class="muted"
                   style="font-size:12px"
                 >
-                  {{ r.resolved_by ? `由 @${r.resolved_by.pawfit_id}` : '' }} {{ formatDate(r.resolved_at, true) }}
+                  {{ r.resolved_by ? t('admin.resolvedBy', { id: r.resolved_by.pawfit_id }) : '' }} {{ formatDate(r.resolved_at, true) }}
                 </div>
                 <div
                   v-else
@@ -282,9 +289,9 @@ void ownerIdOf
                   <button
                     class="btn sm ghost"
                     type="button"
-                    @click="act(r, 'resolve_report', r.id, '目標已不存在')"
+                    @click="act(r, 'resolve_report', r.id, t('admin.notes.targetGone'))"
                   >
-                    結案
+                    {{ t('admin.actions.resolve') }}
                   </button>
                 </div>
               </td>
@@ -295,7 +302,7 @@ void ownerIdOf
           v-else
           class="empty"
         >
-          沒有符合的檢舉。
+          {{ t('admin.queue.empty') }}
         </div>
       </div>
     </div>
@@ -306,7 +313,7 @@ void ownerIdOf
       style="margin-top:22px"
     >
       <h2 class="disp">
-        操作紀錄
+        {{ t('admin.log.title') }}
       </h2>
       <div
         class="bd"
@@ -318,20 +325,20 @@ void ownerIdOf
           class="row"
         >
           <span class="mono muted">{{ formatDate(a.created_at, true) }}</span>
-          <span>{{ a.admin ?? 'admin' }} · {{ ADMIN_ACTION_LABEL[a.action] ?? a.action }} <span class="mono">{{ a.target_type }}/{{ a.target_id.slice(0, 8) }}</span><template v-if="a.note">（{{ a.note }}）</template></span>
+          <span>{{ a.admin ?? 'admin' }} · {{ adminActionLabel(a.action) }} <span class="mono">{{ a.target_type }}/{{ a.target_id.slice(0, 8) }}</span><template v-if="a.note">{{ t('admin.log.note', { note: a.note }) }}</template></span>
         </div>
         <div
           v-if="!stats.recent_actions.length"
           class="muted"
         >
-          尚無紀錄。
+          {{ t('admin.log.empty') }}
         </div>
       </div>
     </div>
 
     <PawDialog
       :open="!!preview"
-      title="內容預覽"
+      :title="t('admin.preview.title')"
       :description="preview ? targetLabel(preview) : ''"
       wide
       @update:open="(v) => !v && (preview = null)"
@@ -348,7 +355,7 @@ void ownerIdOf
           type="button"
           @click="preview = null"
         >
-          關閉
+          {{ t('admin.preview.close') }}
         </button>
       </template>
     </PawDialog>

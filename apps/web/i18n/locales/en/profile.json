@@ -1,0 +1,40 @@
+{
+  "profile": {
+    "notFound": "User not found",
+    "seo": {
+      "title": "{name} ({'@'}{id})",
+      "description": "{name}'s fursonas on Pawfit: {list}",
+      "listSeparator": ", ",
+      "noPublic": "no public fursonas yet",
+      "ogTitle": "{name} · Pawfit"
+    },
+    "header": {
+      "joined": "Joined {month}",
+      "statsOwner": "{total} fursona ({publicCount} public) | {total} fursonas ({publicCount} public)",
+      "statsPublic": "{n} public fursona | {n} public fursonas"
+    },
+    "actions": {
+      "manage": "Manage my fursonas",
+      "friendsSoon": "Friends are coming in Phase 2",
+      "addFriend": "+ Add friend",
+      "report": "Report"
+    },
+    "rep": {
+      "badge": "★ Representative fursona",
+      "moreColors": "+{n} more",
+      "viewFull": "View full reference",
+      "createShareLink": "Create share link",
+      "mediaCount": "{n} reference image | {n} reference images"
+    },
+    "list": {
+      "title": "Public fursonas",
+      "hint": "Private and link-only fursonas are not listed here",
+      "view": "View",
+      "edit": "Edit",
+      "noSharePage": "No share page yet",
+      "emptyOwner": "You have no public fursonas yet. Set one to Public in My Fursonas and it will show up here.",
+      "emptyVisitor": "This user has no public fursonas yet."
+    },
+    "reportTarget": "User {'@'}{id}"
+  }
+}

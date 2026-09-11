@@ -1,25 +1,30 @@
 <script setup lang="ts">
 import type { ProfilePage } from '~/types/api'
-import { formatMonth, paletteGradient } from '~/utils/labels'
+import { paletteGradient } from '~/utils/labels'
 
 const route = useRoute()
 const api = useApi()
 const notify = useNotify()
 const config = useRuntimeConfig()
+const { t } = useI18n()
+const { formatMonth } = useLabels()
 const pawfitId = route.params.pawfitId as string
 
 const { data: page, error } = await useAsyncData(`profile-${pawfitId}`, () => api<ProfilePage>(`/users/${encodeURIComponent(pawfitId)}`))
 if (error.value || !page.value) {
-  throw createError({ statusCode: 404, statusMessage: '找不到這位用戶' })
+  throw createError({ statusCode: 404, statusMessage: t('profile.notFound') })
 }
 
 const user = computed(() => page.value!.user)
 const rep = computed(() => page.value!.representative)
 
 useSeoMeta({
-  title: () => `${user.value.display_name}（@${user.value.pawfit_id}）`,
-  description: () => `${user.value.display_name} 在 Pawfit 的獸設：${page.value!.fursonas.map(f => f.name).join('、') || '尚未公開任何獸設'}`,
-  ogTitle: () => `${user.value.display_name} · Pawfit`,
+  title: () => t('profile.seo.title', { name: user.value.display_name, id: user.value.pawfit_id }),
+  description: () => t('profile.seo.description', {
+    name: user.value.display_name,
+    list: page.value!.fursonas.map(f => f.name).join(t('profile.seo.listSeparator')) || t('profile.seo.noPublic')
+  }),
+  ogTitle: () => t('profile.seo.ogTitle', { name: user.value.display_name }),
   ogImage: () => rep.value?.cover_url ? `${config.public.siteUrl}${rep.value.cover_url}` : undefined,
   ogUrl: () => `${config.public.siteUrl}/u/${user.value.pawfit_id}`
 })
@@ -45,12 +50,12 @@ const reporting = ref(false)
           {{ user.display_name }}
         </h1>
         <div class="id">
-          @{{ user.pawfit_id }} · {{ formatMonth(user.joined_at) }}加入 ·
+          @{{ user.pawfit_id }} · {{ t('profile.header.joined', { month: formatMonth(user.joined_at) }) }} ·
           <template v-if="page.is_owner && page.stats.total_count !== null">
-            {{ page.stats.total_count }} 隻獸設（{{ page.stats.public_count }} 隻公開）
+            {{ t('profile.header.statsOwner', { total: page.stats.total_count, publicCount: page.stats.public_count }, page.stats.total_count) }}
           </template>
           <template v-else>
-            {{ page.stats.public_count }} 隻公開獸設
+            {{ t('profile.header.statsPublic', page.stats.public_count) }}
           </template>
         </div>
       </div>
@@ -60,22 +65,22 @@ const reporting = ref(false)
           class="btn"
           to="/dashboard"
         >
-          管理我的獸設
+          {{ t('profile.actions.manage') }}
         </NuxtLink>
         <template v-else>
           <button
             class="btn"
             type="button"
-            @click="notify.info('好友功能將於 Phase 2 推出')"
+            @click="notify.info(t('profile.actions.friendsSoon'))"
           >
-            ＋ 加好友
+            {{ t('profile.actions.addFriend') }}
           </button>
           <button
             class="btn ghost sm"
             type="button"
             @click="reporting = true"
           >
-            檢舉
+            {{ t('profile.actions.report') }}
           </button>
         </template>
       </div>
@@ -102,7 +107,7 @@ const reporting = ref(false)
         <span
           class="pill accent"
           style="justify-self:start"
-        >★ 代表獸設</span>
+        >{{ t('profile.rep.badge') }}</span>
         <h2
           class="disp"
           style="margin:0;font-size:32px"
@@ -130,7 +135,7 @@ const reporting = ref(false)
             v-if="rep.palette.length > 4"
             class="muted"
             style="font-size:12px;margin-left:4px"
-          >＋{{ rep.palette.length - 4 }} 色</span>
+          >{{ t('profile.rep.moreColors', { n: rep.palette.length - 4 }) }}</span>
         </div>
         <div class="row">
           <NuxtLink
@@ -138,19 +143,19 @@ const reporting = ref(false)
             class="btn primary"
             :to="`/s/${rep.share_link.slug}`"
           >
-            看完整設定
+            {{ t('profile.rep.viewFull') }}
           </NuxtLink>
           <NuxtLink
             v-else-if="page.is_owner"
             class="btn primary"
             :to="`/fursona/${rep.id}#privacy`"
           >
-            產生分享連結
+            {{ t('profile.rep.createShareLink') }}
           </NuxtLink>
           <span
             class="muted"
             style="font-size:12px"
-          >{{ rep.media_count ?? 0 }} 張設定圖</span>
+          >{{ t('profile.rep.mediaCount', rep.media_count ?? 0) }}</span>
         </div>
       </div>
     </div>
@@ -164,14 +169,14 @@ const reporting = ref(false)
           class="disp"
           style="margin:0;font-size:24px"
         >
-          公開獸設
+          {{ t('profile.list.title') }}
         </h2>
       </div>
       <span class="sp" />
       <span
         class="muted"
         style="font-size:12px"
-      >私人與連結可見的獸設不會列在這裡</span>
+      >{{ t('profile.list.hint') }}</span>
     </div>
     <div
       v-if="page.fursonas.length"
@@ -188,20 +193,20 @@ const reporting = ref(false)
             class="btn sm"
             :to="`/s/${f.share_link.slug}`"
           >
-            看設定
+            {{ t('profile.list.view') }}
           </NuxtLink>
           <NuxtLink
             v-else-if="page.is_owner"
             class="btn sm"
             :to="`/fursona/${f.id}`"
           >
-            編輯
+            {{ t('profile.list.edit') }}
           </NuxtLink>
           <span
             v-else
             class="muted"
             style="font-size:12px"
-          >尚未開放分享頁</span>
+          >{{ t('profile.list.noSharePage') }}</span>
         </template>
       </FursonaCard>
     </div>
@@ -209,14 +214,14 @@ const reporting = ref(false)
       v-else
       class="empty"
     >
-      {{ page.is_owner ? '你還沒有公開的獸設。到「我的獸設」把隱私改成公開，就會出現在這裡。' : '這位用戶還沒有公開的獸設。' }}
+      {{ page.is_owner ? t('profile.list.emptyOwner') : t('profile.list.emptyVisitor') }}
     </div>
 
     <ReportDialog
       v-model:open="reporting"
       target-type="profile"
       :target-id="user.id"
-      :target-label="`用戶 @${user.pawfit_id}`"
+      :target-label="t('profile.reportTarget', { id: user.pawfit_id })"
     />
   </section>
 </template>

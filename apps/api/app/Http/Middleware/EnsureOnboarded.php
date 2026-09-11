@@ -14,7 +14,7 @@ class EnsureOnboarded
         $user = $request->user();
         if ($user && ! $user->isOnboarded()) {
             return response()->json([
-                'message' => '請先完成 Pawfit ID 設定與條款同意。',
+                'message' => __('messages.auth.onboarding_required'),
                 'code' => 'onboarding_required',
             ], 409);
         }

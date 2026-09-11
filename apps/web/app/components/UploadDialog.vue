@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Media, MediaKind, Visibility } from '~/types/api'
-import { formatBytes, KIND_LABEL_LONG, VISIBILITY_LABEL } from '~/utils/labels'
+import { formatBytes } from '~/utils/labels'
 
 /**
  * 上傳流程（SASD §2.1）：presign → 瀏覽器 PUT 直傳原檔 → confirm 寫 DB → 後端 queue 產衍生版。
@@ -16,6 +16,11 @@ const emit = defineEmits<{ uploaded: [media: Media] }>()
 
 const api = useApi()
 const notify = useNotify()
+const { t } = useI18n()
+const { kindLabelLong, visibilityLabel } = useLabels()
+
+const KINDS: MediaKind[] = ['art2d', 'model3d', 'photo']
+const VISIBILITIES: Visibility[] = ['public', 'unlisted', 'private']
 
 interface Item {
   file: File
@@ -42,11 +47,11 @@ const ACCEPT = ['image/jpeg', 'image/png', 'image/webp']
 function addFiles(list: FileList | File[]) {
   for (const f of Array.from(list)) {
     if (!ACCEPT.includes(f.type)) {
-      notify.err(`${f.name} 不是支援的格式`, '只接受 jpg / png / webp。')
+      notify.err(t('media.upload.unsupportedFormat', { name: f.name }), t('media.upload.unsupportedFormatHint'))
       continue
     }
     if (f.size > props.maxBytes) {
-      notify.err(`${f.name} 太大`, `單檔上限 ${formatBytes(props.maxBytes)}。`)
+      notify.err(t('media.upload.tooLarge', { name: f.name }), t('media.upload.tooLargeHint', { size: formatBytes(props.maxBytes) }))
       continue
     }
     items.value.push({ file: f, preview: URL.createObjectURL(f), progress: 0, status: 'pending' })
@@ -74,8 +79,8 @@ function putWithProgress(url: string, headers: Record<string, string>, file: Fil
       xhr.setRequestHeader('Content-Type', file.type)
     }
     xhr.upload.onprogress = e => e.lengthComputable && onProgress(Math.round((e.loaded / e.total) * 100))
-    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`直傳失敗（${xhr.status}）`)))
-    xhr.onerror = () => reject(new Error('直傳失敗，請確認網路或儲存服務的 CORS 設定'))
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(t('media.upload.putFailedStatus', { status: xhr.status }))))
+    xhr.onerror = () => reject(new Error(t('media.upload.putFailedNetwork')))
     xhr.send(file)
   })
 }
@@ -110,7 +115,8 @@ async function uploadOne(item: Item) {
   } catch (e) {
     item.status = 'error'
     const err = apiError(e)
-    item.error = err.message === '發生錯誤，請再試一次。' && e instanceof Error ? e.message : err.message
+    // 直傳（XHR）丟出的是沒有 HTTP response 的一般 Error，直接顯示它自己的訊息
+    item.error = err.status === 0 && e instanceof Error ? e.message : err.message
     if (storageKey) {
       api('/media/abandon', { method: 'POST', body: { fursona_id: props.fursonaId, storage_key: storageKey } }).catch(() => {})
     }
@@ -120,10 +126,10 @@ async function uploadOne(item: Item) {
 
 async function submit() {
   errors.value = {}
-  if (!items.value.length) errors.value.files = '請先選擇圖片。'
-  if (!kind.value) errors.value.kind = '請選擇分類。'
-  if (nsfw.value === null) errors.value.nsfw = '請標記內容分級。'
-  if (creditUrl.value && !/^https?:\/\//i.test(creditUrl.value)) errors.value.credit_url = '連結需以 http(s):// 開頭。'
+  if (!items.value.length) errors.value.files = t('media.upload.errors.files')
+  if (!kind.value) errors.value.kind = t('media.upload.errors.kind')
+  if (nsfw.value === null) errors.value.nsfw = t('media.upload.errors.nsfw')
+  if (creditUrl.value && !/^https?:\/\//i.test(creditUrl.value)) errors.value.credit_url = t('media.upload.errors.creditUrl')
   if (Object.keys(errors.value).length) return
 
   busy.value = true
@@ -138,11 +144,11 @@ async function submit() {
   busy.value = false
 
   if (failed === 0) {
-    notify.ok('已加入處理佇列', '展示版與縮圖產生完成後會自動出現在圖庫。')
+    notify.ok(t('media.upload.queued'), t('media.upload.queuedHint'))
     reset()
     open.value = false
   } else {
-    notify.err(`${failed} 張上傳失敗`, '可以修正後再按一次上傳，成功的不會重傳。')
+    notify.err(t('media.upload.failedCount', failed), t('media.upload.failedHint'))
   }
 }
 
@@ -166,8 +172,8 @@ watch(open, (v) => {
 <template>
   <PawDialog
     v-model:open="open"
-    title="上傳圖片"
-    description="原檔會直接上傳到儲存空間，展示版與縮圖稍後自動產生。"
+    :title="t('media.upload.title')"
+    :description="t('media.upload.description')"
     wide
   >
     <div
@@ -181,8 +187,8 @@ watch(open, (v) => {
       @dragleave="over = false"
       @drop.prevent="onDrop"
     >
-      <b>拖曳圖片到這裡，或點擊選擇</b>
-      jpg / png / webp，單檔 {{ formatBytes(maxBytes) }} 以內，可一次選多張。
+      <b>{{ t('media.upload.dropTitle') }}</b>
+      {{ t('media.upload.dropHint', { size: formatBytes(maxBytes) }) }}
       <input
         ref="fileInput"
         type="file"
@@ -234,7 +240,7 @@ watch(open, (v) => {
             v-else-if="it.status === 'done'"
             style="color:var(--ok)"
           >
-            已上傳，處理中
+            {{ t('media.upload.uploadedProcessing') }}
           </div>
         </div>
         <button
@@ -243,19 +249,19 @@ watch(open, (v) => {
           type="button"
           @click="remove(i)"
         >
-          移除
+          {{ t('media.upload.remove') }}
         </button>
       </div>
     </div>
 
     <div class="field">
-      <span class="lbl">分類 <span
+      <span class="lbl">{{ t('media.upload.kind') }} <span
         class="pill danger"
         style="font-size:10px"
-      >必填</span></span>
+      >{{ t('media.upload.required') }}</span></span>
       <div class="seg">
         <label
-          v-for="(label, k) in KIND_LABEL_LONG"
+          v-for="k in KINDS"
           :key="k"
         >
           <input
@@ -263,7 +269,7 @@ watch(open, (v) => {
             type="radio"
             name="upload-kind"
             :value="k"
-          >{{ label }}
+          >{{ kindLabelLong(k) }}
         </label>
       </div>
       <div
@@ -275,10 +281,10 @@ watch(open, (v) => {
     </div>
 
     <div class="field">
-      <span class="lbl">內容分級 <span
+      <span class="lbl">{{ t('media.upload.rating') }} <span
         class="pill danger"
         style="font-size:10px"
-      >必填</span></span>
+      >{{ t('media.upload.required') }}</span></span>
       <div class="seg">
         <label><input
           v-model="nsfw"
@@ -294,7 +300,7 @@ watch(open, (v) => {
         >NSFW</label>
       </div>
       <div class="hint">
-        不可略過。未標記的 NSFW 內容經檢舉會被改標或下架。
+        {{ t('media.upload.ratingHint') }}
       </div>
       <div
         v-if="errors.nsfw"
@@ -312,20 +318,20 @@ watch(open, (v) => {
         class="field"
         style="margin:0"
       >
-        <label for="up-credit">繪師 / 製作者</label>
+        <label for="up-credit">{{ t('media.upload.credit') }}</label>
         <input
           id="up-credit"
           v-model="creditName"
           class="input"
           maxlength="80"
-          placeholder="例如 @kuro_lines"
+          :placeholder="t('media.upload.creditPlaceholder')"
         >
       </div>
       <div
         class="field"
         style="margin:0"
       >
-        <label for="up-credit-url">作者連結（選填）</label>
+        <label for="up-credit-url">{{ t('media.upload.creditUrl') }}</label>
         <input
           id="up-credit-url"
           v-model="creditUrl"
@@ -346,40 +352,40 @@ watch(open, (v) => {
       class="field"
       style="margin-top:14px"
     >
-      <label for="up-caption">說明文字</label>
+      <label for="up-caption">{{ t('media.upload.caption') }}</label>
       <input
         id="up-caption"
         v-model="caption"
         class="input"
         maxlength="200"
-        placeholder="例如：正面設定圖，2026 年版"
+        :placeholder="t('media.upload.captionPlaceholder')"
       >
       <div
         v-if="items.length > 1"
         class="hint"
       >
-        多張同時上傳時會套用同一段說明，之後可逐張編輯。
+        {{ t('media.upload.captionMultiHint') }}
       </div>
     </div>
     <div
       class="field"
       style="margin:0"
     >
-      <label for="up-vis">這張圖的隱私</label>
+      <label for="up-vis">{{ t('media.upload.visibility') }}</label>
       <select
         id="up-vis"
         v-model="override"
         class="input"
       >
         <option value="">
-          繼承獸設設定（{{ VISIBILITY_LABEL[fursonaVisibility] }}）
+          {{ t('media.upload.inherit', { visibility: visibilityLabel(fursonaVisibility) }) }}
         </option>
         <option
-          v-for="(label, v) in VISIBILITY_LABEL"
+          v-for="v in VISIBILITIES"
           :key="v"
           :value="v"
         >
-          {{ label }}
+          {{ visibilityLabel(v) }}
         </option>
       </select>
     </div>
@@ -391,7 +397,7 @@ watch(open, (v) => {
         :disabled="busy"
         @click="open = false"
       >
-        取消
+        {{ t('media.common.cancel') }}
       </button>
       <button
         class="btn primary"
@@ -399,7 +405,7 @@ watch(open, (v) => {
         :disabled="busy"
         @click="submit"
       >
-        {{ busy ? '上傳中…' : `上傳${items.length ? ` ${items.length} 張` : ''}` }}
+        {{ busy ? t('media.upload.uploading') : (items.length ? t('media.upload.submitCount', { n: items.length }) : t('media.upload.submit')) }}
       </button>
     </template>
   </PawDialog>

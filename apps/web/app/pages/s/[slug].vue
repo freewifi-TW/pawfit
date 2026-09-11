@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SharePage } from '~/types/api'
-import { paletteGradient, tagStyle, VISIBILITY_LABEL } from '~/utils/labels'
+import { paletteGradient, tagStyle } from '~/utils/labels'
 
 /**
  * 分享頁（FR-4）：SSR + OG meta，訪客一律看不到 NSFW（由後端過濾）。
@@ -9,26 +9,35 @@ const route = useRoute()
 const api = useApi()
 const config = useRuntimeConfig()
 const { me } = useAuth()
+const { t } = useI18n()
+const { visibilityLabel } = useLabels()
 const slug = route.params.slug as string
 
 const { data: page, error } = await useAsyncData(`share-${slug}`, () => api<SharePage>(`/share/${encodeURIComponent(slug)}`))
 if (error.value || !page.value) {
-  throw createError({ statusCode: 404, statusMessage: '連結可能已停用或獸設已設為私人' })
+  throw createError({ statusCode: 404, statusMessage: t('share.notFound') })
 }
 
 const f = computed(() => page.value!.fursona)
 const owner = computed(() => page.value!.owner)
 const subtitle = computed(() => [f.value.species, ...f.value.tags.slice(0, 2)].filter(Boolean).join(' · '))
+const pageTitle = computed(() => (f.value.species
+  ? t('share.seo.titleWithSpecies', { name: f.value.name, species: f.value.species })
+  : f.value.name))
 const description = computed(() => {
   const bio = (f.value.bio ?? '').split('\n').map(s => s.trim()).filter(Boolean)[0] ?? ''
-  return `${bio ? `${bio} ` : ''}${f.value.palette.length} 色色票 · ${f.value.media?.length ?? 0} 張設定圖 — Pawfit`
+  const summary = t('share.seo.summary', {
+    palette: t('share.seo.paletteCount', f.value.palette.length),
+    media: t('share.seo.mediaCount', f.value.media?.length ?? 0)
+  })
+  return bio ? `${bio} ${summary}` : summary
 })
 const ogImage = computed(() => page.value!.og_image_url ? `${config.public.siteUrl}${page.value!.og_image_url}` : undefined)
 
 useSeoMeta({
-  title: () => `${f.value.name}${f.value.species ? ` · ${f.value.species}` : ''}`,
+  title: pageTitle,
   description,
-  ogTitle: () => `${f.value.name}${f.value.species ? ` · ${f.value.species}` : ''} — Pawfit 獸設分享`,
+  ogTitle: () => t('share.seo.ogTitle', { title: pageTitle.value }),
   ogDescription: description,
   ogImage,
   ogUrl: () => page.value!.share.url,
@@ -44,9 +53,9 @@ const bioParagraphs = computed(() => (f.value.bio ?? '').split(/\n{2,}/).map(s =
 const reporting = ref(false)
 
 const nsfwHint = computed(() => {
-  if (!me.value) return '登入並在設定中完成 18 歲聲明後即可選擇顯示方式。'
-  if (!me.value.adult_confirmed_at) return '到「設定」完成 18 歲聲明後即可選擇顯示方式。'
-  return '你的顯示偏好為「完全隱藏」，可在「設定」中調整。'
+  if (!me.value) return t('share.nsfw.guest')
+  if (!me.value.adult_confirmed_at) return t('share.nsfw.unconfirmed')
+  return t('share.nsfw.hidden')
 })
 </script>
 
@@ -62,7 +71,7 @@ const nsfwHint = computed(() => {
         :gradient="paletteGradient(f.palette)"
         :size="200"
         :border="6"
-        :alt="`${f.name} 的頭像`"
+        :alt="t('share.header.avatarAlt', { name: f.name })"
       />
       <div>
         <h1 class="disp">
@@ -77,19 +86,19 @@ const nsfwHint = computed(() => {
             :size="22"
             :border="0"
             variant="user"
-          />@{{ owner.pawfit_id }} 的獸設
+          />{{ t('share.header.ownerFursona', { id: owner.pawfit_id }) }}
         </NuxtLink>
         <div
           v-if="f.tags.length"
           class="tags"
         >
           <span
-            v-for="(t, i) in f.tags"
-            :key="t"
+            v-for="(tag, i) in f.tags"
+            :key="tag"
             class="tag"
             :class="tagStyle(i).class"
             :style="tagStyle(i).style"
-          >{{ t }}</span>
+          >{{ tag }}</span>
         </div>
       </div>
     </section>
@@ -101,7 +110,7 @@ const nsfwHint = computed(() => {
           class="card"
         >
           <h2 class="disp">
-            關於{{ f.name.split(' ')[0] }}
+            {{ t('share.about.title', { name: f.name.split(' ')[0] }) }}
           </h2>
           <div class="bd bio">
             <p
@@ -117,7 +126,7 @@ const nsfwHint = computed(() => {
           class="card"
         >
           <div class="hd">
-            <span class="disp">色票</span><em>點一下複製色碼</em>
+            <span class="disp">{{ t('share.palette.title') }}</span><em>{{ t('share.palette.hint') }}</em>
           </div>
           <PaletteChips :palette="f.palette" />
         </div>
@@ -125,13 +134,13 @@ const nsfwHint = computed(() => {
           v-if="!bioParagraphs.length && !f.palette.length"
           class="empty"
         >
-          還沒有簡介與色票。
+          {{ t('share.emptyBioPalette') }}
         </div>
       </aside>
 
       <section class="card">
         <h2 class="disp">
-          圖庫
+          {{ t('share.gallery.title') }}
         </h2>
         <GalleryGrid
           :media="f.media ?? []"
@@ -142,26 +151,26 @@ const nsfwHint = computed(() => {
             {{ nsfwHint }}
           </template>
           <template #empty>
-            目前沒有可顯示的圖片。
+            {{ t('share.gallery.empty') }}
           </template>
         </GalleryGrid>
       </section>
     </div>
 
     <div class="share">
-      <span>🔗 分享連結 <b class="mono">{{ page.share.url.replace(/^https?:\/\//, '') }}</b></span>
-      <span>浮水印 <b>{{ page.share.watermark ? '開啟' : '關閉' }}</b></span>
+      <span>{{ t('share.footer.shareLink') }} <b class="mono">{{ page.share.url.replace(/^https?:\/\//, '') }}</b></span>
+      <span>{{ t('share.footer.watermark') }} <b>{{ page.share.watermark ? t('share.footer.on') : t('share.footer.off') }}</b></span>
       <span
         class="sp"
         style="flex:1"
       />
-      <span>{{ VISIBILITY_LABEL[f.visibility] }}<template v-if="f.visibility === 'public'"> · 顯示於個人主頁</template></span>
+      <span>{{ f.visibility === 'public' ? t('share.footer.publicOnProfile', { visibility: visibilityLabel(f.visibility) }) : visibilityLabel(f.visibility) }}</span>
       <NuxtLink
         v-if="page.is_owner"
         class="btn sm"
         :to="`/fursona/${f.id}#privacy`"
       >
-        管理連結
+        {{ t('share.footer.manage') }}
       </NuxtLink>
       <button
         v-else
@@ -169,7 +178,7 @@ const nsfwHint = computed(() => {
         type="button"
         @click="reporting = true"
       >
-        檢舉此頁
+        {{ t('share.footer.report') }}
       </button>
     </div>
 
@@ -177,7 +186,7 @@ const nsfwHint = computed(() => {
       v-model:open="reporting"
       target-type="fursona"
       :target-id="f.id"
-      :target-label="`獸設「${f.name}」`"
+      :target-label="t('share.reportTarget', { name: f.name })"
     />
   </section>
 </template>

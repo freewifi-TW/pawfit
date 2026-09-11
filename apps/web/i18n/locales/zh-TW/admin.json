@@ -1,0 +1,88 @@
+{
+  "admin": {
+    "title": "管理後台",
+    "subtitle": "檢舉佇列與操作紀錄 · 僅站方可見",
+    "stats": {
+      "open": "待處理檢舉",
+      "openIllegal": "紅線內容（優先）",
+      "resolvedThisWeek": "本週已處理",
+      "bannedUsers": "停權帳號"
+    },
+    "queue": {
+      "title": "檢舉佇列",
+      "hint": "紅線內容優先，其餘依時間",
+      "empty": "沒有符合的檢舉。"
+    },
+    "status": {
+      "open": "待處理",
+      "resolved": "已處理",
+      "dismissed": "已駁回",
+      "all": "全部"
+    },
+    "table": {
+      "target": "目標",
+      "reason": "原因",
+      "reporter": "檢舉者",
+      "time": "時間",
+      "status": "狀態"
+    },
+    "target": {
+      "deleted": "（目標已刪除）",
+      "media": "圖片 · {label}",
+      "mediaWithFursona": "圖片 · {label}（{fursona}）",
+      "fursona": "獸設 · {label}",
+      "user": "用戶 · {label}",
+      "owner": "擁有者",
+      "removed": "已下架",
+      "banned": "已停權",
+      "detailQuote": "「{detail}」"
+    },
+    "actions": {
+      "preview": "預覽",
+      "markNsfw": "改標 NSFW",
+      "remove": "下架",
+      "purge": "緊急移除",
+      "view": "檢視",
+      "ban": "停權",
+      "dismiss": "駁回",
+      "resolve": "結案"
+    },
+    "notes": {
+      "purge": "紅線內容緊急移除",
+      "targetGone": "目標已不存在"
+    },
+    "resolvedBy": "由 @{id}",
+    "log": {
+      "title": "操作紀錄",
+      "note": "（{note}）",
+      "empty": "尚無紀錄。"
+    },
+    "preview": {
+      "title": "內容預覽",
+      "close": "關閉"
+    },
+    "notify": {
+      "done": "已{action}",
+      "failed": "操作失敗"
+    },
+    "report": {
+      "title": "檢舉{target}",
+      "description": "檢舉會由站方人工審核；惡意檢舉可能導致停權。",
+      "hints": {
+        "illegal": "涉及未成年、真實暴力等紅線內容，會優先處理。",
+        "untaggedNsfw": "成人內容但標為 SFW。",
+        "copyright": "未經授權使用他人作品。"
+      },
+      "detailLabel": "補充說明（選填）",
+      "detailPlaceholder": "提供連結或說明有助於加速處理",
+      "cancel": "取消",
+      "submit": "送出檢舉",
+      "loginToReport": "登入後檢舉",
+      "notify": {
+        "sent": "已送出檢舉",
+        "sentHint": "站方會盡快處理。",
+        "failed": "送出失敗"
+      }
+    }
+  }
+}

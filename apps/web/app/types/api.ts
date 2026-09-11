@@ -27,6 +27,7 @@ export interface Me {
   is_onboarded: boolean
   is_admin: boolean
   is_banned: boolean
+  locale: string | null
   quota: Quota
   created_at: string
 }

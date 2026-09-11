@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "title": "我的獸設",
+    "subtitle": "{n} 隻獸設 · 代表獸設會顯示在你的個人主頁",
+    "createButton": "＋ 新增獸設",
+    "newCard": {
+      "title": "新增獸設",
+      "hint": "名字、物種、色票，兩分鐘搞定"
+    },
+    "storage": {
+      "title": "儲存空間",
+      "hint": "原檔會完整保留，展示版與縮圖不計入配額。"
+    },
+    "daily": {
+      "title": "今日上傳",
+      "count": "{used} / {limit} 張",
+      "hint": "每日上限用來防止濫用，午夜重置。"
+    },
+    "dialog": {
+      "title": "新增獸設",
+      "description": "先給名字就好，其他資料進編輯器再慢慢補。",
+      "name": "名字",
+      "namePlaceholder": "阿燼 Ember",
+      "species": "物種（選填）",
+      "speciesPlaceholder": "赤狐",
+      "cancel": "取消",
+      "submit": "建立"
+    },
+    "errors": {
+      "nameRequired": "請填名字。",
+      "createFailed": "建立失敗"
+    },
+    "notify": {
+      "created": "已建立 {name}",
+      "createdHint": "接著上傳設定圖、填色票吧。"
+    }
+  }
+}

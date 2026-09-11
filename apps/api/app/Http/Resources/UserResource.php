@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'pawfit_id' => $u->pawfit_id,
             'display_name' => $u->display_name ?? $u->name,
             'avatar_url' => MediaResource::avatarUrl($u),
+            'locale' => $u->locale,
             'nsfw_pref' => $u->nsfw_pref,
             'effective_nsfw_pref' => $u->effectiveNsfwPref(),
             'adult_confirmed_at' => $u->adult_confirmed_at,

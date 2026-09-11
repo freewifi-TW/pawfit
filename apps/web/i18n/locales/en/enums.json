@@ -1,0 +1,48 @@
+{
+  "enums": {
+    "visibility": {
+      "public": "Public",
+      "unlisted": "Link only",
+      "private": "Private"
+    },
+    "kind": {
+      "art2d": "2D",
+      "model3d": "3D",
+      "photo": "Physical"
+    },
+    "kindLong": {
+      "art2d": "2D artwork",
+      "model3d": "3D model",
+      "photo": "Photo"
+    },
+    "creditPrefix": {
+      "art2d": "Artist",
+      "model3d": "Made by",
+      "photo": "Studio"
+    },
+    "reason": {
+      "illegal": "Illegal content",
+      "untagged_nsfw": "Untagged NSFW",
+      "copyright": "Copyright / stolen art",
+      "harassment": "Harassment",
+      "other": "Other"
+    },
+    "adminAction": {
+      "remove_media": "Remove image",
+      "purge_media": "Purge image",
+      "restore_media": "Restore image",
+      "mark_nsfw": "Mark as NSFW",
+      "remove_fursona": "Remove fursona",
+      "restore_fursona": "Restore fursona",
+      "ban_user": "Ban account",
+      "unban_user": "Lift ban",
+      "resolve_report": "Resolve",
+      "dismiss_report": "Dismiss"
+    },
+    "nsfwPref": {
+      "hide": "Hide",
+      "blur": "Blur",
+      "show": "Show"
+    }
+  }
+}

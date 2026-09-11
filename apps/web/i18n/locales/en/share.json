@@ -1,0 +1,43 @@
+{
+  "share": {
+    "notFound": "This link may have been disabled or the fursona set to private",
+    "seo": {
+      "titleWithSpecies": "{name} · {species}",
+      "ogTitle": "{title} — Pawfit fursona share",
+      "paletteCount": "{n} palette color | {n} palette colors",
+      "mediaCount": "{n} reference image | {n} reference images",
+      "summary": "{palette} · {media} — Pawfit"
+    },
+    "header": {
+      "avatarAlt": "{name}'s avatar",
+      "ownerFursona": "Fursona of {'@'}{id}"
+    },
+    "about": {
+      "title": "About {name}"
+    },
+    "palette": {
+      "title": "Palette",
+      "hint": "Click a swatch to copy its hex code"
+    },
+    "emptyBioPalette": "No bio or palette yet.",
+    "gallery": {
+      "title": "Gallery",
+      "empty": "No images to show right now."
+    },
+    "nsfw": {
+      "guest": "Log in and confirm you are 18+ in Settings to choose how NSFW content is shown.",
+      "unconfirmed": "Confirm you are 18+ in Settings to choose how NSFW content is shown.",
+      "hidden": "Your display preference is set to Hide. You can change it in Settings."
+    },
+    "footer": {
+      "shareLink": "🔗 Share link",
+      "watermark": "Watermark",
+      "on": "On",
+      "off": "Off",
+      "publicOnProfile": "{visibility} · Shown on profile",
+      "manage": "Manage link",
+      "report": "Report this page"
+    },
+    "reportTarget": "Fursona “{name}”"
+  }
+}

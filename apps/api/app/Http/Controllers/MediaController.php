@@ -27,18 +27,18 @@ class MediaController extends Controller
             'content_type' => ['required', Rule::in(config('pawfit.media.allowed_mimes'))],
             'bytes' => ['required', 'integer', 'min:1', 'max:'.config('pawfit.quota.max_file_bytes')],
         ], [
-            'content_type.in' => '只接受 jpg、png、webp。',
-            'bytes.max' => '單檔上限 20 MB。',
+            'content_type.in' => __('messages.media.content_type_not_allowed'),
+            'bytes.max' => __('messages.media.file_too_large', ['max' => $this->maxFileMb()]),
         ]);
 
         $fursona = $this->ownedFursona($request, $data['fursona_id']);
         $user = $request->user();
 
         if ($user->uploadsToday() >= config('pawfit.quota.daily_uploads')) {
-            throw ValidationException::withMessages(['bytes' => '今日上傳張數已達上限，明天再試。']);
+            throw ValidationException::withMessages(['bytes' => __('messages.media.daily_limit_reached')]);
         }
         if ($user->storageUsedBytes() + $data['bytes'] > config('pawfit.quota.storage_bytes')) {
-            throw ValidationException::withMessages(['bytes' => '儲存空間不足。']);
+            throw ValidationException::withMessages(['bytes' => __('messages.media.storage_full')]);
         }
 
         $key = $this->storage->newOriginalKey($fursona, $data['content_type']);
@@ -63,25 +63,25 @@ class MediaController extends Controller
             'credit_url' => ['nullable', 'url', 'max:300'],
             'visibility_override' => ['nullable', Rule::in(Fursona::VISIBILITIES)],
         ], [
-            'kind.required' => '請選擇分類（2D／3D／實體）。',
-            'is_nsfw.required' => '請標記內容分級（SFW／NSFW）。',
+            'kind.required' => __('messages.media.kind_required'),
+            'is_nsfw.required' => __('messages.media.is_nsfw_required'),
         ]);
 
         $fursona = $this->ownedFursona($request, $data['fursona_id']);
 
         if (! $this->storage->belongsTo($data['storage_key'], $fursona)) {
-            throw ValidationException::withMessages(['storage_key' => '無效的檔案位置。']);
+            throw ValidationException::withMessages(['storage_key' => __('messages.media.invalid_storage_key')]);
         }
         if (Media::where('storage_key', $data['storage_key'])->exists()) {
-            throw ValidationException::withMessages(['storage_key' => '這個檔案已經確認過了。']);
+            throw ValidationException::withMessages(['storage_key' => __('messages.media.already_confirmed')]);
         }
         if (! $this->storage->exists($data['storage_key'])) {
-            throw ValidationException::withMessages(['storage_key' => '找不到上傳的檔案，請重新上傳。']);
+            throw ValidationException::withMessages(['storage_key' => __('messages.media.upload_not_found')]);
         }
 
         $bytes = $this->storage->size($data['storage_key']);
         if ($bytes > config('pawfit.quota.max_file_bytes')) {
-            throw ValidationException::withMessages(['storage_key' => '檔案超過 20 MB。']);
+            throw ValidationException::withMessages(['storage_key' => __('messages.media.file_exceeds_limit', ['max' => $this->maxFileMb()])]);
         }
 
         $media = $fursona->media()->create([
@@ -148,9 +148,15 @@ class MediaController extends Controller
     {
         $fursona = Fursona::where('owner_id', $request->user()->id)->find($id);
         if (! $fursona) {
-            throw ValidationException::withMessages(['fursona_id' => '找不到這隻獸設。']);
+            throw ValidationException::withMessages(['fursona_id' => __('messages.fursona.not_found')]);
         }
 
         return $fursona;
+    }
+
+    /** 單檔上限（MB），給訊息的 :max 用。 */
+    private function maxFileMb(): int
+    {
+        return (int) round(config('pawfit.quota.max_file_bytes') / 1048576);
     }
 }

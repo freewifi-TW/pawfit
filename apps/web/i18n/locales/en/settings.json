@@ -1,0 +1,58 @@
+{
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Account, content display and privacy",
+    "nav": {
+      "nsfw": "Content display",
+      "language": "Language",
+      "account": "Account",
+      "data": "Data & storage"
+    },
+    "nsfw": {
+      "heading": "Adult content (NSFW) display",
+      "confirmedAt": "Age confirmed on {date}",
+      "notConfirmed": "Age not confirmed yet",
+      "declare": "I confirm that I am at least 18 years old and choose to view adult content.",
+      "declareNote": "We record the time of confirmation. Until then, the options below are locked to \"Hide completely\".",
+      "options": {
+        "hide": {
+          "title": "Hide completely",
+          "hint": "NSFW content never appears, as if it did not exist. (Default)"
+        },
+        "blur": {
+          "title": "Blur",
+          "hint": "Shown as blurred thumbnails; click to reveal."
+        },
+        "show": {
+          "title": "Show",
+          "hint": "Displayed the same way as regular content."
+        }
+      },
+      "applyNote": "This setting applies immediately across the site, including share pages and the future community feed.",
+      "confirmed": "Age confirmation recorded",
+      "unconfirmed": "Age confirmation withdrawn; display set to hide completely",
+      "prefUpdated": "Display preference updated across the site"
+    },
+    "language": {
+      "heading": "Language",
+      "hint": "Applies immediately. While logged in, your choice is remembered and used on any device you sign in from."
+    },
+    "account": {
+      "heading": "Account",
+      "googleLinked": "Google linked",
+      "idNote": "Cannot be changed until the rename policy is finalised.",
+      "idUnset": "Not set yet →",
+      "displayName": "Display name",
+      "save": "Save",
+      "nameEmpty": "Display name cannot be empty",
+      "nameUpdated": "Display name updated"
+    },
+    "data": {
+      "heading": "Data & storage",
+      "storage": "Storage",
+      "uploadsToday": "Uploads today",
+      "uploadsCount": "{used} / {limit} images",
+      "note": "Exporting all data and deleting your account will be available in a later release. To delete your account for now, email us via the contact link in the footer."
+    }
+  }
+}

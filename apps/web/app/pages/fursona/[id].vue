@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { Fursona, Media, PaletteEntry, ShareLink, Visibility } from '~/types/api'
-import { formatDate, paletteGradient, VISIBILITY_LABEL, VISIBILITY_PILL } from '~/utils/labels'
+import { paletteGradient, VISIBILITY_PILL } from '~/utils/labels'
 
 definePageMeta({ middleware: 'onboarded' })
 
+const { t } = useI18n()
+const { visibilityLabel, formatDate } = useLabels()
 const route = useRoute()
 const api = useApi()
 const notify = useNotify()
@@ -12,14 +14,14 @@ const id = route.params.id as string
 
 const { data: fursona, error } = await useAsyncData(`fursona-${id}`, () => api<Fursona>(`/fursonas/${id}`))
 if (error.value || !fursona.value) {
-  throw createError({ statusCode: apiError(error.value).status === 403 ? 404 : (apiError(error.value).status || 404), statusMessage: '找不到這隻獸設' })
+  throw createError({ statusCode: apiError(error.value).status === 403 ? 404 : (apiError(error.value).status || 404), statusMessage: t('fursona.notFound') })
 }
 
-useSeoMeta({ title: () => `編輯 ${fursona.value?.name ?? ''}` })
+useSeoMeta({ title: () => t('fursona.seoTitle', { name: fursona.value?.name ?? '' }) })
 
 type Tab = 'basic' | 'gallery' | 'palette' | 'tags' | 'privacy'
 const tab = ref<Tab>((route.hash.replace('#', '') as Tab) || 'basic')
-watch(tab, t => history.replaceState(null, '', `#${t}`))
+watch(tab, v => history.replaceState(null, '', `#${v}`))
 
 // ---- 可編輯欄位的工作副本 ----
 const form = reactive({
@@ -55,7 +57,7 @@ async function save() {
   if (!fursona.value) return
   errors.value = {}
   if (!form.name.trim()) {
-    errors.value.name = '名字不能空白。'
+    errors.value.name = t('fursona.basic.nameRequired')
     tab.value = 'basic'
     return
   }
@@ -77,11 +79,11 @@ async function save() {
     fursona.value = updated
     loadForm(updated)
     saved.value = snapshot()
-    notify.ok('已儲存變更')
+    notify.ok(t('fursona.notify.saved'))
   } catch (e) {
     const err = apiError(e)
     errors.value = err.errors
-    notify.err('儲存失敗', Object.values(err.errors)[0] || err.message)
+    notify.err(t('fursona.notify.saveFailed'), Object.values(err.errors)[0] || err.message)
   } finally {
     busy.value = false
   }
@@ -89,7 +91,7 @@ async function save() {
 
 // 離開前提醒
 onBeforeRouteLeave(() => {
-  if (dirty.value && !window.confirm('有尚未儲存的變更，確定要離開？')) return false
+  if (dirty.value && !window.confirm(t('fursona.notify.leaveConfirm'))) return false
 })
 
 // ---- 圖庫 ----
@@ -120,10 +122,10 @@ async function setAvatar(mid: string | null) {
   try {
     const updated = await api<Fursona>(`/fursonas/${id}`, { method: 'PATCH', body: { avatar_media_id: mid } })
     fursona.value = { ...updated, media: media.value }
-    notify.ok('已更新獸設頭像')
+    notify.ok(t('fursona.notify.avatarUpdated'))
     editing.value = null
   } catch (e) {
-    notify.err('更新失敗', apiError(e).message)
+    notify.err(t('fursona.notify.updateFailed'), apiError(e).message)
   }
 }
 async function reorder(ids: string[]) {
@@ -133,7 +135,7 @@ async function reorder(ids: string[]) {
   try {
     await api(`/fursonas/${id}/media/reorder`, { method: 'POST', body: { ids } })
   } catch (e) {
-    notify.err('排序未儲存', apiError(e).message)
+    notify.err(t('fursona.notify.reorderFailed'), apiError(e).message)
   }
 }
 
@@ -166,21 +168,23 @@ async function destroy() {
   try {
     await api(`/fursonas/${id}`, { method: 'DELETE' })
     saved.value = snapshot()
-    notify.ok('已刪除獸設')
+    notify.ok(t('fursona.notify.deleted'))
     await fetchMe(true)
     await navigateTo('/dashboard')
   } catch (e) {
-    notify.err('刪除失敗', apiError(e).message)
+    notify.err(t('fursona.notify.deleteFailed'), apiError(e).message)
   } finally {
     busy.value = false
   }
 }
 
-const visibilityOptions: Array<{ value: Visibility, title: string, hint: string }> = [
-  { value: 'public', title: '公開', hint: '出現在你的個人主頁，任何人都能看。' },
-  { value: 'unlisted', title: '連結可見', hint: '知道連結的人才能看，不出現在主頁與搜尋。' },
-  { value: 'private', title: '私人', hint: '只有你看得到，分享連結自動停用。' }
-]
+const visibilityOptions = computed<Array<{ value: Visibility, title: string, hint: string }>>(() =>
+  (['public', 'unlisted', 'private'] as Visibility[]).map(value => ({
+    value,
+    title: visibilityLabel(value),
+    hint: t(`fursona.privacy.hints.${value}`)
+  }))
+)
 </script>
 
 <template>
@@ -198,7 +202,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
       />
       <div>
         <h1 class="disp">
-          {{ form.name || '未命名' }}
+          {{ form.name || t('fursona.unnamed') }}
         </h1>
         <div class="meta">
           <span
@@ -208,11 +212,11 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
           <span
             class="pill"
             :class="VISIBILITY_PILL[form.visibility]"
-          >{{ VISIBILITY_LABEL[form.visibility] }}</span>
+          >{{ visibilityLabel(form.visibility) }}</span>
           <span
             v-if="form.is_representative"
             class="pill accent"
-          >★ 代表獸設</span>
+          >{{ t('fursona.header.representative') }}</span>
           <span
             v-if="form.is_nsfw"
             class="pill accent"
@@ -220,8 +224,8 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
           <span
             v-if="fursona.removed_at"
             class="pill danger"
-          >已被站方下架</span>
-          <span class="pill">最後更新 <span class="mono">{{ formatDate(fursona.updated_at) }}</span></span>
+          >{{ t('fursona.header.removed') }}</span>
+          <span class="pill">{{ t('fursona.header.updatedAt') }} <span class="mono">{{ formatDate(fursona.updated_at) }}</span></span>
         </div>
       </div>
       <div class="acts row">
@@ -231,7 +235,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
           :to="`/s/${fursona.share_link.slug}`"
           target="_blank"
         >
-          預覽分享頁
+          {{ t('fursona.header.previewShare') }}
         </NuxtLink>
         <button
           class="btn primary"
@@ -239,7 +243,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
           :disabled="busy || !dirty"
           @click="save"
         >
-          {{ dirty ? '儲存' : '已儲存' }}
+          {{ dirty ? t('fursona.actions.save') : t('fursona.actions.saved') }}
         </button>
       </div>
     </div>
@@ -249,7 +253,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
       class="visitor-note"
       style="margin:0 0 18px;border-color:var(--danger);background:var(--danger-soft)"
     >
-      這隻獸設已被站方下架，目前只有你看得到。如有疑問請透過頁尾聯絡方式申訴。
+      {{ t('fursona.header.removedNotice') }}
     </p>
 
     <div
@@ -261,35 +265,35 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
         :class="{ on: tab === 'basic' }"
         @click="tab = 'basic'"
       >
-        基本資料
+        {{ t('fursona.tabs.basic') }}
       </button>
       <button
         type="button"
         :class="{ on: tab === 'gallery' }"
         @click="tab = 'gallery'"
       >
-        圖庫 <span class="muted">{{ media.length }}</span>
+        {{ t('fursona.tabs.gallery') }} <span class="muted">{{ media.length }}</span>
       </button>
       <button
         type="button"
         :class="{ on: tab === 'palette' }"
         @click="tab = 'palette'"
       >
-        色票 <span class="muted">{{ form.palette.length }}</span>
+        {{ t('fursona.tabs.palette') }} <span class="muted">{{ form.palette.length }}</span>
       </button>
       <button
         type="button"
         :class="{ on: tab === 'tags' }"
         @click="tab = 'tags'"
       >
-        標籤 <span class="muted">{{ form.tags.length }}</span>
+        {{ t('fursona.tabs.tags') }} <span class="muted">{{ form.tags.length }}</span>
       </button>
       <button
         type="button"
         :class="{ on: tab === 'privacy' }"
         @click="tab = 'privacy'"
       >
-        隱私與分享
+        {{ t('fursona.tabs.privacy') }}
       </button>
     </div>
 
@@ -300,11 +304,11 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
     >
       <div class="card">
         <h2 class="disp">
-          基本資料
+          {{ t('fursona.basic.title') }}
         </h2>
         <div class="bd">
           <div class="field">
-            <label for="f-name">名字</label>
+            <label for="f-name">{{ t('fursona.basic.name') }}</label>
             <input
               id="f-name"
               v-model="form.name"
@@ -320,7 +324,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
             </div>
           </div>
           <div class="field">
-            <label for="f-species">物種</label>
+            <label for="f-species">{{ t('fursona.basic.species') }}</label>
             <input
               id="f-species"
               v-model="form.species"
@@ -332,7 +336,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
             class="field"
             style="margin:0"
           >
-            <label for="f-bio">簡介</label>
+            <label for="f-bio">{{ t('fursona.basic.bio') }}</label>
             <textarea
               id="f-bio"
               v-model="form.bio"
@@ -341,7 +345,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
               style="min-height:160px"
             />
             <div class="hint">
-              會顯示在分享頁「關於」區塊，支援換行。
+              {{ t('fursona.basic.bioHint') }}
             </div>
           </div>
         </div>
@@ -349,7 +353,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
       <div class="stack">
         <div class="card">
           <h2 class="disp">
-            頭像與代表
+            {{ t('fursona.avatar.title') }}
           </h2>
           <div
             class="bd stack"
@@ -368,13 +372,13 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
                   type="button"
                   @click="tab = 'gallery'"
                 >
-                  從圖庫選擇
+                  {{ t('fursona.avatar.pickFromGallery') }}
                 </button>
                 <div
                   class="hint muted"
                   style="font-size:12px;margin-top:6px"
                 >
-                  在圖庫點「編輯」→「設為獸設頭像」。頭像會裁成 Pawfit 的圓潤形狀。
+                  {{ t('fursona.avatar.hint') }}
                 </div>
               </div>
             </div>
@@ -382,16 +386,16 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
               <input
                 v-model="form.is_representative"
                 type="checkbox"
-              > 設為代表獸設<span
+              > {{ t('fursona.avatar.representative') }}<span
                 class="muted"
                 style="font-weight:400;font-size:12px"
-              >（顯示於個人主頁）</span>
+              >{{ t('fursona.avatar.representativeHint') }}</span>
             </label>
           </div>
         </div>
         <div class="card">
           <h2 class="disp">
-            內容分級
+            {{ t('fursona.rating.title') }}
           </h2>
           <div
             class="bd stack"
@@ -401,13 +405,13 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
               <input
                 v-model="form.is_nsfw"
                 type="checkbox"
-              > 這隻獸設本身為 NSFW
+              > {{ t('fursona.rating.nsfw') }}
             </label>
             <p
               class="muted"
               style="font-size:12px;margin:0"
             >
-              勾選後，整隻獸設對訪客與未開啟成人內容的用戶隱藏。單張圖的 NSFW 標記在上傳時另外設定。
+              {{ t('fursona.rating.hint') }}
             </p>
           </div>
         </div>
@@ -431,11 +435,11 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
             type="button"
             @click="uploading = true"
           >
-            ⬆ 上傳圖片
+            {{ t('fursona.gallery.upload') }}
           </button>
         </template>
         <template #empty>
-          還沒有圖片。上傳正面、背面設定圖與委託成品，分類與分級為必填。
+          {{ t('fursona.gallery.empty') }}
         </template>
       </GalleryGrid>
     </div>
@@ -446,7 +450,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
       class="card"
     >
       <div class="hd">
-        <span class="disp">色票</span><em>拖曳左側把手排序 · 分享頁會照這個順序顯示</em>
+        <span class="disp">{{ t('fursona.palette.title') }}</span><em>{{ t('fursona.palette.subtitle') }}</em>
       </div>
       <PaletteEditor v-model="form.palette" />
     </div>
@@ -464,7 +468,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
       <div class="stack">
         <div class="card">
           <h2 class="disp">
-            誰看得到這隻獸設
+            {{ t('fursona.privacy.title') }}
           </h2>
           <div class="bd radio-list">
             <label
@@ -486,29 +490,29 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
                 name="vis"
                 disabled
               >
-              <span><b>限好友</b> <span
+              <span><b>{{ t('fursona.privacy.friendsOnly') }}</b> <span
                 class="pill"
                 style="font-size:10px"
-              >Phase 2 推出</span><small>好友系統上線後開放。</small></span>
+              >{{ t('fursona.privacy.phase2') }}</span><small>{{ t('fursona.privacy.friendsHint') }}</small></span>
             </label>
             <p
               class="muted"
               style="font-size:12px;margin:4px 0 0"
             >
-              單張圖可以在圖庫中個別覆寫隱私。改完記得按右上角「儲存」。
+              {{ t('fursona.privacy.note') }}
             </p>
           </div>
         </div>
         <div class="card">
           <h2 class="disp">
-            刪除獸設
+            {{ t('fursona.delete.title') }}
           </h2>
           <div class="bd">
             <p
               class="sub"
               style="margin:0 0 12px;font-size:13px"
             >
-              會一併刪除所有圖片原檔與衍生版本，分享連結立即失效，無法復原。
+              {{ t('fursona.delete.warning') }}
             </p>
             <div class="row">
               <button
@@ -517,7 +521,7 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
                 type="button"
                 @click="confirmDelete = true"
               >
-                刪除這隻獸設
+                {{ t('fursona.delete.button') }}
               </button>
               <template v-else>
                 <button
@@ -526,14 +530,14 @@ const visibilityOptions: Array<{ value: Visibility, title: string, hint: string 
                   :disabled="busy"
                   @click="destroy"
                 >
-                  確認刪除 {{ fursona.name }}
+                  {{ t('fursona.delete.confirm', { name: fursona.name }) }}
                 </button>
                 <button
                   class="btn sm ghost"
                   type="button"
                   @click="confirmDelete = false"
                 >
-                  取消
+                  {{ t('fursona.actions.cancel') }}
                 </button>
               </template>
             </div>
