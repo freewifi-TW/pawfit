@@ -1,0 +1,20 @@
+# 開發用 Caddyfile：純 HTTP，:80 對外
+# /api/* 與 /sanctum/* → Laravel；其餘 → Nuxt dev server（含 HMR websocket）
+
+:80 {
+	encode zstd gzip
+
+	@api path /api/* /sanctum/* /up
+	handle @api {
+		reverse_proxy api:8080
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

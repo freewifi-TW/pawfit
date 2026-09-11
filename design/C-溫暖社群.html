@@ -1,0 +1,156 @@
+<title>Pawfit 走向 C · 角色貼紙簿</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Noto+Sans+TC:wght@400;500;700&family=Fira+Code:wght@400&display=swap">
+<style>
+  :root{
+    --bg:#ece7f6; --paper:#fbfaff; --paper-2:#f3f0fb; --line:#d8d0ea;
+    --ink:#2a2352; --ink-2:#5b5480; --ink-3:#8f88ad;
+    --accent:#ff7a59; --accent-ink:#fff; --accent-soft:#ffe6de;
+    --mint:#b9e6d3; --butter:#fde9a9; --sky:#cfe3ff;
+    --shadow:0 2px 0 var(--line);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1d1930; --paper:#272240; --paper-2:#2f2a4a; --line:#3d3760;
+      --ink:#f1edff; --ink-2:#c3bce0; --ink-3:#8a83ad;
+      --accent:#ff8a6b; --accent-ink:#2a160f; --accent-soft:#4a2c25;
+      --mint:#3f7a66; --butter:#8a7231; --sky:#3b5a8a;
+      --shadow:0 2px 0 #12102a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1d1930; --paper:#272240; --paper-2:#2f2a4a; --line:#3d3760;
+    --ink:#f1edff; --ink-2:#c3bce0; --ink-3:#8a83ad;
+    --accent:#ff8a6b; --accent-ink:#2a160f; --accent-soft:#4a2c25;
+    --mint:#3f7a66; --butter:#8a7231; --sky:#3b5a8a;
+    --shadow:0 2px 0 #12102a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "Noto Sans TC",system-ui,sans-serif;padding-block:0 72px}
+  .disp{font-family:"Baloo 2","Noto Sans TC",sans-serif;font-weight:800}
+  .mono{font-family:"Fira Code",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  .top{background:var(--paper);border-bottom:2px solid var(--line)}
+  .top .in{max-width:1080px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;gap:20px}
+  .logo{font-family:"Baloo 2";font-weight:800;font-size:24px;color:var(--accent);display:flex;align-items:center;gap:8px}
+  .paw{width:26px;height:26px;display:inline-block}
+  .top nav{display:flex;gap:18px;color:var(--ink-2);font-weight:500;font-size:14px}
+  .top .sp{flex:1}
+  .btn{border:2px solid var(--line);background:var(--paper);color:var(--ink);padding:7px 14px;border-radius:999px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 2px 0 #c95a3f}
+
+  .profile{display:grid;grid-template-columns:200px 1fr;gap:28px;align-items:center;padding:36px 0 26px}
+  @media (max-width:680px){.profile{grid-template-columns:1fr;text-align:center;justify-items:center}}
+  .avatar{width:200px;height:200px;border-radius:44% 56% 52% 48% / 55% 45% 55% 45%;background:radial-gradient(circle at 40% 35%,#F4E7D3 0%,#D9642A 45%,#4A2E2A 100%);border:6px solid var(--paper);box-shadow:0 6px 0 var(--line)}
+  .profile h1{margin:0;font-size:44px;line-height:1.05;text-wrap:balance}
+  .profile h1 small{display:block;font:500 15px/1.4 "Noto Sans TC";color:var(--ink-2);margin-top:6px}
+  .owner{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:var(--ink-2);background:var(--paper);padding:4px 10px 4px 4px;border-radius:999px;border:2px solid var(--line)}
+  .owner i{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#ff7a59,#fde9a9);display:inline-block}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  @media (max-width:680px){.tags{justify-content:center}}
+  .tag{font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;border:2px solid var(--line);background:var(--paper);box-shadow:var(--shadow);transform:rotate(var(--r,0deg))}
+  .tag.mint{background:var(--mint)}.tag.butter{background:var(--butter)}.tag.sky{background:var(--sky)}
+
+  .board{display:grid;grid-template-columns:1fr 1.6fr;gap:22px;align-items:start}
+  @media (max-width:860px){.board{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:2px solid var(--line);border-radius:22px;box-shadow:0 4px 0 var(--line)}
+  .card h2{margin:0;padding:16px 20px 0;font-size:20px;display:flex;align-items:center;gap:8px}
+  .card h2 em{font-style:normal;font:500 12px "Noto Sans TC";color:var(--ink-3);margin-left:auto}
+  .bio{padding:12px 20px 20px;color:var(--ink-2)}
+  .bio p{margin:0 0 10px;max-width:46ch}.bio p:last-child{margin:0}
+
+  .palette{padding:14px 20px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .chip{display:flex;flex-direction:column;gap:6px;cursor:pointer}
+  .chip i{height:64px;border-radius:16px;border:3px solid var(--paper);box-shadow:0 0 0 2px var(--line)}
+  .chip .n{font-size:13px;font-weight:700}
+  .chip .h{font-size:11px;color:var(--ink-3)}
+  .chip .note{font-size:11px;color:var(--ink-2)}
+
+  .tabs{display:flex;gap:8px;padding:14px 20px 0;flex-wrap:wrap}
+  .tabs button{border:2px solid var(--line);background:var(--paper-2);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;font-weight:700;color:var(--ink-2);cursor:pointer}
+  .tabs button.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .tabs .count{margin-left:auto;font-size:12px;color:var(--ink-3);align-self:center}
+  .gallery{padding:16px 20px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:560px){.gallery{grid-template-columns:repeat(2,1fr)}}
+  .pic{position:relative;border-radius:18px;overflow:hidden;background:var(--paper-2);border:2px solid var(--line);margin:0}
+  .pic .art{aspect-ratio:1;display:block}
+  .kind{position:absolute;top:10px;left:10px;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;background:var(--paper);border:2px solid var(--line);color:var(--ink-2)}
+  .cap{padding:10px 12px 12px;font-size:13px;background:var(--paper)}
+  .cap .t{font-weight:700}
+  .cap .c{color:var(--ink-3);font-size:12px}
+  .cap .c a{color:var(--accent);font-weight:700}
+  .nsfw .art{filter:blur(20px) saturate(.75);transform:scale(1.2)}
+  .nsfw .lock{position:absolute;top:0;left:0;right:0;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:12px;font-weight:700;color:var(--ink);background:rgba(251,250,255,.35)}
+  .nsfw .lock b{font-size:11px;background:var(--accent);color:var(--accent-ink);padding:3px 10px;border-radius:999px}
+
+  .share{margin-top:24px;background:var(--accent-soft);border:2px dashed var(--accent);border-radius:22px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;font-size:13px;color:var(--ink-2)}
+  .share b{color:var(--ink)}
+  .share .sp{flex:1}
+</style>
+
+<header class="top">
+  <div class="in">
+    <a class="logo" href="#"><svg class="paw" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="15" r="5" fill="currentColor"/><circle cx="6" cy="9" r="2.4" fill="currentColor"/><circle cx="10" cy="5.5" r="2.4" fill="currentColor"/><circle cx="14.5" cy="5.5" r="2.4" fill="currentColor"/><circle cx="18.5" cy="9" r="2.4" fill="currentColor"/></svg>Pawfit</a>
+    <nav><a href="#">我的獸設</a><a href="#">圖庫</a><a href="#">設定</a></nav>
+    <span class="sp"></span>
+    <button class="btn">複製連結</button>
+    <button class="btn primary">編輯獸設</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="profile">
+    <div class="avatar" role="img" aria-label="阿燼的頭像"></div>
+    <div>
+      <h1 class="disp">阿燼 Ember<small>赤狐 · 成年 · 標準體型</small></h1>
+      <span class="owner"><i></i>@firefox_ash 的獸設</span>
+      <div class="tags">
+        <span class="tag mint" style="--r:-2deg">犬科</span><span class="tag" style="--r:1.5deg">赤狐</span><span class="tag butter" style="--r:-1deg">標準體型</span><span class="tag sky" style="--r:2deg">成年</span><span class="tag" style="--r:-1.5deg">篝火</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="board">
+    <aside style="display:grid;gap:22px">
+      <div class="card">
+        <h2 class="disp">關於阿燼</h2>
+        <div class="bio">
+          <p>山腳小鎮的篝火看守人。尾尖那撮白毛是小時候被雪埋過的紀念，畫的時候請保留。</p>
+          <p>性格外冷內熱，慣用左手；左耳有一道舊傷缺口，正面圖較明顯。</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="disp">色票 <em>點一下複製色碼</em></h2>
+        <div class="palette">
+          <div class="chip"><i style="background:#D9642A"></i><span class="n">主毛色</span><span class="h mono">#D9642A</span><span class="note">背部、頭頂、四肢外側</span></div>
+          <div class="chip"><i style="background:#F4E7D3"></i><span class="n">腹毛</span><span class="h mono">#F4E7D3</span><span class="note">胸腹、下顎</span></div>
+          <div class="chip"><i style="background:#2B2420"></i><span class="n">耳尖 / 手足</span><span class="h mono">#2B2420</span><span class="note">末端漸層</span></div>
+          <div class="chip"><i style="background:#7FB7A3"></i><span class="n">眼睛</span><span class="h mono">#7FB7A3</span><span class="note">圓形瞳孔</span></div>
+          <div class="chip"><i style="background:#4A2E2A"></i><span class="n">爪墊 / 鼻</span><span class="h mono">#4A2E2A</span><span class="note"></span></div>
+          <div class="chip"><i style="background:#F1EEE8"></i><span class="n">尾尖</span><span class="h mono">#F1EEE8</span><span class="note">約尾長 1/5</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="card">
+      <h2 class="disp">圖庫</h2>
+      <div class="tabs"><button class="on">全部</button><button>2D 平面</button><button>3D 模型</button><button>實體照片</button><span class="count">7 張 · 1 張已模糊</span></div>
+      <div class="gallery">
+        <figure class="pic"><div class="art" style="background:linear-gradient(160deg,#D9642A,#F4E7D3 55%,#2B2420)"></div><span class="kind">2D</span><figcaption class="cap"><div class="t">正面設定圖</div><div class="c">繪師 <a href="#">@kuro_lines</a></div></figcaption></figure>
+        <figure class="pic"><div class="art" style="background:linear-gradient(200deg,#2B2420,#D9642A 50%,#F1EEE8)"></div><span class="kind">2D</span><figcaption class="cap"><div class="t">背面設定圖</div><div class="c">繪師 <a href="#">@kuro_lines</a></div></figcaption></figure>
+        <figure class="pic"><div class="art" style="background:linear-gradient(135deg,#7FB7A3,#F4E7D3 45%,#D9642A)"></div><span class="kind">2D</span><figcaption class="cap"><div class="t">表情表（六格）</div><div class="c">繪師 <a href="#">@mochi_draws</a></div></figcaption></figure>
+        <figure class="pic"><div class="art" style="background:radial-gradient(circle at 40% 35%,#F4E7D3,#D9642A 40%,#1a1a1a)"></div><span class="kind">3D</span><figcaption class="cap"><div class="t">VRM 模型截圖</div><div class="c">製作 <a href="#">@poly_den</a></div></figcaption></figure>
+        <figure class="pic"><div class="art" style="background:linear-gradient(180deg,#8fa3b8,#D9642A 60%,#4A2E2A)"></div><span class="kind">實體</span><figcaption class="cap"><div class="t">毛裝頭部試戴</div><div class="c">工作室 <a href="#">FuzzWorks</a></div></figcaption></figure>
+        <figure class="pic nsfw"><div class="art" style="background:linear-gradient(150deg,#D9642A,#F4E7D3 40%,#4A2E2A)"></div><div class="lock"><b>NSFW</b>點擊解鎖觀看</div><figcaption class="cap"><div class="t">委託成品（成人向）</div><div class="c">繪師 <a href="#">@late_night_fox</a></div></figcaption></figure>
+      </div>
+    </section>
+  </div>
+
+  <div class="share">
+    <span>🔗 分享連結 <b class="mono">pawfit.app/s/k3Xq9vTz2A</b></span>
+    <span>浮水印 <b>開啟</b></span>
+    <span class="sp"></span>
+    <span>連結可見 · 不會出現在搜尋與公開列表</span>
+  </div>
+</main>

@@ -1,0 +1,38 @@
+# 環境變數與秘密
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Node / Nuxt
+node_modules/
+.nuxt/
+.output/
+.nitro/
+.cache/
+dist/
+*.log
+npm-debug.log*
+
+# Laravel
+apps/api/vendor/
+apps/api/storage/*.key
+apps/api/storage/logs/*
+apps/api/storage/framework/cache/data/*
+apps/api/storage/framework/sessions/*
+apps/api/storage/framework/views/*
+apps/api/storage/app/public/*
+apps/api/public/storage
+apps/api/public/hot
+apps/api/bootstrap/cache/*.php
+apps/api/.phpunit.result.cache
+
+# Docker 本機資料
+infra/data/
+
+# 編輯器與系統
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

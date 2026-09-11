@@ -1,0 +1,30 @@
+# 正式環境 Caddyfile：自動 HTTPS（Let's Encrypt）
+# 以環境變數 SITE_DOMAIN 帶入網域，例如 pawfit.app
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	@api path /api/* /sanctum/* /up
+	handle @api {
+		reverse_proxy api:8080
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 50mb
+			roll_keep 5
+		}
+	}
+}

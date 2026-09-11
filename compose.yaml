@@ -1,0 +1,138 @@
+# Pawfit 開發環境（Docker Compose）
+# 啟動：docker compose up -d
+# 正式部署另用 compose.prod.yaml 覆蓋（見 infra/README.md）
+#
+# 路由：Caddy :80 → /api/* 轉 Laravel（api）、其餘轉 Nuxt（web）
+# same-domain，前端與 API 共用 cookie，無 CORS 問題。
+
+name: pawfit
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./infra/caddy/Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - web
+      - api
+
+  web:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install -g pnpm@latest >/dev/null 2>&1 && pnpm install && pnpm dev --host 0.0.0.0 --port 3000"
+    environment:
+      NUXT_PUBLIC_API_BASE: /api
+      NUXT_API_INTERNAL_BASE: http://api:8080/api   # SSR 端在容器網路內直接打 Laravel
+      NUXT_PUBLIC_SITE_URL: ${APP_URL:-http://localhost:8080}
+      CHOKIDAR_USEPOLLING: "true"                  # Windows bind mount 需要 polling 才能熱更新
+    volumes:
+      - ./apps/web:/app
+      - web_node_modules:/app/node_modules
+    expose:
+      - "3000"
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: ../../infra/api/Dockerfile
+      target: dev
+    environment:
+      PHP_OPCACHE_ENABLE: "0"
+      AUTORUN_ENABLED: "true"          # 容器啟動時自動跑 migrate
+      AUTORUN_LARAVEL_MIGRATION: "true"
+      AUTORUN_LARAVEL_STORAGE_LINK: "false"
+      AUTORUN_LARAVEL_OPTIMIZE: "false"   # 開發環境不要快取 config/route/view
+    env_file:
+      - ./apps/api/.env
+    volumes:
+      - ./apps/api:/var/www/html
+      # Windows bind mount 對 www-data 唯讀，可寫目錄改用 named volume（見 infra/api/Dockerfile dev 註解）
+      - api_storage:/var/www/html/storage
+      - api_bootstrap_cache:/var/www/html/bootstrap/cache
+    expose:
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build:
+      context: ./apps/api
+      dockerfile: ../../infra/api/Dockerfile
+      target: dev
+    command: ["php", "/var/www/html/artisan", "queue:work", "--tries=3", "--timeout=120", "--sleep=2"]
+    env_file:
+      - ./apps/api/.env
+    volumes:
+      - ./apps/api:/var/www/html
+      - api_storage:/var/www/html/storage
+      - api_bootstrap_cache:/var/www/html/bootstrap/cache
+    depends_on:
+      - api
+      - redis
+    stop_signal: SIGTERM
+    healthcheck:
+      disable: true   # 映像預設的 healthcheck 是打 Nginx，worker 沒有 Nginx
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-pawfit}
+      POSTGRES_USER: ${DB_USERNAME:-pawfit}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pawfit}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT_HOST:-54329}:5432"   # 給本機 GUI 工具連線用
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+
+  # 本機模擬 Cloudflare R2（S3 相容）。正式環境不啟動此服務，直接指向 R2。
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${R2_ACCESS_KEY_ID:-pawfit}
+      MINIO_ROOT_PASSWORD: ${R2_SECRET_ACCESS_KEY:-pawfitpawfit}
+    ports:
+      - "9000:9000"   # S3 API（前端 presigned PUT 直傳會用到）
+      - "9001:9001"   # 管理介面
+    volumes:
+      - minio_data:/data
+
+  # 啟動時建立 bucket（跑完即結束）
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 3;
+      mc alias set local http://minio:9000 ${R2_ACCESS_KEY_ID:-pawfit} ${R2_SECRET_ACCESS_KEY:-pawfitpawfit};
+      mc mb --ignore-existing local/${R2_BUCKET:-pawfit-media};
+      mc mb --ignore-existing local/${R2_BACKUP_BUCKET:-pawfit-backup};
+      exit 0;
+      "
+
+volumes:
+  caddy_data:
+  web_node_modules:
+  api_storage:
+  api_bootstrap_cache:
+  pg_data:
+  redis_data:
+  minio_data:

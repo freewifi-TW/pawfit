@@ -1,0 +1,60 @@
+# 正式環境覆蓋檔（GCP VM）
+# 用法：docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+# 差異：Caddy 自動 HTTPS、web/api 改用建置好的映像、不啟動 MinIO（改用 Cloudflare R2）、不對外開 DB port
+
+services:
+  caddy:
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+    volumes:
+      - ./infra/caddy/Caddyfile.prod:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    restart: unless-stopped
+
+  web:
+    image: pawfit-web:latest
+    build:
+      context: ./apps/web
+      dockerfile: ../../infra/web/Dockerfile
+    command: ["node", ".output/server/index.mjs"]
+    environment:
+      NUXT_PUBLIC_API_BASE: /api
+      NUXT_API_INTERNAL_BASE: http://api:8080/api
+      NUXT_PUBLIC_SITE_URL: https://${SITE_DOMAIN}
+    volumes: []
+    restart: unless-stopped
+
+  api:
+    image: pawfit-api:latest
+    build:
+      context: ./apps/api
+      dockerfile: ../../infra/api/Dockerfile
+      target: prod
+    environment:
+      PHP_OPCACHE_ENABLE: "1"
+    volumes: []
+    restart: unless-stopped
+
+  worker:
+    image: pawfit-api:latest
+    build:
+      context: ./apps/api
+      dockerfile: ../../infra/api/Dockerfile
+      target: prod
+    volumes: []
+    restart: unless-stopped
+
+  postgres:
+    ports: []
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+
+  minio:
+    profiles: ["never"]
+  minio-init:
+    profiles: ["never"]
