@@ -2,8 +2,7 @@
 
 獸圈用的獸設檔案庫：多視角圖庫、精準色票、標籤，一個連結分享完整設定。
 
-- 需求與設計文件：`Pawfit (爪搭).md`、`SASD-Phase*.md`
-- 視覺走向與可點 demo：`design/pawfit-demo.html`（走向 C：溫暖社群）
+- 文件都在 `docs/`：需求 `Pawfit (爪搭).md`、各階段設計 `SASD-Phase*.md`、log 與觀測 `logging.md`
 
 ## 架構
 
@@ -115,8 +114,7 @@ Caddy 會自動申請 Let's Encrypt 憑證；圖片改指向 Cloudflare R2，不
 apps/web     Nuxt 4 + Nuxt UI（前端，SSR）
 apps/api     Laravel 13（API）— 見 apps/api/CLAUDE.md 的開發慣例
 infra/       Caddyfile、Dockerfile、observability/（Loki、Alloy、Grafana 設定）
-docs/        logging.md（log 格式、事件、查詢方式）
-design/      設計原型
+docs/        需求（Pawfit (爪搭).md）、各階段設計（SASD-Phase*.md）、logging.md
 compose.yaml            開發環境
 compose.prod.yaml       正式環境覆蓋
 ```
