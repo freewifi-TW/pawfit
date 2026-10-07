@@ -25,6 +25,8 @@ Same-domain 路由，前後端共用 cookie（Sanctum stateful），沒有 CORS 
 | M3 圖庫 | presigned PUT 直傳 → queue 產展示版/縮圖、分類、credit、單圖隱私與 NSFW、拖曳排序、ACL 圖片路由 | ✅ |
 | M4 分享包 | `/s/:slug` SSR + OG meta、重新生成/停用連結、浮水印版圖檔 | ✅ |
 | M5 治理 | 18+ 聲明、NSFW 顯示矩陣全站生效、檢舉、管理後台 `/admin`、條款/守則/隱私頁 | ✅ |
+| M6 開放與嵌入 | oEmbed、SVG 色票卡、iframe 卡片、公開 JSON API v1；用戶 opt-in 預設關閉（見 SASD Phase 1 FR-7） | 🔲 規劃中 |
+| M7 委託需求單 | 模板雙語描述文字 + 參考圖與色票合成圖，`/c/:slug` 分享給繪師（不含 AI，見 SASD Phase 1 FR-6） | 🔲 規劃中 |
 
 尚未拍板／未做：Pawfit ID 更名（R-2，目前鎖定不可改）、帳號刪除與資料匯出、Postgres 自動備份排程（SASD §2.5）、條款文字定稿（R-5）。
 
