@@ -48,6 +48,18 @@ return [
         'use_remove' => 'Already friends; use remove friend instead.',
     ],
 
+    'posts' => [
+        'media_required' => 'Pick at least one image.',
+        'too_many_media' => 'A post can have at most :max images.',
+        'media_locked' => 'The images of a post cannot be changed afterwards. Create a new post instead.',
+        'is_nsfw_required' => 'Please set the post rating (SFW / NSFW).',
+        'fursona_not_owned' => 'Fursona not found.',
+        'media_not_owned' => 'Only images from your own gallery can be used.',
+        'media_not_active' => 'Some images are still processing or have been removed.',
+        'nsfw_locked' => 'A source image or the fursona is NSFW, so the post is locked to NSFW.',
+        'suppressed_note' => 'Multiple reports; visibility reduced pending moderator review',
+    ],
+
     'commission' => [
         'media_required' => 'Pick at least one reference image.',
         'too_many_media' => 'At most :max reference images.',
@@ -60,6 +72,7 @@ return [
     'report' => [
         'target_not_found' => 'Report target not found.',
         'untitled_media' => 'Untitled image',
+        'untitled_post' => '(no text)',
         'no_pawfit_id' => 'not set',
     ],
 

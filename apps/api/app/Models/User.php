@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -62,6 +63,12 @@ class User extends Authenticatable
     {
         return Friendship::involving($this->id)->accepted()->get()
             ->map(fn (Friendship $f) => $f->otherId($this->id))->all();
+    }
+
+    /** 這批貼文中我按過讚的 id。 */
+    public function likedPostIds(array $postIds): array
+    {
+        return DB::table('post_likes')->where('user_id', $this->id)->whereIn('post_id', $postIds)->pluck('post_id')->all();
     }
 
     /** 我封鎖的 + 封鎖我的（查詢層排除用）。 */

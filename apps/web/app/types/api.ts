@@ -126,6 +126,67 @@ export interface ProfilePage {
   relation: { status: 'none' | 'friends' | 'pending_out' | 'pending_in', friendship_id: string | null, blocked_by_me: boolean } | null
 }
 
+/* ---- 貼文與河道（Phase 2 FR-B3–B6） ---- */
+
+export type PostVisibility = 'public' | 'friends'
+export type PostStatus = 'active' | 'removed' | 'suppressed'
+
+export interface PostMedia {
+  id: string
+  kind: MediaKind
+  caption: string | null
+  credit_name: string | null
+  credit_url: string | null
+  is_nsfw: boolean
+  width: number | null
+  height: number | null
+  state: ViewState
+  urls: { thumb: string, display: string }
+}
+
+export interface Post {
+  id: string
+  url: string
+  author: PublicUser
+  fursona: { id: string, name: string, species: string | null, avatar_url: string | null } | null
+  body: string
+  tags: string[]
+  is_nsfw: boolean
+  visibility: PostVisibility
+  status: PostStatus
+  status_note?: string | null
+  like_count: number
+  comment_count: number
+  liked_by_me: boolean
+  state: ViewState
+  media: PostMedia[]
+  can_edit: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface FeedPage {
+  data: Post[]
+  next_cursor: string | null
+  tags?: string[]
+}
+
+export interface PostComment {
+  id: string
+  post_id: string
+  author: PublicUser
+  body: string
+  status: 'active' | 'removed'
+  can_delete: boolean
+  created_at: string
+}
+
+export interface PostCommentPage {
+  data: PostComment[]
+  next_after: string | null
+  total: number
+}
+
 /* ---- 好友（Phase 2 FR-B1） ---- */
 
 export interface FriendEntry {
@@ -224,7 +285,7 @@ export interface PublicMediaPage {
   total: number
 }
 
-export type ReportTargetType = 'media' | 'fursona' | 'profile'
+export type ReportTargetType = 'media' | 'fursona' | 'profile' | 'post' | 'comment'
 export type ReportReason = 'illegal' | 'untagged_nsfw' | 'copyright' | 'harassment' | 'other'
 export type ReportStatus = 'open' | 'resolved' | 'dismissed'
 
@@ -238,11 +299,12 @@ export interface Report {
     fursona_id?: string
     owner_pawfit_id?: string | null
     is_nsfw?: boolean
-    status?: MediaStatus
+    status?: MediaStatus | PostStatus
     thumb_url?: string
     visibility?: Visibility
     removed_at?: string | null
     is_banned?: boolean
+    post_id?: string
   } | null
   reason_code: ReportReason
   detail: string | null

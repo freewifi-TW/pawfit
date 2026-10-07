@@ -5,12 +5,15 @@ use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommissionKitController;
 use App\Http\Controllers\CommissionPageController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\FursonaController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\OEmbedController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostInteractionController;
 use App\Http\Controllers\PublicApiController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ReportController;
@@ -77,6 +80,18 @@ Route::middleware(['auth:sanctum', 'not-banned', 'onboarded'])->group(function (
         Route::delete('blocks/{user}', [FriendController::class, 'unblock']);
     });
 
+    // Phase 2 M2–M3：發文、好友河道、互動（FR-B3、B5、B6）
+    Route::middleware('feature:feed')->group(function () {
+        Route::post('posts', [PostController::class, 'store'])->middleware('throttle:social');
+        Route::patch('posts/{post}', [PostController::class, 'update']);
+        Route::delete('posts/{post}', [PostController::class, 'destroy']);
+        Route::get('feed/friends', [FeedController::class, 'friends']);
+        Route::post('posts/{post}/like', [PostInteractionController::class, 'like'])->middleware('throttle:social');
+        Route::delete('posts/{post}/like', [PostInteractionController::class, 'unlike'])->middleware('throttle:social');
+        Route::post('posts/{post}/comments', [PostInteractionController::class, 'storeComment'])->middleware('throttle:social');
+        Route::delete('comments/{comment}', [PostInteractionController::class, 'destroyComment']);
+    });
+
     // 委託需求單（M7，FR-6）
     Route::get('commission-kits', [CommissionKitController::class, 'index']);
     Route::post('commission-kits', [CommissionKitController::class, 'store']);
@@ -94,6 +109,13 @@ Route::middleware('throttle:public')->group(function () {
     Route::get('img/{media}', [ImageController::class, 'show']);
     Route::get('share/{slug}', [PublicController::class, 'share']);
     Route::get('users/{pawfitId}', [PublicController::class, 'profile']);
+    // Phase 2：探索河道、貼文、留言、個人主頁貼文（訪客可讀）
+    Route::middleware('feature:feed')->group(function () {
+        Route::get('feed/explore', [FeedController::class, 'explore']);
+        Route::get('posts/{post}', [PostController::class, 'show']);
+        Route::get('posts/{post}/comments', [PostInteractionController::class, 'comments']);
+        Route::get('users/{pawfitId}/posts', [FeedController::class, 'user']);
+    });
     Route::get('commission/{slug}', [CommissionPageController::class, 'show']);
     Route::get('commission/{slug}/sheet', [CommissionPageController::class, 'sheet']);
 });

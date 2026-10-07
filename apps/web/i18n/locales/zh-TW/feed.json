@@ -1,0 +1,94 @@
+{
+  "feed": {
+    "disabled": "河道功能尚未開放",
+    "nav": {
+      "feed": "河道"
+    },
+    "friends": {
+      "title": "好友河道",
+      "subtitle": "好友與你自己的貼文，依時間排序",
+      "empty": "還沒有貼文。加幾個好友，或先發第一篇。"
+    },
+    "explore": {
+      "title": "探索",
+      "subtitle": "全站公開貼文，可用標籤篩選",
+      "tagsPlaceholder": "輸入標籤，逗號分隔，例如：犬科, 赤狐",
+      "filter": "篩選",
+      "clear": "清除",
+      "filtering": "篩選：",
+      "empty": "沒有符合的貼文。"
+    },
+    "tabs": {
+      "friends": "好友",
+      "explore": "探索"
+    },
+    "newPost": "發文",
+    "loadMore": "載入更多",
+    "loading": "載入中…",
+    "friendsOnly": "限好友",
+    "blurNote": "NSFW 內容，點擊顯示",
+    "openImage": "開啟圖片",
+    "credits": "繪師：",
+    "edit": "編輯",
+    "delete": "刪除",
+    "deleteConfirm": "確定刪除",
+    "report": "檢舉",
+    "reportTarget": "{'@'}{id} 的貼文",
+    "status": {
+      "active": "已發布",
+      "suppressed": "能見度已降低（待審核）",
+      "removed": "已下架"
+    },
+    "post": {
+      "notFound": "找不到這篇貼文，或你沒有權限瀏覽",
+      "title": "{name} 的貼文",
+      "comments": "留言",
+      "commentPlaceholder": "寫點什麼…（最多 500 字）",
+      "send": "送出",
+      "loginToComment": "登入後留言",
+      "noComments": "還沒有留言。",
+      "loadMoreComments": "更多留言",
+      "deleteComment": "刪除",
+      "reportComment": "檢舉",
+      "commentTarget": "{'@'}{id} 的留言"
+    },
+    "compose": {
+      "title": "發文",
+      "editTitle": "編輯貼文",
+      "subtitle": "從你的圖庫挑 1–10 張圖，加上文字與標籤",
+      "fursona": "獸設",
+      "fursonaNone": "不指定獸設",
+      "fursonaHint": "選定獸設後會自動帶入它的標籤，可以再增刪；不會回寫獸設。",
+      "pickTitle": "圖片",
+      "pickCount": "已選 {n} / {max}",
+      "pickEmpty": "這隻獸設還沒有處理完成的圖；先去圖庫上傳。",
+      "pickAnyEmpty": "你的圖庫還沒有圖；先去上傳。",
+      "maxReached": "最多 {max} 張",
+      "body": "文字",
+      "bodyPlaceholder": "想說點什麼？（最多 2000 字）",
+      "tags": "標籤",
+      "visibility": "誰看得到",
+      "public": "公開",
+      "publicHint": "出現在探索河道、你的主頁與好友河道。",
+      "friendsOnlyHint": "只有好友看得到；不出現在探索河道。",
+      "nsfw": "這篇貼文是 NSFW",
+      "nsfwLocked": "來源圖或獸設為 NSFW，貼文已鎖定為 NSFW。",
+      "mediaLocked": "圖片組成不能事後變更；要換圖請重新發文。",
+      "submit": "發布",
+      "save": "儲存",
+      "pickOne": "請至少選一張圖",
+      "needLogin": "請先登入"
+    },
+    "notify": {
+      "posted": "已發布",
+      "saved": "已儲存",
+      "deleted": "貼文已刪除",
+      "commentDeleted": "留言已刪除",
+      "failed": "操作失敗"
+    },
+    "profile": {
+      "title": "貼文",
+      "empty": "還沒有貼文。"
+    }
+  }
+}

@@ -145,6 +145,7 @@ input, select, textarea {
 .sub { color: var(--ink-2); }
 .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
 .wrap.narrow { max-width: 560px; }
+.wrap.narrow-feed { max-width: 720px; }
 .link { color: var(--accent); font-weight: 700; }
 
 /* ---------- 通用元件 ---------- */

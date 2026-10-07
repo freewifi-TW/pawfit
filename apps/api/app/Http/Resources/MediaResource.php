@@ -47,7 +47,7 @@ class MediaResource extends JsonResource
     }
 
     /** 圖片一律走 ACL 路由，由後端 302 到簽名 URL。 */
-    public static function imgUrl(Media $m, string $variant, ?string $slug = null, ?string $kitSlug = null): string
+    public static function imgUrl(Media $m, string $variant, ?string $slug = null, ?string $kitSlug = null, ?string $postId = null): string
     {
         $url = "/api/img/{$m->id}?v={$variant}";
         if ($slug) {
@@ -55,6 +55,9 @@ class MediaResource extends JsonResource
         }
         if ($kitSlug) {
             $url .= '&k='.urlencode($kitSlug);
+        }
+        if ($postId) {
+            $url .= '&p='.urlencode($postId);
         }
 
         return $url;

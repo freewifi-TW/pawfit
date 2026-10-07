@@ -10,7 +10,10 @@ class Report extends Model
 {
     use HasUuids;
 
-    public const TARGET_TYPES = ['media', 'fursona', 'profile'];
+    public const TARGET_TYPES = ['media', 'fursona', 'profile', 'post', 'comment']; // post/comment：Phase 2
+
+    /** FR-B7.1：同一目標累積多少筆（不同檢舉者的）未處理檢舉時自動降能見度 */
+    public const SUPPRESS_THRESHOLD = 3;
 
     public const REASONS = ['illegal', 'untagged_nsfw', 'copyright', 'harassment', 'other'];
 

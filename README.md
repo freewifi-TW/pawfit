@@ -35,9 +35,9 @@ Same-domain 路由，前後端共用 cookie（Sanctum stateful），沒有 CORS 
 | 里程碑 | 內容 | flag | 狀態 |
 |---|---|---|---|
 | M1 好友 | 邀請／接受／解除、封鎖（雙向互不可見）、`friends` 隱私值（獸設與單圖）、分享頁對 friends 的處理、`/friends` 頁與主頁按鈕 | `FEATURE_FRIENDS` | ✅ |
-| M2 發文 | 貼文 CRUD、母標籤繼承、credit 沿用、NSFW 鎖定 | `FEATURE_FEED` | 🔲 |
-| M3 河道與互動 | 雙軌河道、標籤篩選、讚、留言 | `FEATURE_FEED` | 🔲 |
-| M4 治理強化 | 檢舉擴充、自動降能見度、後台貼文操作 | `FEATURE_FEED` | 🔲 |
+| M2 發文 | 貼文 CRUD（1–10 張圖庫圖＋文字＋標籤）、母標籤繼承、NSFW 鎖定、圖片經 `/api/img?p=` 出口 | `FEATURE_FEED` | ✅ |
+| M3 河道與互動 | 好友河道 `/feed`、探索河道 `/feed/explore?tags=`（AND 篩選）、(created_at,id) cursor、讚、單層留言、主頁貼文 | `FEATURE_FEED` | ✅ |
+| M4 治理強化 | 檢舉增列 post／comment、同目標 ≥3 位檢舉者自動降能見度（suppressed）、後台下架／恢復貼文與留言 | `FEATURE_FEED` | ✅ |
 | M5 換獸頭貼圖 | 瀏覽器端人臉偵測＋貼圖發文 | `FEATURE_HEAD_STICKER` | 🔲 |
 
 flag 全部在 `apps/api/.env`（程式先部署、功能再啟用）；前端由 `GET /api/features` 取得，關閉時相關頁面與按鈕不出現、API 回 404。封鎖與好友的可見性判斷只在 `Visibility::relation()`（同一請求內快取在 Request attributes 上）。

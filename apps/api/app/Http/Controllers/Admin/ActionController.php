@@ -7,6 +7,8 @@ use App\Http\Resources\ReportResource;
 use App\Models\AdminAction;
 use App\Models\Fursona;
 use App\Models\Media;
+use App\Models\Post;
+use App\Models\PostComment;
 use App\Models\Report;
 use App\Models\User;
 use App\Services\MediaStorage;
@@ -32,6 +34,11 @@ class ActionController extends Controller
         'unban_user',
         'resolve_report',
         'dismiss_report',
+        // Phase 2 FR-B7.2
+        'remove_post',      // 下架（含解除自動降能見度後直接下架）
+        'restore_post',     // 恢復：removed／suppressed → active
+        'remove_comment',
+        'restore_comment',
     ];
 
     public function __construct(private readonly MediaStorage $storage) {}
@@ -124,6 +131,36 @@ class ActionController extends Controller
                 User::findOrFail($targetId)->forceFill(['is_banned' => false])->save();
 
                 return ['profile', $note];
+
+            case 'remove_post':
+                $p = Post::findOrFail($targetId);
+                $p->forceFill(['status' => 'removed', 'status_note' => $note ?? __('messages.admin.removed_by_staff')])->save();
+
+                return ['post', $note];
+
+            case 'restore_post':
+                $p = Post::findOrFail($targetId);
+                $p->forceFill(['status' => 'active', 'status_note' => null])->save();
+
+                return ['post', $note];
+
+            case 'remove_comment':
+                $c = PostComment::findOrFail($targetId);
+                if ($c->isActive()) {
+                    $c->forceFill(['status' => 'removed'])->save();
+                    $c->post()->where('comment_count', '>', 0)->decrement('comment_count');
+                }
+
+                return ['comment', $note ?? __('messages.admin.removed_by_staff')];
+
+            case 'restore_comment':
+                $c = PostComment::findOrFail($targetId);
+                if (! $c->isActive()) {
+                    $c->forceFill(['status' => 'active'])->save();
+                    $c->post()->increment('comment_count');
+                }
+
+                return ['comment', $note];
 
             case 'resolve_report':
             case 'dismiss_report':

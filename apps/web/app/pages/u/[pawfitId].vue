@@ -18,6 +18,10 @@ if (error.value || !page.value) {
 const user = computed(() => page.value!.user)
 const rep = computed(() => page.value!.representative)
 
+// Phase 2：個人主頁貼文（flag 開啟時）
+const { feed: feedEnabled } = useFeatures()
+const postsFeed = feedEnabled.value ? await useFeed(`profile-posts-${pawfitId}`, () => `/users/${encodeURIComponent(pawfitId)}/posts`) : null
+
 useSeoMeta({
   title: () => t('profile.seo.title', { name: user.value.display_name, id: user.value.pawfit_id }),
   description: () => t('profile.seo.description', {
@@ -340,6 +344,46 @@ async function block() {
     >
       {{ page.is_owner ? t('profile.list.emptyOwner') : t('profile.list.emptyVisitor') }}
     </div>
+
+    <section
+      v-if="postsFeed"
+      class="stack"
+      style="gap:14px;margin-top:28px"
+    >
+      <h2
+        class="disp"
+        style="margin:0;font-size:22px"
+      >
+        {{ t('feed.profile.title') }}
+      </h2>
+      <PostCard
+        v-for="p in postsFeed.posts.value"
+        :key="p.id"
+        :post="p"
+        @update="postsFeed.replace"
+        @deleted="postsFeed.remove"
+      />
+      <div
+        v-if="!postsFeed.posts.value.length && !postsFeed.pending.value"
+        class="empty"
+      >
+        {{ t('feed.profile.empty') }}
+      </div>
+      <div
+        v-if="postsFeed.hasMore.value"
+        class="row"
+        style="justify-content:center"
+      >
+        <button
+          class="btn"
+          type="button"
+          :disabled="postsFeed.loading.value"
+          @click="postsFeed.loadMore"
+        >
+          {{ postsFeed.loading.value ? t('feed.loading') : t('feed.loadMore') }}
+        </button>
+      </div>
+    </section>
 
     <ReportDialog
       v-model:open="reporting"

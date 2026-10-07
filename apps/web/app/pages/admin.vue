@@ -45,6 +45,8 @@ function targetLabel(r: Report): string {
         ? t('admin.target.mediaWithFursona', { label: tg.label, fursona: tg.fursona_name })
         : t('admin.target.media', { label: tg.label })
     case 'fursona': return t('admin.target.fursona', { label: tg.label })
+    case 'post': return t('admin.target.post', { label: tg.label })
+    case 'comment': return t('admin.target.comment', { label: tg.label })
     default: return t('admin.target.user', { label: tg.label })
   }
 }
@@ -163,6 +165,9 @@ void ownerIdOf
                   <template v-if="r.target_type === 'fursona' && r.target.removed_at">
                     · {{ t('admin.target.removed') }}
                   </template>
+                  <template v-if="(r.target_type === 'post' || r.target_type === 'comment') && r.target.status">
+                    · {{ t(`feed.status.${r.target.status}`) }}
+                  </template>
                   <template v-if="r.target_type === 'profile' && r.target.is_banned">
                     · {{ t('admin.target.banned') }}
                   </template>
@@ -250,6 +255,53 @@ void ownerIdOf
                       type="button"
                       :disabled="busyId === r.id"
                       @click="act(r, 'remove_fursona', r.target_id)"
+                    >
+                      {{ t('admin.actions.remove') }}
+                    </button>
+                  </template>
+                  <template v-else-if="r.target_type === 'post'">
+                    <NuxtLink
+                      v-if="r.target.post_id"
+                      class="btn sm"
+                      :to="`/post/${r.target.post_id}`"
+                      target="_blank"
+                    >
+                      {{ t('admin.actions.view') }}
+                    </NuxtLink>
+                    <button
+                      v-if="r.target.status === 'suppressed'"
+                      class="btn sm"
+                      type="button"
+                      :disabled="busyId === r.id"
+                      @click="act(r, 'restore_post', r.target_id)"
+                    >
+                      {{ t('admin.actions.restore') }}
+                    </button>
+                    <button
+                      v-if="r.target.status !== 'removed'"
+                      class="btn sm danger"
+                      type="button"
+                      :disabled="busyId === r.id"
+                      @click="act(r, 'remove_post', r.target_id)"
+                    >
+                      {{ t('admin.actions.remove') }}
+                    </button>
+                  </template>
+                  <template v-else-if="r.target_type === 'comment'">
+                    <NuxtLink
+                      v-if="r.target.post_id"
+                      class="btn sm"
+                      :to="`/post/${r.target.post_id}#comments`"
+                      target="_blank"
+                    >
+                      {{ t('admin.actions.view') }}
+                    </NuxtLink>
+                    <button
+                      v-if="r.target.status === 'active'"
+                      class="btn sm danger"
+                      type="button"
+                      :disabled="busyId === r.id"
+                      @click="act(r, 'remove_comment', r.target_id)"
                     >
                       {{ t('admin.actions.remove') }}
                     </button>

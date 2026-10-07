@@ -27,6 +27,8 @@
       "status": "Status"
     },
     "target": {
+      "post": "Post · {label}",
+      "comment": "Comment · {label}",
       "deleted": "(target deleted)",
       "media": "Image · {label}",
       "mediaWithFursona": "Image · {label} ({fursona})",
@@ -38,6 +40,7 @@
       "detailQuote": "“{detail}”"
     },
     "actions": {
+      "restore": "Restore",
       "preview": "Preview",
       "markNsfw": "Mark NSFW",
       "remove": "Remove",

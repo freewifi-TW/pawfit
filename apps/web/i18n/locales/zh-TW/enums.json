@@ -29,6 +29,10 @@
       "other": "其他"
     },
     "adminAction": {
+      "remove_post": "下架貼文",
+      "restore_post": "恢復貼文",
+      "remove_comment": "下架留言",
+      "restore_comment": "恢復留言",
       "remove_media": "下架圖片",
       "purge_media": "緊急刪除圖片",
       "restore_media": "還原圖片",

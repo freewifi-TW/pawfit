@@ -4,6 +4,8 @@ namespace App\Http\Resources;
 
 use App\Models\Fursona;
 use App\Models\Media;
+use App\Models\Post;
+use App\Models\PostComment;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -57,6 +59,20 @@ class ReportResource extends JsonResource
                 'label' => '@'.($u->pawfit_id ?? __('messages.report.no_pawfit_id')),
                 'owner_pawfit_id' => $u->pawfit_id,
                 'is_banned' => $u->is_banned,
+            ] : null,
+            'post' => ($p = Post::with(['author', 'media'])->find($r->target_id)) ? [
+                'label' => mb_strimwidth($p->body !== '' ? $p->body : __('messages.report.untitled_post'), 0, 60, '…'),
+                'owner_pawfit_id' => $p->author?->pawfit_id,
+                'is_nsfw' => $p->is_nsfw,
+                'status' => $p->status,
+                'thumb_url' => ($first = $p->media->first()) ? MediaResource::imgUrl($first, 'thumb', postId: $p->id) : null,
+                'post_id' => $p->id,
+            ] : null,
+            'comment' => ($c = PostComment::with('author')->find($r->target_id)) ? [
+                'label' => mb_strimwidth($c->body, 0, 60, '…'),
+                'owner_pawfit_id' => $c->author?->pawfit_id,
+                'status' => $c->status,
+                'post_id' => $c->post_id,
             ] : null,
             default => null,
         };

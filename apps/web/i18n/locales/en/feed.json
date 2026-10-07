@@ -1,0 +1,94 @@
+{
+  "feed": {
+    "disabled": "The feed is not available yet",
+    "nav": {
+      "feed": "Feed"
+    },
+    "friends": {
+      "title": "Friends feed",
+      "subtitle": "Posts from your friends and you, newest first",
+      "empty": "No posts yet. Add some friends, or write the first one."
+    },
+    "explore": {
+      "title": "Explore",
+      "subtitle": "All public posts, filterable by tag",
+      "tagsPlaceholder": "Tags, comma separated, e.g. canine, red fox",
+      "filter": "Filter",
+      "clear": "Clear",
+      "filtering": "Filtering:",
+      "empty": "No matching posts."
+    },
+    "tabs": {
+      "friends": "Friends",
+      "explore": "Explore"
+    },
+    "newPost": "New post",
+    "loadMore": "Load more",
+    "loading": "Loading…",
+    "friendsOnly": "Friends only",
+    "blurNote": "NSFW content, click to reveal",
+    "openImage": "Open image",
+    "credits": "Art by:",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Yes, delete",
+    "report": "Report",
+    "reportTarget": "post by {'@'}{id}",
+    "status": {
+      "active": "Published",
+      "suppressed": "Visibility reduced (pending review)",
+      "removed": "Removed"
+    },
+    "post": {
+      "notFound": "This post does not exist, or you cannot view it",
+      "title": "Post by {name}",
+      "comments": "Comments",
+      "commentPlaceholder": "Write something… (up to 500 characters)",
+      "send": "Send",
+      "loginToComment": "Log in to comment",
+      "noComments": "No comments yet.",
+      "loadMoreComments": "More comments",
+      "deleteComment": "Delete",
+      "reportComment": "Report",
+      "commentTarget": "comment by {'@'}{id}"
+    },
+    "compose": {
+      "title": "New post",
+      "editTitle": "Edit post",
+      "subtitle": "Pick 1–10 images from your gallery, add text and tags",
+      "fursona": "Fursona",
+      "fursonaNone": "No fursona",
+      "fursonaHint": "Choosing a fursona pre-fills its tags; you can add or remove them without changing the fursona.",
+      "pickTitle": "Images",
+      "pickCount": "{n} / {max} selected",
+      "pickEmpty": "This fursona has no processed images yet; upload some to its gallery first.",
+      "pickAnyEmpty": "Your gallery is empty; upload something first.",
+      "maxReached": "At most {max} images",
+      "body": "Text",
+      "bodyPlaceholder": "What's on your mind? (up to 2000 characters)",
+      "tags": "Tags",
+      "visibility": "Who can see this",
+      "public": "Public",
+      "publicHint": "Shown in Explore, on your profile and in friends' feeds.",
+      "friendsOnlyHint": "Only friends can see it; not shown in Explore.",
+      "nsfw": "This post is NSFW",
+      "nsfwLocked": "A source image or the fursona is NSFW, so the post is locked to NSFW.",
+      "mediaLocked": "Images cannot be changed afterwards; create a new post to use different ones.",
+      "submit": "Publish",
+      "save": "Save",
+      "pickOne": "Pick at least one image",
+      "needLogin": "Please log in first"
+    },
+    "notify": {
+      "posted": "Published",
+      "saved": "Saved",
+      "deleted": "Post deleted",
+      "commentDeleted": "Comment deleted",
+      "failed": "Action failed"
+    },
+    "profile": {
+      "title": "Posts",
+      "empty": "No posts yet."
+    }
+  }
+}

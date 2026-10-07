@@ -48,6 +48,18 @@ return [
         'use_remove' => '已是好友，請改用解除好友。',
     ],
 
+    'posts' => [
+        'media_required' => '請至少選一張圖。',
+        'too_many_media' => '一篇貼文最多 :max 張圖。',
+        'media_locked' => '貼文的圖片組成不能事後變更，請重新發文。',
+        'is_nsfw_required' => '請標記貼文分級（SFW／NSFW）。',
+        'fursona_not_owned' => '找不到這隻獸設。',
+        'media_not_owned' => '只能選自己圖庫的圖。',
+        'media_not_active' => '有圖片還在處理中或已下架。',
+        'nsfw_locked' => '來源圖或獸設為 NSFW，貼文分級鎖定為 NSFW。',
+        'suppressed_note' => '多筆檢舉，暫時降低能見度，待站方審核',
+    ],
+
     'commission' => [
         'media_required' => '請至少選一張參考圖。',
         'too_many_media' => '參考圖最多 :max 張。',
@@ -60,6 +72,7 @@ return [
     'report' => [
         'target_not_found' => '找不到檢舉目標。',
         'untitled_media' => '未命名圖片',
+        'untitled_post' => '（無文字）',
         'no_pawfit_id' => '未設定',
     ],
 

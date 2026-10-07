@@ -29,6 +29,10 @@
       "other": "Other"
     },
     "adminAction": {
+      "remove_post": "Remove post",
+      "restore_post": "Restore post",
+      "remove_comment": "Remove comment",
+      "restore_comment": "Restore comment",
       "remove_media": "Remove image",
       "purge_media": "Purge image",
       "restore_media": "Restore image",

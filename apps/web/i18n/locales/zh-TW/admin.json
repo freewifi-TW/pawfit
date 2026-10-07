@@ -27,6 +27,8 @@
       "status": "狀態"
     },
     "target": {
+      "post": "貼文 · {label}",
+      "comment": "留言 · {label}",
       "deleted": "（目標已刪除）",
       "media": "圖片 · {label}",
       "mediaWithFursona": "圖片 · {label}（{fursona}）",
@@ -38,6 +40,7 @@
       "detailQuote": "「{detail}」"
     },
     "actions": {
+      "restore": "恢復",
       "preview": "預覽",
       "markNsfw": "改標 NSFW",
       "remove": "下架",

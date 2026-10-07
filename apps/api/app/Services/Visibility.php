@@ -6,6 +6,7 @@ use App\Models\Block;
 use App\Models\CommissionKit;
 use App\Models\Fursona;
 use App\Models\Media;
+use App\Models\Post;
 use App\Models\ShareLink;
 use App\Models\User;
 use ArrayObject;
@@ -177,6 +178,73 @@ class Visibility
         }
 
         return $this->fursonaState(null, $fursona, $link) === 'show';
+    }
+
+    /**
+     * 貼文（Phase 2 §2.2）：封鎖 → 狀態（removed／suppressed 僅作者與管理員）→ 隱私（friends 需好友）→ NSFW 矩陣。
+     * 作者與管理員永遠 'show'。
+     */
+    public function postState(?User $viewer, Post $post): ?string
+    {
+        if ($viewer !== null && ($viewer->id === $post->author_id || $viewer->isAdmin())) {
+            return 'show';
+        }
+        if (! $post->isActive()) {
+            return null;
+        }
+        $author = $post->relationLoaded('author') ? $post->author : $post->author()->first();
+        if ($author === null || $author->is_banned || $this->isBlockedBetween($viewer, $post->author_id)) {
+            return null;
+        }
+        $visible = match ($post->visibility) {
+            'public' => true,
+            'friends' => $this->relation($viewer, $post->author_id)['friend'],
+            default => false,
+        };
+        if (! $visible) {
+            return null;
+        }
+
+        return $post->is_nsfw ? $this->nsfwState($viewer) : 'show';
+    }
+
+    /**
+     * 經貼文觀看圖片（p=）：貼文可見即可看圖，不再另判圖庫隱私（作者發文等於公開該圖給貼文的觀眾），
+     * 但圖片下架與 NSFW 矩陣仍然生效；不在貼文裡的圖一律不可見。
+     */
+    public function mediaStateViaPost(?User $viewer, Media $media, Post $post): ?string
+    {
+        if ($this->isPrivileged($viewer, $media)) {
+            return 'show';
+        }
+        if ($this->postState($viewer, $post) === null) {
+            return null;
+        }
+        if (! $media->isActive() || ! $post->includesMedia($media->id)) {
+            return null;
+        }
+
+        return $media->isNsfwContent() ? $this->nsfwState($viewer) : 'show';
+    }
+
+    /** 把貼文的 state 與每張圖的 state 塞進模型（PostResource 讀 view_state）。已下架的圖直接剔除。 */
+    public function decoratePost(?User $viewer, Post $post, string $state): Post
+    {
+        $post->setAttribute('view_state', $state);
+        if ($post->relationLoaded('media')) {
+            $post->setRelation('media', $post->media->filter(function (Media $m) use ($viewer, $post) {
+                if (! $m->isActive() && ! $this->isPrivileged($viewer, $m)) {
+                    return false;
+                }
+                $m->setAttribute('view_state', $m->isNsfwContent() && ! $this->isPrivileged($viewer, $m)
+                    ? ($this->nsfwState($viewer) ?? $post->getAttribute('view_state'))
+                    : 'show');
+
+                return true;
+            })->values());
+        }
+
+        return $post;
     }
 
     /**

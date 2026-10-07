@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const { me, isAdmin, logout } = useAuth()
-const { friends: friendsEnabled } = useFeatures()
+const { friends: friendsEnabled, feed: feedEnabled } = useFeatures()
 const menuOpen = ref(false)
 </script>
 
@@ -12,6 +12,12 @@ const menuOpen = ref(false)
       <nav>
         <NuxtLink to="/">
           {{ t('common.nav.home') }}
+        </NuxtLink>
+        <NuxtLink
+          v-if="feedEnabled"
+          :to="me?.is_onboarded ? '/feed' : '/feed/explore'"
+        >
+          {{ t('common.nav.feed') }}
         </NuxtLink>
         <template v-if="me?.is_onboarded">
           <NuxtLink to="/dashboard">
