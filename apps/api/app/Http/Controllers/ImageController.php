@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CommissionKit;
 use App\Models\Media;
 use App\Models\ShareLink;
 use App\Services\MediaStorage;
@@ -10,8 +11,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 /**
- * GET /api/img/{media}?v=thumb|display|original&s={slug}
+ * GET /api/img/{media}?v=thumb|display|original&s={slug}&k={kitSlug}
  * 唯一的圖片出口：經 Visibility 判斷後 302 到短效簽名 URL（SASD §2.1 讀取流程）。
+ * s＝分享連結、k＝委託需求單（FR-6.4）；需求單情境的浮水印沿用該獸設目前分享連結的設定。
  */
 class ImageController extends Controller
 {
@@ -20,10 +22,14 @@ class ImageController extends Controller
         $viewer = $request->user('sanctum');
         $variant = (string) $request->query('v', 'thumb');
         $link = $request->filled('s') ? ShareLink::where('slug', $request->query('s'))->first() : null;
+        $kit = $request->filled('k') ? CommissionKit::with('fursona.owner')->where('slug', $request->query('k'))->first() : null;
 
         $media->loadMissing('fursona.owner');
-        $state = $visibility->mediaState($viewer, $media, $link);
+        $state = $kit ? $visibility->mediaStateViaKit($viewer, $media, $kit) : $visibility->mediaState($viewer, $media, $link);
         abort_if($state === null, 404);
+        if ($kit && ! $link) {
+            $link = $media->fursona->shareLink;
+        }
 
         $privileged = $visibility->isPrivileged($viewer, $media);
 

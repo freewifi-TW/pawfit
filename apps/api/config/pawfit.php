@@ -21,6 +21,8 @@ return [
         'dev_login' => (bool) env('FEATURE_DEV_LOGIN', false),
         // 後續 phase 的 flag 預留
         'feed' => (bool) env('FEATURE_FEED', false),
+        // M7 委託需求單的 LLM 潤飾（FR-6.7）：純文字模型改寫語氣與翻譯；預設關，開啟前需先接供應商
+        'brief_llm' => (bool) env('FEATURE_BRIEF_LLM', false),
         'wardrobe' => (bool) env('FEATURE_WARDROBE', false),
     ],
 
@@ -47,6 +49,14 @@ return [
     'fursona' => [
         'max_palette' => 24,
         'max_tags' => 30,
+    ],
+
+    // M7 委託需求單（FR-6）
+    'commission' => [
+        // 每份需求單的參考圖張數上限
+        'max_media' => 10,
+        // 合成圖文字字型檔（映像已裝 font-noto-cjk）；檔案不存在時退回 media.watermark_font（Baloo2，無中文）
+        'font' => env('COMMISSION_FONT', '/usr/share/fonts/noto/NotoSansCJK-Regular.ttc'),
     ],
 
     // M6 開放與嵌入（FR-7）：公開 JSON API、oEmbed、SVG 色票卡、iframe 卡片

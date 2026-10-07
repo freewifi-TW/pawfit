@@ -1,0 +1,92 @@
+{
+  "commission": {
+    "locales": {
+      "zh-TW": "繁中",
+      "en": "English"
+    },
+    "status": {
+      "processing": "合成圖產生中",
+      "active": "可用",
+      "failed": "合成圖失敗",
+      "revoked": "已停用"
+    },
+    "fields": {
+      "composition": "構圖／姿勢",
+      "scene": "情境／背景",
+      "size": "尺寸／規格",
+      "usage": "用途",
+      "budget": "預算",
+      "deadline": "截稿",
+      "notes": "補充"
+    },
+    "placeholders": {
+      "composition": "例：半身、看向鏡頭、微笑",
+      "scene": "例：夜晚篝火旁、暖色調",
+      "size": "例：3000×4000 px、300 dpi",
+      "usage": "例：個人用途、Twitter 頭像",
+      "budget": "例：USD 80–120",
+      "deadline": "例：2026-12-01 前",
+      "notes": "任何繪師需要知道的事：請保留尾尖白毛、左耳缺口要畫出來……"
+    },
+    "panel": {
+      "title": "委託需求單",
+      "subtitle": "一個連結把色票、參考圖與要求交給繪師",
+      "intro": "需求單是建立當下的快照：角色資料、色票、你勾選的參考圖與本次要求，附雙語描述文字與一張合成圖。之後修改獸設不會影響已送出的需求單。全程不使用 AI 生圖。",
+      "create": "建立需求單",
+      "needMedia": "先在圖庫上傳至少一張處理完成的圖",
+      "mediaCount": "{n} 張參考圖",
+      "copyLink": "複製連結",
+      "copyBrief": "複製描述文字",
+      "open": "開啟",
+      "regenerate": "重新生成連結",
+      "regenerateAsk": "舊連結會立即失效，確定？",
+      "regenerateConfirm": "確定重新生成",
+      "revoke": "停用",
+      "revokeConfirm": "確定停用",
+      "empty": "還沒有需求單。建立後會得到一個 /c/ 連結，直接貼給繪師即可。"
+    },
+    "create": {
+      "title": "建立委託需求單",
+      "description": "勾選參考圖（依點選順序排列）並填寫本次要求，所有欄位皆選填。",
+      "pickTitle": "參考圖",
+      "pickCount": "已選 {n} / {max}",
+      "maxReached": "最多 {max} 張",
+      "pickOne": "請至少選一張參考圖",
+      "nsfwNote": "包含 NSFW 內容：整份需求單會標記 NSFW，未登入或未完成 18 歲聲明的人無法開啟。",
+      "footerNote": "描述文字由模板產生，色票與 credit 為原始資料。",
+      "submit": "產生需求單"
+    },
+    "notify": {
+      "created": "需求單已建立，合成圖產生中",
+      "linkCopied": "已複製需求單連結",
+      "copied": "已複製描述文字",
+      "regenerated": "已重新生成，舊連結已失效",
+      "revoked": "需求單已停用",
+      "failed": "操作失敗",
+      "clipboardError": "無法存取剪貼簿，請手動複製"
+    },
+    "page": {
+      "notFound": "這份需求單不存在、已停用，或含有你目前無法瀏覽的內容",
+      "badge": "委託需求單",
+      "title": "{name} 的委託需求單",
+      "seoDescription": "{name} 的委託需求單：{palette} 色色票、{media} 張參考圖與本次要求 — Pawfit",
+      "by": "由 {'@'}{id} 於 {date} 產生",
+      "fullSheet": "完整角色設定",
+      "manage": "管理需求單",
+      "nsfwNote": "這份需求單含 NSFW 內容，依你的偏好以模糊顯示，點擊解鎖。",
+      "briefTitle": "描述文字",
+      "copy": "複製全文",
+      "copyHint": "純文字，可直接貼到 Discord、Twitter DM 或 email。",
+      "requestTitle": "本次委託",
+      "paletteTitle": "色票",
+      "paletteHint": "點一下複製色碼",
+      "sheetTitle": "一頁總覽",
+      "sheetProcessing": "合成圖產生中，稍後重新整理",
+      "sheetFailed": "合成圖產生失敗，擁有者可重新生成",
+      "sheetAlt": "{name} 的委託需求總覽圖",
+      "referencesTitle": "參考圖（{n}）",
+      "referencesEmpty": "沒有可顯示的參考圖",
+      "footer": "本需求單由 Pawfit 爪搭依角色設定自動整理，色票與繪師標記為原始資料；未使用任何 AI 生圖。需求單為建立當下的快照，擁有者可隨時停用連結。"
+    }
+  }
+}

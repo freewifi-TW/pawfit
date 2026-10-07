@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CommissionKit;
 use App\Models\Fursona;
 use App\Models\Media;
 use App\Models\ShareLink;
@@ -126,6 +127,42 @@ class Visibility
         }
 
         return $this->fursonaState(null, $fursona, $link) === 'show';
+    }
+
+    /**
+     * 委託需求單（FR-6.4／6.5）：固定 unlisted——知道 slug 即可看；
+     * 整份 NSFW 時對訪客／未聲明／偏好 hide 不顯示；擁有者與管理員永遠可見。
+     */
+    public function kitState(?User $viewer, CommissionKit $kit): ?string
+    {
+        if ($viewer !== null && ($viewer->id === $kit->owner_id || $viewer->isAdmin())) {
+            return 'show';
+        }
+        $fursona = $kit->fursona;
+        if (! $kit->isActive() || $fursona === null || $fursona->isRemoved() || $fursona->owner->is_banned) {
+            return null;
+        }
+
+        return $kit->is_nsfw ? $this->nsfwState($viewer) : 'show';
+    }
+
+    /**
+     * 經需求單觀看參考圖：需求單是擁有者挑選的快照，圖片本身的隱私設定不再另判，
+     * 但下架（removed）與 NSFW 矩陣仍然生效；不在需求單裡的圖一律不可見。
+     */
+    public function mediaStateViaKit(?User $viewer, Media $media, CommissionKit $kit): ?string
+    {
+        if ($this->isPrivileged($viewer, $media)) {
+            return 'show';
+        }
+        if ($this->kitState($viewer, $kit) === null) {
+            return null;
+        }
+        if (! $media->isActive() || ! in_array($media->id, $kit->media_ids ?? [], true)) {
+            return null;
+        }
+
+        return $media->isNsfwContent() ? $this->nsfwState($viewer) : 'show';
     }
 
     private function passesVisibility(string $visibility, Fursona $fursona, ?ShareLink $link): bool

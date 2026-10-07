@@ -39,6 +39,15 @@ return [
         'file_exceeds_limit' => '檔案超過 :max MB。',
     ],
 
+    'commission' => [
+        'media_required' => '請至少選一張參考圖。',
+        'too_many_media' => '參考圖最多 :max 張。',
+        'fursona_not_owned' => '找不到這隻獸設。',
+        'media_not_owned' => '包含不屬於這隻獸設的圖片。',
+        'media_not_active' => '有圖片還在處理中或已下架，請先移除。',
+        'revoked' => '這份需求單已停用。',
+    ],
+
     'report' => [
         'target_not_found' => '找不到檢舉目標。',
         'untitled_media' => '未命名圖片',

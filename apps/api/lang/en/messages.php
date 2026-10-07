@@ -39,6 +39,15 @@ return [
         'file_exceeds_limit' => 'The file exceeds :max MB.',
     ],
 
+    'commission' => [
+        'media_required' => 'Pick at least one reference image.',
+        'too_many_media' => 'At most :max reference images.',
+        'fursona_not_owned' => 'Fursona not found.',
+        'media_not_owned' => 'Includes images that do not belong to this fursona.',
+        'media_not_active' => 'Some images are still processing or have been removed. Please deselect them.',
+        'revoked' => 'This brief has been disabled.',
+    ],
+
     'report' => [
         'target_not_found' => 'Report target not found.',
         'untitled_media' => 'Untitled image',

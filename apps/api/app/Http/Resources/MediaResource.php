@@ -17,6 +17,7 @@ class MediaResource extends JsonResource
     {
         $m = $this->resource;
         $slug = $request->attributes->get('share_slug');
+        $kit = $request->attributes->get('kit_slug');
         $isOwner = $request->user('sanctum')?->id === $m->owner_id;
 
         return [
@@ -37,8 +38,8 @@ class MediaResource extends JsonResource
             // 由 Visibility::filterMedia 設定；擁有者介面沒有這個值時前端視為 show
             'state' => $m->getAttribute('view_state') ?? 'show',
             'urls' => [
-                'thumb' => static::imgUrl($m, 'thumb', $slug),
-                'display' => static::imgUrl($m, 'display', $slug),
+                'thumb' => static::imgUrl($m, 'thumb', $slug, $kit),
+                'display' => static::imgUrl($m, 'display', $slug, $kit),
                 'original' => $this->when($isOwner, static::imgUrl($m, 'original')),
             ],
             'created_at' => $m->created_at,
@@ -46,11 +47,14 @@ class MediaResource extends JsonResource
     }
 
     /** 圖片一律走 ACL 路由，由後端 302 到簽名 URL。 */
-    public static function imgUrl(Media $m, string $variant, ?string $slug = null): string
+    public static function imgUrl(Media $m, string $variant, ?string $slug = null, ?string $kitSlug = null): string
     {
         $url = "/api/img/{$m->id}?v={$variant}";
         if ($slug) {
             $url .= '&s='.urlencode($slug);
+        }
+        if ($kitSlug) {
+            $url .= '&k='.urlencode($kitSlug);
         }
 
         return $url;

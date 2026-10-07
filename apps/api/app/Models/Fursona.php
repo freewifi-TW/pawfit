@@ -63,6 +63,11 @@ class Fursona extends Model
         return $this->hasMany(ShareLink::class);
     }
 
+    public function commissionKits(): HasMany
+    {
+        return $this->hasMany(CommissionKit::class);
+    }
+
     public function isPublic(): bool
     {
         return $this->visibility === 'public';

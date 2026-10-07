@@ -12,6 +12,8 @@ FROM serversideup/php:${PHP_VERSION}-fpm-nginx-alpine AS base
 USER root
 # pdo_pgsql：Postgres；redis：queue/cache；imagick：縮圖與浮水印；intl/bcmath：Laravel 常用
 RUN install-php-extensions pdo_pgsql redis imagick intl bcmath exif gd
+# 中日韓字型：委託需求單合成圖（M7）與浮水印要能畫中文；Noto Sans CJK 走 fontconfig 給 Imagick 用
+RUN apk add --no-cache fontconfig font-noto-cjk && fc-cache -f
 
 # Nginx 監聯 8080（映像預設），Caddy 反向代理到這裡
 ENV NGINX_WEBROOT=/var/www/html/public \

@@ -26,7 +26,7 @@ Same-domain 路由，前後端共用 cookie（Sanctum stateful），沒有 CORS 
 | M4 分享包 | `/s/:slug` SSR + OG meta、重新生成/停用連結、浮水印版圖檔 | ✅ |
 | M5 治理 | 18+ 聲明、NSFW 顯示矩陣全站生效、檢舉、管理後台 `/admin`、條款/守則/隱私頁 | ✅ |
 | M6 開放與嵌入 | oEmbed、SVG 色票卡、iframe 卡片、公開 JSON API v1；用戶 opt-in 預設關閉（見 SASD Phase 1 FR-7） | ✅ |
-| M7 委託需求單 | 模板雙語描述文字 + 參考圖與色票合成圖，`/c/:slug` 分享給繪師（不含 AI，見 SASD Phase 1 FR-6） | 🔲 規劃中 |
+| M7 委託需求單 | 模板雙語描述文字 + 參考圖與色票合成圖，`/c/:slug` 分享給繪師（不含 AI，見 SASD Phase 1 FR-6） | ✅ |
 
 尚未拍板／未做：Pawfit ID 更名（R-2，目前鎖定不可改）、帳號刪除與資料匯出、Postgres 自動備份排程（SASD §2.5）、條款文字定稿（R-5）。
 
@@ -98,6 +98,15 @@ docker compose down -v                                        # 連資料一起�
 
 公開 API：匿名、GET only、CORS `*`、每 IP 每分鐘 60 次（`EMBED_RATE_PER_MINUTE`）、`Cache-Control: public, max-age=300`、一律帶 `X-Robots-Tag: noai, noimageai` 與 `X-Pawfit-Terms`。Caddy 只對 `/embed/*` 放開 `frame-ancestors *`，其餘路由維持 `'self'`；`apps/web/public/robots.txt` 封鎖已知 AI 爬蟲。嵌入程式碼產生器在設定頁。
 
+### 委託需求單（M7）
+
+獸設編輯器「委託」分頁：勾選 1–10 張參考圖、填本次要求 → `POST /api/commission-kits` 建立 **快照**（`commission_kits.snapshot`：角色資料、色票、參考圖 caption／credit、要求）並以模板產生繁中＋英文描述文字（`lang/<locale>/commission.php`，`App\Services\CommissionBrief`），queue 以 Imagick 合成「參考圖＋色票」一頁總覽圖（`App\Services\CommissionSheet`，webp 2048 寬；映像內已裝 `font-noto-cjk`，字型路徑由 `COMMISSION_FONT` 控制）。
+
+- 公開頁 `/c/:slug`（SSR + OG，固定 unlisted、`noindex`）：描述文字可切語言與複製、總覽圖、參考圖原尺寸。NSFW 需求單對訪客整份 404。
+- 參考圖經 `GET /api/img/:id?k=<slug>` 出口：在需求單內的圖不再另判隱私（擁有者挑選的快照），但下架與 NSFW 矩陣仍生效；浮水印沿用該獸設分享連結的設定。
+- 重新生成＝換 slug（舊連結立即失效）並重跑合成圖；停用＝連結失效、資料保留。之後修改獸設不影響既有需求單。
+- 不使用任何 AI 生圖；LLM 潤飾文字（FR-6.7）只預留 `FEATURE_BRIEF_LLM` flag，尚未接供應商。
+
 ### 多語系
 
 目前支援繁體中文（預設）與英文。前端用 `@nuxtjs/i18n`（語言檔 `apps/web/i18n/locales/<code>/*.json`，網址不帶語言前綴，記在 cookie），登入者的偏好存在 `users.locale`；後端依 `users.locale` → `Accept-Language` 回對應語言的訊息（`apps/api/lang/<code>/messages.php`）。
@@ -111,7 +120,7 @@ Caddy 對每個請求產生 `X-Request-Id` 貫穿 web、api、worker 與瀏覽�
 
 ### 測試
 
-- API：`tests/Feature/VisibilityTest.php`（隱私 × NSFW 矩陣）、`tests/Feature/Phase1FlowTest.php`（onboarding → 上傳 → 分享 → 檢舉 → 後台）、`tests/Feature/EmbedApiTest.php`（M6：opt-in 開關、公開 API、oEmbed、SVG、標頭）。
+- API：`tests/Feature/VisibilityTest.php`（隱私 × NSFW 矩陣）、`tests/Feature/Phase1FlowTest.php`（onboarding → 上傳 → 分享 → 檢舉 → 後台）、`tests/Feature/EmbedApiTest.php`（M6：opt-in 開關、公開 API、oEmbed、SVG、標頭）、`tests/Feature/CommissionKitTest.php`（M7：快照、模板文字、NSFW、k= 圖片出口、重新生成／停用、合成圖 job 實際渲染）。
 - 測試強制使用 sqlite in-memory：`tests/bootstrap.php` 會覆蓋 Docker 注入的 `DB_*` 環境變數，`tests/TestCase.php` 若偵測到非 sqlite 會直接中止，避免 `RefreshDatabase` 清掉開發資料庫。
 
 ## 正式部署（GCP VM）

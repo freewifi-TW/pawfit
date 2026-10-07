@@ -124,6 +124,49 @@ export interface ProfilePage {
   embed_enabled: boolean
 }
 
+/* ---- 委託需求單（FR-6，M7） ---- */
+
+export type CommissionKitStatus = 'processing' | 'active' | 'failed' | 'revoked'
+export type CommissionRequestField = 'composition' | 'scene' | 'size' | 'usage' | 'budget' | 'deadline' | 'notes'
+
+export interface CommissionSnapshot {
+  fursona: { name: string, species: string | null, bio: string | null, tags: string[], palette: PaletteEntry[] }
+  owner: { pawfit_id: string, display_name: string }
+  media: Array<{ id: string, kind: MediaKind, caption: string | null, credit_name: string | null, credit_url: string | null, is_nsfw: boolean, width: number | null, height: number | null }>
+  request: Partial<Record<CommissionRequestField, string | null>>
+  share_url: string | null
+}
+
+export interface CommissionKit {
+  id: string
+  slug: string
+  url: string
+  kind: 'art2d' | 'fursuit'
+  status: CommissionKitStatus
+  is_nsfw: boolean
+  fursona_id: string
+  snapshot: CommissionSnapshot
+  /** locale（BCP 47）→ 模板文字 */
+  brief_text: Record<string, string>
+  brief_source: 'template' | 'llm'
+  media_count: number
+  sheet_url: string | null
+  media_ids?: string[]
+  revoked_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CommissionPage {
+  kit: CommissionKit
+  media: Media[]
+  owner: PublicUser
+  fursona: { id: string, name: string, share_url: string | null }
+  state: ViewState
+  is_owner: boolean
+  og_image_url: string | null
+}
+
 /* ---- 公開 JSON API v1（/api/v1/public，FR-7.5）：嵌入卡片用 ---- */
 
 export interface PublicFursona {

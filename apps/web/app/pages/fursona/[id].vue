@@ -19,7 +19,7 @@ if (error.value || !fursona.value) {
 
 useSeoMeta({ title: () => t('fursona.seoTitle', { name: fursona.value?.name ?? '' }) })
 
-type Tab = 'basic' | 'gallery' | 'palette' | 'tags' | 'privacy'
+type Tab = 'basic' | 'gallery' | 'palette' | 'tags' | 'privacy' | 'commission'
 const tab = ref<Tab>((route.hash.replace('#', '') as Tab) || 'basic')
 watch(tab, v => history.replaceState(null, '', `#${v}`))
 
@@ -295,6 +295,14 @@ const visibilityOptions = computed<Array<{ value: Visibility, title: string, hin
       >
         {{ t('fursona.tabs.privacy') }}
       </button>
+      <button
+        type="button"
+        role="tab"
+        :class="{ on: tab === 'commission' }"
+        @click="tab = 'commission'"
+      >
+        {{ t('fursona.tabs.commission') }}
+      </button>
     </div>
 
     <!-- 基本資料 -->
@@ -547,6 +555,14 @@ const visibilityOptions = computed<Array<{ value: Visibility, title: string, hin
       <ShareLinkPanel
         :fursona="fursona"
         @change="onShareChange"
+      />
+    </div>
+
+    <!-- 委託需求單（M7，FR-6） -->
+    <div v-if="tab === 'commission'">
+      <CommissionKitPanel
+        :fursona="fursona"
+        :media="media"
       />
     </div>
 

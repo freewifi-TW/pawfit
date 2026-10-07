@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\ActionController as AdminActionController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommissionKitController;
+use App\Http\Controllers\CommissionPageController;
 use App\Http\Controllers\FursonaController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MeController;
@@ -58,6 +60,13 @@ Route::middleware(['auth:sanctum', 'not-banned', 'onboarded'])->group(function (
     Route::delete('media/{media}', [MediaController::class, 'destroy']);
 
     Route::post('reports', [ReportController::class, 'store'])->middleware('throttle:reports');
+
+    // 委託需求單（M7，FR-6）
+    Route::get('commission-kits', [CommissionKitController::class, 'index']);
+    Route::post('commission-kits', [CommissionKitController::class, 'store']);
+    Route::get('commission-kits/{commissionKit}', [CommissionKitController::class, 'show']);
+    Route::post('commission-kits/{commissionKit}/regenerate', [CommissionKitController::class, 'regenerate']);
+    Route::delete('commission-kits/{commissionKit}', [CommissionKitController::class, 'destroy']);
 });
 
 /*
@@ -69,6 +78,8 @@ Route::middleware('throttle:public')->group(function () {
     Route::get('img/{media}', [ImageController::class, 'show']);
     Route::get('share/{slug}', [PublicController::class, 'share']);
     Route::get('users/{pawfitId}', [PublicController::class, 'profile']);
+    Route::get('commission/{slug}', [CommissionPageController::class, 'show']);
+    Route::get('commission/{slug}/sheet', [CommissionPageController::class, 'sheet']);
 });
 
 /*
