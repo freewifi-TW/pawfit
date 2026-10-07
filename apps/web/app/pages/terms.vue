@@ -2,7 +2,7 @@
 const { t, tm, rt } = useI18n()
 
 interface LinkParagraph { before: string, text: string, after: string, to: string }
-interface Section { title: string, paragraphs?: string[], items?: string[], link?: LinkParagraph }
+interface Section { id?: string, title: string, paragraphs?: string[], items?: string[], link?: LinkParagraph }
 
 const sections = computed(() => tm('legal.terms.sections') as Section[])
 
@@ -22,7 +22,10 @@ useSeoMeta({ title: () => t('legal.terms.title'), description: () => t('legal.te
       v-for="(s, i) in sections"
       :key="i"
     >
-      <h2 class="disp">
+      <h2
+        :id="s.id ? rt(s.id) : undefined"
+        class="disp"
+      >
         {{ rt(s.title) }}
       </h2>
       <p

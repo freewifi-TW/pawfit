@@ -32,6 +32,8 @@ class DemoSeeder extends Seeder
                 'tos_accepted_at' => now(),
                 'adult_confirmed_at' => now(),
                 'nsfw_pref' => 'blur',
+                // 示範嵌入與公開 API（M6）：/embed/demoEmber1、/api/v1/public/users/firefox_ash
+                'allow_embed_api' => true,
             ],
         );
 

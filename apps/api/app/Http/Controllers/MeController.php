@@ -16,6 +16,7 @@ class MeController extends Controller
     public const RESERVED_IDS = [
         'admin', 'api', 'login', 'logout', 'onboarding', 'dashboard', 'settings', 'terms', 'privacy',
         'guidelines', 'help', 'about', 'pawfit', 'official', 'support', 'me', 'u', 's', 'img', 'fursona',
+        'embed', 'oembed', 'c', 'feed', 'post',
     ];
 
     public function show(Request $request): UserResource
@@ -36,6 +37,7 @@ class MeController extends Controller
             'tos_accepted' => ['sometimes', 'accepted'],
             'avatar_media_id' => ['sometimes', 'nullable', 'uuid'],
             'locale' => ['sometimes', 'nullable', Rule::in(config('pawfit.locales.supported'))],
+            'allow_embed_api' => ['sometimes', 'boolean'],
         ], [
             'pawfit_id.regex' => __('messages.me.pawfit_id_format'),
             'pawfit_id.not_in' => __('messages.me.pawfit_id_reserved'),
@@ -43,6 +45,9 @@ class MeController extends Controller
 
         if (array_key_exists('locale', $data)) {
             $user->locale = $data['locale'];
+        }
+        if (array_key_exists('allow_embed_api', $data)) {
+            $user->allow_embed_api = $data['allow_embed_api'];
         }
 
         if (array_key_exists('pawfit_id', $data)) {

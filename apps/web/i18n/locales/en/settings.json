@@ -5,6 +5,7 @@
     "nav": {
       "nsfw": "Content display",
       "language": "Language",
+      "embed": "Embeds & API",
       "account": "Account",
       "data": "Data & storage"
     },
@@ -53,6 +54,66 @@
       "uploadsToday": "Uploads today",
       "uploadsCount": "{used} / {limit} images",
       "note": "Exporting all data and deleting your account will be available in a later release. To delete your account for now, email us via the contact link in the footer."
+    },
+    "embed": {
+      "heading": "Embeds & API",
+      "stateOn": "Open: other sites can reference your public fursonas",
+      "stateOff": "Closed (default)",
+      "master": "Allow embed cards, palette cards and the public API to read my public fursonas",
+      "masterNote": "Off by default. When on, only fursonas that are public, SFW and have a share link are exposed; private and NSFW content never is. Turning it off disables all embeds and API access immediately. Your data is served with noai headers and the Terms prohibit AI training use.",
+      "enabled": "Embeds and public API enabled",
+      "disabled": "Embeds and public API disabled",
+      "fursonaUpdated": "Embed setting for {name} updated",
+      "overrideLabel": "Embed setting for {name}",
+      "override": {
+        "inherit": "Follow master switch",
+        "on": "Always open",
+        "off": "Always closed"
+      },
+      "status": {
+        "open": "Embeddable",
+        "closed": "Closed"
+      },
+      "reasons": {
+        "private": "Private, not exposed",
+        "nsfw": "NSFW, not exposed",
+        "noLink": "Create a share link first",
+        "removed": "Taken down"
+      },
+      "getCode": "Get embed code",
+      "hideCode": "Hide",
+      "createLink": "Create share link",
+      "noFursonas": "No fursonas yet. Create one and generate a share link to get embed code here.",
+      "tabs": {
+        "iframe": "iframe card",
+        "svg": "Palette card (image)",
+        "api": "Public API"
+      },
+      "size": "Size",
+      "sizes": {
+        "sm": "Small",
+        "md": "Medium",
+        "lg": "Large"
+      },
+      "theme": "Theme",
+      "themes": {
+        "auto": "Follow system",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "format": "Format",
+      "layout": "Layout",
+      "layouts": {
+        "row": "Single row",
+        "grid": "Grid"
+      },
+      "apiNote": "Anonymous, read-only, public SFW data only; 60 requests per minute, responses cacheable for 5 minutes. Image URLs are /api/img paths and can be used directly in <img>.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "clipboardError": "Clipboard unavailable, please copy manually",
+      "preview": "Preview in new tab",
+      "apiDocs": "Public API entry point:",
+      "termsLink": "Terms of use"
     }
   }
 }

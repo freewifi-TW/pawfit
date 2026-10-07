@@ -20,7 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'google_id', 'email', 'name', 'google_avatar_url',
         'pawfit_id', 'display_name', 'avatar_media_id', 'nsfw_pref',
-        'adult_confirmed_at', 'tos_accepted_at', 'is_banned', 'last_login_at', 'locale',
+        'adult_confirmed_at', 'tos_accepted_at', 'is_banned', 'last_login_at', 'locale', 'allow_embed_api',
     ];
 
     protected $hidden = ['remember_token', 'google_id'];
@@ -32,6 +32,7 @@ class User extends Authenticatable
             'tos_accepted_at' => 'datetime',
             'last_login_at' => 'datetime',
             'is_banned' => 'boolean',
+            'allow_embed_api' => 'boolean',
         ];
     }
 

@@ -120,6 +120,7 @@ class FursonaController extends Controller
             'is_nsfw' => ['sometimes', 'boolean'],
             'is_representative' => ['sometimes', 'boolean'],
             'avatar_media_id' => ['sometimes', 'nullable', 'uuid'],
+            'allow_embed_api' => ['sometimes', 'nullable', 'boolean'],
         ], [
             'palette.*.hex.regex' => __('messages.fursona.palette_hex_format'),
         ]);

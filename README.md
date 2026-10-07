@@ -25,7 +25,7 @@ Same-domain 路由，前後端共用 cookie（Sanctum stateful），沒有 CORS 
 | M3 圖庫 | presigned PUT 直傳 → queue 產展示版/縮圖、分類、credit、單圖隱私與 NSFW、拖曳排序、ACL 圖片路由 | ✅ |
 | M4 分享包 | `/s/:slug` SSR + OG meta、重新生成/停用連結、浮水印版圖檔 | ✅ |
 | M5 治理 | 18+ 聲明、NSFW 顯示矩陣全站生效、檢舉、管理後台 `/admin`、條款/守則/隱私頁 | ✅ |
-| M6 開放與嵌入 | oEmbed、SVG 色票卡、iframe 卡片、公開 JSON API v1；用戶 opt-in 預設關閉（見 SASD Phase 1 FR-7） | 🔲 規劃中 |
+| M6 開放與嵌入 | oEmbed、SVG 色票卡、iframe 卡片、公開 JSON API v1；用戶 opt-in 預設關閉（見 SASD Phase 1 FR-7） | ✅ |
 | M7 委託需求單 | 模板雙語描述文字 + 參考圖與色票合成圖，`/c/:slug` 分享給繪師（不含 AI，見 SASD Phase 1 FR-6） | 🔲 規劃中 |
 
 尚未拍板／未做：Pawfit ID 更名（R-2，目前鎖定不可改）、帳號刪除與資料匯出、Postgres 自動備份排程（SASD §2.5）、條款文字定稿（R-5）。
@@ -83,6 +83,21 @@ docker compose down -v                                        # 連資料一起�
 - `AWS_ENDPOINT` 指向 `host.docker.internal:9000`，讓 Laravel 產生的簽名 URL 在容器內與瀏覽器都能使用。
 - worker 是長駐程序：`composer require` 之後要 `docker compose restart worker`，否則新類別找不到。
 
+### 開放與嵌入（M6）
+
+全部 opt-in：使用者在「設定 → 開放與嵌入」打開總開關（`users.allow_embed_api`），每隻獸設可單獨覆寫（`fursonas.allow_embed_api`，null＝跟隨）。只輸出「公開 + SFW + 已建立分享連結」的獸設，觀看者永遠視同訪客（`Visibility::embeddable()`）。
+
+| 端點 | 說明 |
+|---|---|
+| `GET /api/v1/public/users/:pawfitId` | 用戶摘要與可嵌入的公開獸設清單（含分享 slug） |
+| `GET /api/v1/public/fursonas/:slug` | 獸設資料（色票、標籤、credit、封面）；`:slug` 為分享連結 slug |
+| `GET /api/v1/public/fursonas/:slug/media?cursor=` | 公開 SFW 圖，每頁 24 張，圖片網址為 `/api/img` 路徑 |
+| `GET /embed/:slug/palette.svg?theme=light\|dark&layout=row\|grid` | 靜態 SVG 色票卡（Nuxt 代理到 API，快取 10 分鐘） |
+| `GET /embed/:slug?theme=auto\|light\|dark&size=sm\|md\|lg` | iframe 卡片頁（無導覽、無 cookie、無登入狀態） |
+| `GET /api/oembed?url=&format=json` | oEmbed；分享頁與個人主頁在可嵌入時帶 discovery link |
+
+公開 API：匿名、GET only、CORS `*`、每 IP 每分鐘 60 次（`EMBED_RATE_PER_MINUTE`）、`Cache-Control: public, max-age=300`、一律帶 `X-Robots-Tag: noai, noimageai` 與 `X-Pawfit-Terms`。Caddy 只對 `/embed/*` 放開 `frame-ancestors *`，其餘路由維持 `'self'`；`apps/web/public/robots.txt` 封鎖已知 AI 爬蟲。嵌入程式碼產生器在設定頁。
+
 ### 多語系
 
 目前支援繁體中文（預設）與英文。前端用 `@nuxtjs/i18n`（語言檔 `apps/web/i18n/locales/<code>/*.json`，網址不帶語言前綴，記在 cookie），登入者的偏好存在 `users.locale`；後端依 `users.locale` → `Accept-Language` 回對應語言的訊息（`apps/api/lang/<code>/messages.php`）。
@@ -96,7 +111,7 @@ Caddy 對每個請求產生 `X-Request-Id` 貫穿 web、api、worker 與瀏覽�
 
 ### 測試
 
-- API：`tests/Feature/VisibilityTest.php`（隱私 × NSFW 矩陣）、`tests/Feature/Phase1FlowTest.php`（onboarding → 上傳 → 分享 → 檢舉 → 後台）。
+- API：`tests/Feature/VisibilityTest.php`（隱私 × NSFW 矩陣）、`tests/Feature/Phase1FlowTest.php`（onboarding → 上傳 → 分享 → 檢舉 → 後台）、`tests/Feature/EmbedApiTest.php`（M6：opt-in 開關、公開 API、oEmbed、SVG、標頭）。
 - 測試強制使用 sqlite in-memory：`tests/bootstrap.php` 會覆蓋 Docker 注入的 `DB_*` 環境變數，`tests/TestCase.php` 若偵測到非 sqlite 會直接中止，避免 `RefreshDatabase` 清掉開發資料庫。
 
 ## 正式部署（GCP VM）

@@ -28,6 +28,8 @@ export interface Me {
   is_admin: boolean
   is_banned: boolean
   locale: string | null
+  /** 嵌入與公開 API 總開關（FR-7.1），預設 false */
+  allow_embed_api: boolean
   quota: Quota
   created_at: string
 }
@@ -91,6 +93,9 @@ export interface Fursona {
   media_count: number | null
   palette_count: number
   removed_at?: string | null
+  /** 擁有者才有：null＝繼承用戶總開關；embed_enabled 為實際生效值 */
+  allow_embed_api?: boolean | null
+  embed_enabled?: boolean
   share_link?: ShareLink | null
   media?: Media[]
   owner?: PublicUser
@@ -106,6 +111,8 @@ export interface SharePage {
   is_owner: boolean
   share: { slug: string, url: string, watermark: boolean }
   og_image_url: string | null
+  /** 可嵌入時分享頁輸出 oEmbed discovery link */
+  embed_enabled: boolean
 }
 
 export interface ProfilePage {
@@ -114,6 +121,46 @@ export interface ProfilePage {
   representative: Fursona | null
   fursonas: Fursona[]
   stats: { public_count: number, total_count: number | null }
+  embed_enabled: boolean
+}
+
+/* ---- 公開 JSON API v1（/api/v1/public，FR-7.5）：嵌入卡片用 ---- */
+
+export interface PublicFursona {
+  slug: string
+  name: string
+  species: string | null
+  bio: string | null
+  tags: string[]
+  palette: Array<{ hex: string, name: string, note: string }>
+  is_nsfw: boolean
+  avatar_url: string | null
+  cover_url: string | null
+  media_count: number
+  credits: Array<{ name: string, url: string | null }>
+  owner: { pawfit_id: string, display_name: string, profile_url: string }
+  share_url: string
+  embed: { card_url: string, palette_svg_url: string, media_url: string }
+  updated_at: string
+}
+
+export interface PublicMedia {
+  id: string
+  kind: MediaKind
+  caption: string | null
+  credit_name: string | null
+  credit_url: string | null
+  width: number | null
+  height: number | null
+  url: string
+  thumb_url: string
+  created_at: string
+}
+
+export interface PublicMediaPage {
+  data: PublicMedia[]
+  next_cursor: string | null
+  total: number
 }
 
 export type ReportTargetType = 'media' | 'fursona' | 'profile'

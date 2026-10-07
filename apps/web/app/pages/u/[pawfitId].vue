@@ -29,6 +29,18 @@ useSeoMeta({
   ogUrl: () => `${config.public.siteUrl}/u/${user.value.pawfit_id}`
 })
 
+// 可嵌入時輸出 oEmbed discovery link（FR-7.2；指向代表獸設的卡片）
+useHead(() => ({
+  link: page.value?.embed_enabled && rep.value
+    ? [{
+        rel: 'alternate',
+        type: 'application/json+oembed',
+        href: `${config.public.siteUrl}/api/oembed?format=json&url=${encodeURIComponent(`${config.public.siteUrl}/u/${user.value.pawfit_id}`)}`,
+        title: `${user.value.display_name} · Pawfit`
+      }]
+    : []
+}))
+
 const reporting = ref(false)
 </script>
 

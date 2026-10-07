@@ -49,6 +49,23 @@ return [
         'max_tags' => 30,
     ],
 
+    // M6 開放與嵌入（FR-7）：公開 JSON API、oEmbed、SVG 色票卡、iframe 卡片
+    'embed' => [
+        // 公開 API 與嵌入端點的 IP rate limit（每分鐘）
+        'rate_per_minute' => (int) env('EMBED_RATE_PER_MINUTE', 60),
+        // 回應快取秒數：JSON 300、SVG 600（FR-7.3、FR-7.5）
+        'json_max_age' => 300,
+        'svg_max_age' => 600,
+        // 每頁 media 筆數
+        'media_page_size' => 24,
+        // iframe 卡片尺寸（oEmbed 與設定頁產生器共用；與 apps/web 的 EMBED_SIZES 一致）
+        'sizes' => [
+            'sm' => [320, 200],
+            'md' => [480, 320],
+            'lg' => [640, 420],
+        ],
+    ],
+
     // 前端網址（分享連結、OAuth 完成後轉址用）
     'frontend_url' => rtrim((string) env('FRONTEND_URL', env('APP_URL', 'http://localhost:8080')), '/'),
 

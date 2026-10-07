@@ -7,9 +7,12 @@ use App\Http\Controllers\FursonaController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\OEmbedController;
+use App\Http\Controllers\PublicApiController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ShareLinkController;
+use App\Http\Middleware\PublicApiHeaders;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -66,6 +69,22 @@ Route::middleware('throttle:public')->group(function () {
     Route::get('img/{media}', [ImageController::class, 'show']);
     Route::get('share/{slug}', [PublicController::class, 'share']);
     Route::get('users/{pawfitId}', [PublicController::class, 'profile']);
+});
+
+/*
+ |------------------------------------------------------------------
+ | 開放與嵌入（M6，FR-7）：匿名、GET only、觀看者永遠視同訪客
+ |------------------------------------------------------------------
+ */
+Route::middleware(['throttle:public_api', PublicApiHeaders::class])->group(function () {
+    Route::get('oembed', [OEmbedController::class, 'show']);
+
+    Route::prefix('v1/public')->group(function () {
+        Route::get('users/{pawfitId}', [PublicApiController::class, 'user']);
+        Route::get('fursonas/{slug}/palette.svg', [PublicApiController::class, 'paletteSvg']);
+        Route::get('fursonas/{slug}/media', [PublicApiController::class, 'media']);
+        Route::get('fursonas/{slug}', [PublicApiController::class, 'fursona']);
+    });
 });
 
 /*

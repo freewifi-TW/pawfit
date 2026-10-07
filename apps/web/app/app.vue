@@ -19,11 +19,8 @@ useSeoMeta({
 </script>
 
 <template>
-  <UApp :toaster="{ position: 'bottom-center' }">
-    <AppHeader />
-    <main>
-      <NuxtPage />
-    </main>
-    <AppFooter />
-  </UApp>
+  <!-- 一般頁面用 layouts/default.vue（含導覽與 toaster）；嵌入卡片用 layouts/embed.vue -->
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>

@@ -49,6 +49,18 @@ useSeoMeta({
   robots: () => (f.value.visibility === 'unlisted' ? 'noindex, nofollow' : 'index, follow')
 })
 
+// 可嵌入時輸出 oEmbed discovery link，讓 WordPress／Notion 等貼連結時取得卡片（FR-7.2）
+useHead(() => ({
+  link: page.value?.embed_enabled
+    ? [{
+        rel: 'alternate',
+        type: 'application/json+oembed',
+        href: `${config.public.siteUrl}/api/oembed?format=json&url=${encodeURIComponent(page.value.share.url)}`,
+        title: `${f.value.name} · Pawfit`
+      }]
+    : []
+}))
+
 const bioParagraphs = computed(() => (f.value.bio ?? '').split(/\n{2,}/).map(s => s.trim()).filter(Boolean))
 const reporting = ref(false)
 

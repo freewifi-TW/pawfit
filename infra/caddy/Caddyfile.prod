@@ -14,11 +14,27 @@
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options nosniff
-		X-Frame-Options SAMEORIGIN
 		Referrer-Policy strict-origin-when-cross-origin
 		-Server
 		>X-Request-Id {http.request.uuid}
 	}
+
+	# 嵌入（SASD Phase 1 FR-7.4 / FR-7.7）：只有 /embed/* 可被跨站 iframe（不送 X-Frame-Options）；
+	# 其餘路由 frame-ancestors 'self' + X-Frame-Options SAMEORIGIN；公開頁與公開 API 帶 noai / noimageai
+	@embed path /embed/*
+	header @embed {
+		Content-Security-Policy "frame-ancestors *"
+		# 嵌入頁不設 cookie（i18n 的語言 cookie 也不要）
+		-Set-Cookie
+	}
+	@notembed not path /embed/*
+	header @notembed {
+		Content-Security-Policy "frame-ancestors 'self'"
+		X-Frame-Options SAMEORIGIN
+	}
+	# （/api/v1/public/* 與 /api/oembed 由 Laravel 的 PublicApiHeaders 自己帶，這裡不重複）
+	@noai path /s/* /u/* /embed/*
+	header @noai X-Robots-Tag "noai, noimageai"
 
 	@api path /api/* /sanctum/* /up
 	handle @api {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Me, NsfwPref } from '~/types/api'
+import type { Fursona, Me, NsfwPref } from '~/types/api'
 import { formatBytes } from '~/utils/labels'
 
 definePageMeta({ middleware: 'auth' })
@@ -68,7 +68,48 @@ const maskedEmail = computed(() => {
   return u && d ? `${u.slice(0, 1)}•••••@${d}` : ''
 })
 
-const section = ref<'nsfw' | 'language' | 'account' | 'data'>('nsfw')
+const section = ref<'nsfw' | 'language' | 'embed' | 'account' | 'data'>('nsfw')
+
+/* ---- 開放與嵌入（FR-7）：總開關、各獸設覆寫、嵌入程式碼 ---- */
+const embedOn = ref(!!me.value?.allow_embed_api)
+const { data: fursonas, refresh: refreshFursonas } = await useAsyncData('settings-fursonas', () => api<Fursona[]>('/fursonas'), { default: () => [] })
+const openCode = ref<string | null>(null)
+
+type EmbedChoice = 'inherit' | 'on' | 'off'
+function embedChoice(f: Fursona): EmbedChoice {
+  return f.allow_embed_api === null || f.allow_embed_api === undefined ? 'inherit' : f.allow_embed_api ? 'on' : 'off'
+}
+/** 這隻獸設實際能否被嵌入：開關 + 有分享連結 + 非私人 + 非 NSFW（NSFW 對訪客永遠隱藏） */
+function embeddable(f: Fursona): boolean {
+  return !!f.embed_enabled && !!f.share_link && f.visibility !== 'private' && !f.is_nsfw && !f.removed_at
+}
+function embedBlockReason(f: Fursona): string | null {
+  if (!f.embed_enabled) return null
+  if (f.removed_at) return t('settings.embed.reasons.removed')
+  if (f.visibility === 'private') return t('settings.embed.reasons.private')
+  if (f.is_nsfw) return t('settings.embed.reasons.nsfw')
+  if (!f.share_link) return t('settings.embed.reasons.noLink')
+  return null
+}
+
+async function onEmbedToggle(v: boolean) {
+  const ok = await patch({ allow_embed_api: v }, v ? t('settings.embed.enabled') : t('settings.embed.disabled'))
+  if (!ok) embedOn.value = !v
+  else await refreshFursonas()
+}
+
+async function onFursonaEmbedChange(f: Fursona, choice: EmbedChoice) {
+  busy.value = true
+  try {
+    await api<Fursona>(`/fursonas/${f.id}`, { method: 'PATCH', body: { allow_embed_api: choice === 'inherit' ? null : choice === 'on' } })
+    await refreshFursonas()
+    notify.ok(t('settings.embed.fursonaUpdated', { name: f.name }))
+  } catch (e) {
+    notify.err(t('common.notify.saveFailed'), apiError(e).message)
+  } finally {
+    busy.value = false
+  }
+}
 </script>
 
 <template>
@@ -97,6 +138,11 @@ const section = ref<'nsfw' | 'language' | 'account' | 'data'>('nsfw')
           :class="{ on: section === 'language' }"
           @click="section = 'language'"
         >{{ t('settings.nav.language') }}</a>
+        <a
+          href="#embed"
+          :class="{ on: section === 'embed' }"
+          @click="section = 'embed'"
+        >{{ t('settings.nav.embed') }}</a>
         <a
           href="#account"
           :class="{ on: section === 'account' }"
@@ -196,6 +242,127 @@ const section = ref<'nsfw' | 'language' | 'account' | 'data'>('nsfw')
               style="font-size:12px;margin:0"
             >
               {{ t('settings.language.hint') }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          id="embed"
+          class="card"
+        >
+          <div class="hd">
+            <span class="disp">{{ t('settings.embed.heading') }}</span>
+            <em>{{ embedOn ? t('settings.embed.stateOn') : t('settings.embed.stateOff') }}</em>
+          </div>
+          <div
+            class="bd stack"
+            style="gap:16px"
+          >
+            <label class="switch">
+              <input
+                v-model="embedOn"
+                type="checkbox"
+                :disabled="busy"
+                @change="onEmbedToggle(($event.target as HTMLInputElement).checked)"
+              > {{ t('settings.embed.master') }}
+            </label>
+            <p
+              class="muted"
+              style="font-size:12px;margin:0"
+            >
+              {{ t('settings.embed.masterNote') }}
+            </p>
+
+            <div
+              v-if="fursonas.length"
+              class="embed-list"
+            >
+              <div
+                v-for="f in fursonas"
+                :key="f.id"
+                class="embed-item"
+              >
+                <div class="row">
+                  <BlobAvatar
+                    :src="f.avatar_url"
+                    :size="36"
+                    :border="2"
+                    :alt="f.name"
+                  />
+                  <b style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.name }}</b>
+                  <span
+                    v-if="embeddable(f)"
+                    class="pill ok"
+                  >{{ t('settings.embed.status.open') }}</span>
+                  <span
+                    v-else-if="embedBlockReason(f)"
+                    class="pill warn"
+                    :title="embedBlockReason(f) ?? ''"
+                  >{{ embedBlockReason(f) }}</span>
+                  <span
+                    v-else
+                    class="pill"
+                  >{{ t('settings.embed.status.closed') }}</span>
+                  <span class="sp" />
+                  <select
+                    class="input"
+                    style="width:auto;padding:6px 10px;font-size:13px"
+                    :value="embedChoice(f)"
+                    :disabled="busy"
+                    :aria-label="t('settings.embed.overrideLabel', { name: f.name })"
+                    @change="onFursonaEmbedChange(f, ($event.target as HTMLSelectElement).value as EmbedChoice)"
+                  >
+                    <option value="inherit">
+                      {{ t('settings.embed.override.inherit') }}
+                    </option>
+                    <option value="on">
+                      {{ t('settings.embed.override.on') }}
+                    </option>
+                    <option value="off">
+                      {{ t('settings.embed.override.off') }}
+                    </option>
+                  </select>
+                  <button
+                    v-if="embeddable(f)"
+                    class="btn sm"
+                    type="button"
+                    :aria-expanded="openCode === f.id"
+                    @click="openCode = openCode === f.id ? null : f.id"
+                  >
+                    {{ openCode === f.id ? t('settings.embed.hideCode') : t('settings.embed.getCode') }}
+                  </button>
+                  <NuxtLink
+                    v-else-if="f.embed_enabled && !f.share_link && f.visibility !== 'private' && !f.is_nsfw"
+                    class="btn sm ghost"
+                    :to="`/fursona/${f.id}#share`"
+                  >
+                    {{ t('settings.embed.createLink') }}
+                  </NuxtLink>
+                </div>
+                <EmbedCodePanel
+                  v-if="openCode === f.id && f.share_link"
+                  :slug="f.share_link.slug"
+                  :name="f.name"
+                />
+              </div>
+            </div>
+            <p
+              v-else
+              class="muted"
+              style="font-size:12px;margin:0"
+            >
+              {{ t('settings.embed.noFursonas') }}
+            </p>
+
+            <p
+              class="muted"
+              style="font-size:12px;margin:0"
+            >
+              {{ t('settings.embed.apiDocs') }} <code class="mono">GET /api/v1/public/users/{{ me.pawfit_id ?? 'your_id' }}</code> ·
+              <NuxtLink
+                class="link"
+                to="/terms#api"
+              >{{ t('settings.embed.termsLink') }}</NuxtLink>
             </p>
           </div>
         </div>
@@ -313,3 +480,8 @@ const section = ref<'nsfw' | 'language' | 'account' | 'data'>('nsfw')
     </div>
   </section>
 </template>
+
+<style scoped>
+.embed-list { display: grid; gap: 10px; }
+.embed-item { display: grid; gap: 12px; padding: 12px 14px; border: var(--border) solid var(--line); border-radius: var(--r-in); background: var(--paper-2); }
+</style>

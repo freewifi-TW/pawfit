@@ -38,6 +38,9 @@ class FursonaResource extends JsonResource
             'media_count' => $f->media_count ?? $media?->count(),
             'palette_count' => count($f->palette ?? []),
             'removed_at' => $this->when($isOwner, $f->removed_at),
+            // 嵌入開關（FR-7.1）：null＝繼承用戶總開關；embed_enabled 為實際生效值
+            'allow_embed_api' => $this->when($isOwner, $f->allow_embed_api),
+            'embed_enabled' => $this->when($isOwner, fn () => $f->embedEnabled()),
             'share_link' => $this->when(
                 $isOwner,
                 fn () => $f->shareLink ? new ShareLinkResource($f->shareLink) : null,

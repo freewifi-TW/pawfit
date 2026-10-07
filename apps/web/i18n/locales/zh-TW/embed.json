@@ -1,0 +1,7 @@
+{
+  "embed": {
+    "notFound": "這個嵌入卡片不存在，或擁有者尚未開放嵌入",
+    "viewOnPawfit": "在 Pawfit 查看",
+    "mediaCount": "{n} 張設定圖"
+  }
+}

@@ -44,6 +44,8 @@ class PublicController extends Controller
             'hidden_nsfw_count' => $filtered['hidden_nsfw'],
             'is_owner' => $this->visibility->isOwner($viewer, $fursona),
             'share' => ['slug' => $link->slug, 'url' => $link->url(), 'watermark' => $link->watermark],
+            // oEmbed discovery link 只在可嵌入時輸出（FR-7.2）
+            'embed_enabled' => $this->visibility->embeddable($fursona, $link),
             // OG 圖一律 SFW，且走簽名 URL 302
             'og_image_url' => $og ? MediaResource::imgUrl($og, 'display', $link->slug) : null,
         ]);
@@ -77,6 +79,7 @@ class PublicController extends Controller
         return response()->json([
             'user' => new PublicUserResource($user),
             'is_owner' => $isOwner,
+            'embed_enabled' => (bool) $user->allow_embed_api,
             'representative' => $representative ? new FursonaResource($representative) : null,
             'fursonas' => FursonaResource::collection($fursonas),
             'stats' => [

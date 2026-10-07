@@ -17,7 +17,7 @@ class Fursona extends Model
 
     protected $fillable = [
         'owner_id', 'name', 'species', 'bio', 'tags', 'palette',
-        'visibility', 'is_nsfw', 'is_representative', 'avatar_media_id', 'removed_at',
+        'visibility', 'is_nsfw', 'is_representative', 'avatar_media_id', 'removed_at', 'allow_embed_api',
     ];
 
     protected function casts(): array
@@ -27,6 +27,7 @@ class Fursona extends Model
             'palette' => 'array',
             'is_nsfw' => 'boolean',
             'is_representative' => 'boolean',
+            'allow_embed_api' => 'boolean',
             'removed_at' => 'datetime',
         ];
     }
@@ -70,5 +71,11 @@ class Fursona extends Model
     public function isPrivate(): bool
     {
         return $this->visibility === 'private';
+    }
+
+    /** 嵌入與公開 API 是否開放（FR-7.1）：單隻覆寫優先，否則繼承用戶總開關。 */
+    public function embedEnabled(): bool
+    {
+        return $this->allow_embed_api ?? (bool) $this->owner->allow_embed_api;
     }
 }

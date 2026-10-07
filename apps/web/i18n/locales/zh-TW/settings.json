@@ -5,6 +5,7 @@
     "nav": {
       "nsfw": "內容顯示",
       "language": "介面語言",
+      "embed": "開放與嵌入",
       "account": "帳號",
       "data": "資料與儲存"
     },
@@ -53,6 +54,66 @@
       "uploadsToday": "今日上傳",
       "uploadsCount": "{used} / {limit} 張",
       "note": "匯出全部資料與刪除帳號功能將於後續版本提供；如需刪除帳號請透過頁尾聯絡方式來信。"
+    },
+    "embed": {
+      "heading": "開放與嵌入",
+      "stateOn": "已開放：其他網站可引用你的公開獸設",
+      "stateOff": "未開放（預設）",
+      "master": "允許嵌入卡片、色票卡與公開 API 讀取我的公開獸設",
+      "masterNote": "預設關閉。開啟後，只有「公開」且 SFW、並已建立分享連結的獸設會被輸出；私人與 NSFW 內容永遠不會。關閉後所有嵌入與 API 立即失效。你的資料會帶 noai 標頭，服務條款禁止用於 AI 訓練。",
+      "enabled": "已開放嵌入與公開 API",
+      "disabled": "已關閉嵌入與公開 API",
+      "fursonaUpdated": "已更新 {name} 的嵌入設定",
+      "overrideLabel": "{name} 的嵌入設定",
+      "override": {
+        "inherit": "跟隨總開關",
+        "on": "單獨開放",
+        "off": "單獨關閉"
+      },
+      "status": {
+        "open": "可嵌入",
+        "closed": "未開放"
+      },
+      "reasons": {
+        "private": "私人，不會輸出",
+        "nsfw": "NSFW，不會輸出",
+        "noLink": "需先建立分享連結",
+        "removed": "已下架"
+      },
+      "getCode": "取得嵌入程式碼",
+      "hideCode": "收起",
+      "createLink": "去建立分享連結",
+      "noFursonas": "還沒有獸設。建立獸設並產生分享連結後，就能在這裡取得嵌入程式碼。",
+      "tabs": {
+        "iframe": "iframe 卡片",
+        "svg": "色票卡（圖片）",
+        "api": "公開 API"
+      },
+      "size": "尺寸",
+      "sizes": {
+        "sm": "小",
+        "md": "中",
+        "lg": "大"
+      },
+      "theme": "主題",
+      "themes": {
+        "auto": "跟隨系統",
+        "light": "淺色",
+        "dark": "深色"
+      },
+      "format": "格式",
+      "layout": "排列",
+      "layouts": {
+        "row": "單列",
+        "grid": "網格"
+      },
+      "apiNote": "匿名、唯讀、只回公開 SFW 資料；每分鐘 60 次，回應可快取 5 分鐘。圖片網址為 /api/img 路徑，直接當 <img> 用即可。",
+      "copy": "複製",
+      "copied": "已複製",
+      "clipboardError": "無法存取剪貼簿，請手動複製",
+      "preview": "開新分頁預覽",
+      "apiDocs": "公開 API 入口：",
+      "termsLink": "使用條款"
     }
   }
 }

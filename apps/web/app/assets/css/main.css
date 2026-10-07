@@ -63,7 +63,7 @@
   --ui-radius: 12px;
 }
 
-.dark {
+.dark, .theme-dark {
   --bg: #1d1930;
   --paper: #272240;
   --paper-2: #2f2a4a;
@@ -83,6 +83,31 @@
   --warn-soft: #3f3018;
   --danger: #f0807c;
   --danger-soft: #4a2626;
+}
+
+/* 嵌入卡片 theme=auto：跟隨嵌入方（瀏覽器）的色彩偏好。變數與 .dark 相同。 */
+@media (prefers-color-scheme: dark) {
+  .theme-auto {
+    --bg: #1d1930;
+    --paper: #272240;
+    --paper-2: #2f2a4a;
+    --line: #3d3760;
+    --ink: #f1edff;
+    --ink-2: #c3bce0;
+    --ink-3: #8a83ad;
+    --accent-ink: #2a160f;
+    --accent-soft: #4a2c25;
+    --accent-deep: #a8482f;
+    --mint: #3f7a66;
+    --butter: #8a7231;
+    --sky: #3b5a8a;
+    --ok: #6cc9a3;
+    --ok-soft: #1f3d32;
+    --warn: #f0b455;
+    --warn-soft: #3f3018;
+    --danger: #f0807c;
+    --danger-soft: #4a2626;
+  }
 }
 
 /* ---------- 基礎 ---------- */

@@ -57,6 +57,16 @@
           "paragraphs": [
             "The service is provided as is. The Site makes no guarantee as to the accuracy of content, uninterrupted service, or the absence of data loss. Please keep your own backups of your original files."
           ]
+        },
+        {
+          "id": "api",
+          "title": "8. Embeds and Public API",
+          "items": [
+            "You may enable \"Embeds & API\" in Settings so that your public fursonas can be referenced from other websites via embed cards, palette cards and the public API. This is off by default and can be turned off at any time; existing embeds and API access stop working immediately once disabled.",
+            "Data obtained through embed cards, palette cards, oEmbed or the public API may only be used for display and reference on personal websites, community pages and similar uses. Bulk crawling, building mirror databases, or using any content from the Site (including images, profile text and palettes) to train machine learning or generative AI models is prohibited. The Site signals this with noai / noimageai headers.",
+            "Embeds and the API only expose public, SFW content. Adult content is never delivered through these channels.",
+            "The Site may rate-limit the public API and block sources that abuse it."
+          ]
         }
       ]
     },

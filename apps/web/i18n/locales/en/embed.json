@@ -1,0 +1,7 @@
+{
+  "embed": {
+    "notFound": "This embed card does not exist, or its owner has not enabled embedding",
+    "viewOnPawfit": "View on Pawfit",
+    "mediaCount": "{n} reference image | {n} reference images"
+  }
+}

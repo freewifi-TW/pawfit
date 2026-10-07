@@ -14,7 +14,7 @@ export const SUPPORTED_LOCALES = [
 
 export const DEFAULT_LOCALE = 'zh-TW'
 
-const NAMESPACES = ['common', 'enums', 'home', 'auth', 'dashboard', 'fursona', 'media', 'share', 'profile', 'settings', 'admin', 'legal']
+const NAMESPACES = ['common', 'enums', 'home', 'auth', 'dashboard', 'fursona', 'media', 'share', 'profile', 'settings', 'admin', 'legal', 'embed']
 
 export default defineNuxtConfig({
   modules: [
@@ -81,7 +81,6 @@ export default defineNuxtConfig({
     })),
     defaultLocale: DEFAULT_LOCALE,
     strategy: 'no_prefix',
-    lazy: true,
     langDir: 'locales',
     vueI18n: './i18n.config.ts',
     detectBrowserLanguage: {

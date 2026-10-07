@@ -115,6 +115,19 @@ class Visibility
         return ['visible' => $visible, 'hidden_nsfw' => $hiddenNsfw];
     }
 
+    /**
+     * 嵌入與公開 API（FR-7）：觀看者永遠視同訪客（FR-5.4 矩陣第一欄），
+     * 且用戶總開關與獸設覆寫都要允許。NSFW 獸設因訪客規則自然不可嵌入。
+     */
+    public function embeddable(Fursona $fursona, ?ShareLink $link = null): bool
+    {
+        if (! $fursona->embedEnabled()) {
+            return false;
+        }
+
+        return $this->fursonaState(null, $fursona, $link) === 'show';
+    }
+
     private function passesVisibility(string $visibility, Fursona $fursona, ?ShareLink $link): bool
     {
         return match ($visibility) {

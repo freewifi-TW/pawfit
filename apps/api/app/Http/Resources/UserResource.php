@@ -30,6 +30,7 @@ class UserResource extends JsonResource
             'is_onboarded' => $u->isOnboarded(),
             'is_admin' => $u->isAdmin(),
             'is_banned' => $u->is_banned,
+            'allow_embed_api' => (bool) $u->allow_embed_api,
             'quota' => [
                 'storage_used' => $u->storageUsedBytes(),
                 'storage_limit' => config('pawfit.quota.storage_bytes'),
