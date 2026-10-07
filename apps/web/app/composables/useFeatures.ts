@@ -6,11 +6,12 @@ export interface Features {
   dev_login: boolean
   friends: boolean
   feed: boolean
+  head_sticker: boolean
   wardrobe: boolean
   brief_llm: boolean
 }
 
-const DEFAULTS: Features = { dev_login: false, friends: false, feed: false, wardrobe: false, brief_llm: false }
+const DEFAULTS: Features = { dev_login: false, friends: false, feed: false, head_sticker: false, wardrobe: false, brief_llm: false }
 
 export function useFeatures() {
   const features = useState<Features>('features', () => ({ ...DEFAULTS }))

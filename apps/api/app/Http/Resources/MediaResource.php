@@ -28,6 +28,8 @@ class MediaResource extends JsonResource
             'credit_name' => $m->credit_name,
             'credit_url' => $m->credit_url,
             'is_nsfw' => $m->is_nsfw,
+            'origin' => $m->origin ?? 'upload',
+            'is_head_sticker' => (bool) $m->is_head_sticker,
             'visibility_override' => $m->visibility_override,
             'sort_order' => $m->sort_order,
             'status' => $m->status,

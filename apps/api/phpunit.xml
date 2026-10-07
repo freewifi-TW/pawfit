@@ -28,6 +28,7 @@
         <!-- feature flag 在測試中一律關閉；需要的測試自行 config(['pawfit.features.*' => true]) -->
         <env name="FEATURE_FRIENDS" value="false" force="true"/>
         <env name="FEATURE_FEED" value="false" force="true"/>
+        <env name="FEATURE_HEAD_STICKER" value="false" force="true"/>
         <env name="FEATURE_BRIEF_LLM" value="false" force="true"/>
         <env name="DB_CONNECTION" value="sqlite" force="true"/>
         <env name="DB_DATABASE" value=":memory:" force="true"/>

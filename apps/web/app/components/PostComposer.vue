@@ -14,17 +14,22 @@ const notify = useNotify()
 
 const MAX = 10
 const editing = computed(() => !!props.post)
+// 換獸頭工具（/post/new/head-sticker）完成後帶 ?fursona=&media= 進來
+const route = useRoute()
+const presetMedia = String(route.query.media ?? '').split(',').filter(Boolean)
+const presetFursona = typeof route.query.fursona === 'string' ? route.query.fursona : ''
 
 const { data: fursonas } = await useAsyncData('compose-fursonas', () => api<Fursona[]>('/fursonas'), { default: () => [] })
-const fursonaId = ref<string>(props.post?.fursona?.id ?? fursonas.value.find(f => f.is_representative)?.id ?? fursonas.value[0]?.id ?? '')
+const fursonaId = ref<string>(props.post?.fursona?.id ?? (presetFursona && fursonas.value.some(f => f.id === presetFursona) ? presetFursona : '') ?? fursonas.value.find(f => f.is_representative)?.id ?? fursonas.value[0]?.id ?? '')
+if (!fursonaId.value) fursonaId.value = fursonas.value.find(f => f.is_representative)?.id ?? fursonas.value[0]?.id ?? ''
 const { data: fursonaDetail, pending: loadingMedia } = await useAsyncData(
   'compose-fursona-detail',
   () => fursonaId.value && !editing.value ? api<Fursona>(`/fursonas/${fursonaId.value}`) : Promise.resolve(null),
   { watch: [fursonaId] }
 )
-const pickable = computed<Media[]>(() => (fursonaDetail.value?.media ?? []).filter(m => m.status === 'active'))
+const pickable = computed<Media[]>(() => (fursonaDetail.value?.media ?? []).filter(m => m.status === 'active' || (presetMedia.includes(m.id) && m.status === 'processing')))
 
-const selected = ref<string[]>(props.post?.media.map(m => m.id) ?? [])
+const selected = ref<string[]>(props.post?.media.map(m => m.id) ?? presetMedia)
 const body = ref(props.post?.body ?? '')
 const tags = ref<string[]>(props.post?.tags ?? [])
 const visibility = ref<'public' | 'friends'>(props.post?.visibility ?? 'public')
@@ -35,7 +40,8 @@ const busy = ref(false)
 const tagsTouched = ref(false)
 watch(fursonaDetail, (f) => {
   if (!editing.value && f && !tagsTouched.value) tags.value = [...f.tags]
-  if (!editing.value) selected.value = selected.value.filter(id => pickable.value.some(m => m.id === id))
+  // 預選的圖（換獸頭輸出）可能還在 processing，暫時保留；其餘只留這隻獸設現有的圖
+  if (!editing.value) selected.value = selected.value.filter(id => presetMedia.includes(id) || pickable.value.some(m => m.id === id))
 }, { immediate: true })
 watch(tags, () => (tagsTouched.value = true))
 

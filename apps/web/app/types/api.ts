@@ -57,6 +57,10 @@ export interface Media {
   credit_name: string | null
   credit_url: string | null
   is_nsfw: boolean
+  /** Phase 2 FR-B8：upload | head_sticker（Phase 5 再增列 ai_*） */
+  origin?: 'upload' | 'head_sticker' | string
+  /** 標記為頭像貼圖素材（只允許 SFW 2D） */
+  is_head_sticker?: boolean
   visibility_override: Visibility | null
   sort_order: number
   status: MediaStatus

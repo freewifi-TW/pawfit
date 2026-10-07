@@ -37,6 +37,8 @@ return [
         'already_confirmed' => 'This file has already been confirmed.',
         'upload_not_found' => 'The uploaded file could not be found. Please upload it again.',
         'file_exceeds_limit' => 'The file exceeds :max MB.',
+        'sticker_disabled' => 'The head sticker tool is not available yet.',
+        'sticker_requires_sfw_art2d' => 'A head sticker must be a SFW 2D image.',
     ],
 
     'friends' => [

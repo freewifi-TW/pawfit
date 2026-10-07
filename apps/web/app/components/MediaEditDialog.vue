@@ -12,7 +12,7 @@ const { t } = useI18n()
 const { kindLabelLong, visibilityLabel } = useLabels()
 
 const KINDS: MediaKind[] = ['art2d', 'model3d', 'photo']
-const { friends: friendsEnabled } = useFeatures()
+const { friends: friendsEnabled, features } = useFeatures()
 const VISIBILITIES = computed<Visibility[]>(() => friendsEnabled.value ? ['public', 'friends', 'unlisted', 'private'] : ['public', 'unlisted', 'private'])
 
 const form = reactive({
@@ -21,7 +21,8 @@ const form = reactive({
   credit_url: '',
   kind: 'art2d' as MediaKind,
   is_nsfw: false,
-  visibility_override: '' as Visibility | ''
+  visibility_override: '' as Visibility | '',
+  is_head_sticker: false
 })
 const busy = ref(false)
 const errors = ref<Record<string, string>>({})
@@ -44,6 +45,7 @@ watch(media, (m) => {
   form.kind = m.kind
   form.is_nsfw = m.is_nsfw
   form.visibility_override = m.visibility_override ?? ''
+  form.is_head_sticker = !!m.is_head_sticker
 })
 
 async function save() {
@@ -59,7 +61,8 @@ async function save() {
         credit_url: form.credit_url || null,
         kind: form.kind,
         is_nsfw: form.is_nsfw,
-        visibility_override: form.visibility_override || null
+        visibility_override: form.visibility_override || null,
+        ...(features.value.head_sticker ? { is_head_sticker: form.is_head_sticker && form.kind === 'art2d' && !form.is_nsfw } : {})
       }
     })
     emit('updated', updated)
@@ -194,6 +197,22 @@ async function remove() {
           >NSFW</label>
         </div>
       </div>
+      <label
+        v-if="features.head_sticker"
+        class="check"
+        :class="{ disabled: form.kind !== 'art2d' || form.is_nsfw }"
+        style="margin-bottom:16px"
+      >
+        <input
+          v-model="form.is_head_sticker"
+          type="checkbox"
+          :disabled="form.kind !== 'art2d' || form.is_nsfw"
+        >
+        <span>{{ t('media.edit.headSticker') }}<br><span
+          class="muted"
+          style="font-size:12px"
+        >{{ t('media.edit.headStickerHint') }}</span></span>
+      </label>
       <div class="field">
         <label for="me-vis">{{ t('media.edit.visibility') }}</label>
         <select

@@ -1,0 +1,51 @@
+{
+  "headsticker": {
+    "title": "Head swap",
+    "subtitle": "Replace faces in a photo with your fursona head sticker, then post it",
+    "disabled": "The head sticker tool is not available yet",
+    "privacy": "Your photo never leaves your device: face detection runs in the browser, only finds where faces are, never identifies anyone, and stores no facial data. Only the composed image you choose to save is uploaded.",
+    "pickPhoto": "Choose a photo",
+    "changePhoto": "Change photo",
+    "redetect": "Detect again",
+    "detecting": "Detecting…",
+    "addFace": "+ Add box manually",
+    "facesFound": "{n} face found | {n} faces found",
+    "noFaces": "No faces detected. Use \"Add box manually\" to place one yourself.",
+    "detectFailed": "The detection model failed to load (the first run downloads about 10 MB). You can still add boxes manually.",
+    "empty": "Pick a photo to start. Group photos work too; each face can get a different head.",
+    "canvasHint": "Click a face box to select it and drag to move; adjust size, angle and flip on the right.",
+    "defaultCaption": "Head swap",
+    "stickers": {
+      "title": "Head stickers",
+      "empty": "No stickers yet. In your gallery, mark a transparent PNG of your head as a \"head sticker\". Stickers marked by friends appear here too.",
+      "selectFace": "Select a face in the photo first",
+      "mine": "Mine",
+      "none": "No sticker on this face"
+    },
+    "adjust": {
+      "title": "Adjust",
+      "scale": "Size",
+      "rotate": "Angle",
+      "dx": "Left/right",
+      "dy": "Up/down",
+      "flip": "Flip horizontally",
+      "remove": "Remove this box",
+      "face": "Face {n}"
+    },
+    "export": {
+      "title": "Save image",
+      "fursona": "Save to which fursona's gallery",
+      "nsfw": "This composed image is NSFW",
+      "submit": "Save image and post",
+      "uploading": "Uploading…",
+      "note": "The composed image is saved to the gallery as a \"physical photo\" marked as head-swap output, then taken to the new post page. You are responsible for the likeness of other people in the photo."
+    },
+    "notify": {
+      "loadFailed": "Could not read the photo",
+      "stickerLoadFailed": "Sticker failed to load; the image storage may not allow cross-origin reads",
+      "pickFursona": "Choose a fursona to save into first",
+      "saved": "Image saved",
+      "failed": "Action failed"
+    }
+  }
+}

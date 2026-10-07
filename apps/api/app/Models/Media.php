@@ -15,18 +15,23 @@ class Media extends Model
 
     public const STATUSES = ['processing', 'active', 'removed', 'failed'];
 
+    /** 來源：一般上傳／換獸頭貼圖工具輸出（Phase 2 FR-B8.4）；Phase 5 再增列 ai_* */
+    public const ORIGINS = ['upload', 'head_sticker'];
+
     protected $table = 'media';
 
     protected $fillable = [
         'fursona_id', 'owner_id', 'kind', 'storage_key', 'display_key', 'thumb_key',
         'watermarked_key', 'mime', 'width', 'height', 'bytes', 'credit_name', 'credit_url',
         'is_nsfw', 'visibility_override', 'caption', 'sort_order', 'status', 'status_note',
+        'origin', 'is_head_sticker',
     ];
 
     protected function casts(): array
     {
         return [
             'is_nsfw' => 'boolean',
+            'is_head_sticker' => 'boolean',
             'width' => 'integer',
             'height' => 'integer',
             'bytes' => 'integer',

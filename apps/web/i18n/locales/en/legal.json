@@ -67,6 +67,14 @@
             "Embeds and the API only expose public, SFW content. Adult content is never delivered through these channels.",
             "The Site may rate-limit the public API and block sources that abuse it."
           ]
+        },
+        {
+          "id": "likeness",
+          "title": "9. Head Swap and Other People's Likeness",
+          "items": [
+            "Face detection in the head swap tool runs in your browser. It only locates faces, never identifies anyone, and neither the original photo nor any facial data is uploaded or stored; only the composed image you choose to save is uploaded.",
+            "When you upload photos that include other people (including composed images), you should have their consent. Any likeness or privacy dispute that follows is the poster's responsibility; people in the photo can request removal through the report feature."
+          ]
         }
       ]
     },

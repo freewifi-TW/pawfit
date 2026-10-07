@@ -38,7 +38,7 @@ Same-domain 路由，前後端共用 cookie（Sanctum stateful），沒有 CORS 
 | M2 發文 | 貼文 CRUD（1–10 張圖庫圖＋文字＋標籤）、母標籤繼承、NSFW 鎖定、圖片經 `/api/img?p=` 出口 | `FEATURE_FEED` | ✅ |
 | M3 河道與互動 | 好友河道 `/feed`、探索河道 `/feed/explore?tags=`（AND 篩選）、(created_at,id) cursor、讚、單層留言、主頁貼文 | `FEATURE_FEED` | ✅ |
 | M4 治理強化 | 檢舉增列 post／comment、同目標 ≥3 位檢舉者自動降能見度（suppressed）、後台下架／恢復貼文與留言 | `FEATURE_FEED` | ✅ |
-| M5 換獸頭貼圖 | 瀏覽器端人臉偵測＋貼圖發文 | `FEATURE_HEAD_STICKER` | 🔲 |
+| M5 換獸頭貼圖 | `/post/new/head-sticker`：MediaPipe Face Detector 在瀏覽器偵測（模型 `public/models/`、WASM 由 Nitro 從 node_modules 提供，不打第三方）、每張臉貼自己或好友的「頭像貼圖素材」、canvas 合成後走 presign 成為 `origin=head_sticker` 的 media 並接到發文頁；原照不離開裝置 | `FEATURE_HEAD_STICKER` | ✅ |
 
 flag 全部在 `apps/api/.env`（程式先部署、功能再啟用）；前端由 `GET /api/features` 取得，關閉時相關頁面與按鈕不出現、API 回 404。封鎖與好友的可見性判斷只在 `Visibility::relation()`（同一請求內快取在 Request attributes 上）。
 
@@ -147,7 +147,7 @@ Caddy 會自動申請 Let's Encrypt 憑證；圖片改指向 Cloudflare R2，不
 上線前務必：
 
 - `apps/api/.env`：`FEATURE_DEV_LOGIN=false`、`APP_ENV=production`、`SANCTUM_STATEFUL_DOMAINS` 與 `SESSION_DOMAIN` 改成正式網域、`AWS_*` 改成 R2 端點與私有 bucket、`ADMIN_EMAILS` 填站方帳號。
-- R2 bucket 要設定 CORS，允許正式網域對 `PUT` 直傳（`AllowedMethods: PUT`、`AllowedHeaders: Content-Type`）。
+- R2 bucket 要設定 CORS，允許正式網域對 `PUT` 直傳（`AllowedMethods: PUT`、`AllowedHeaders: Content-Type`）；換獸頭工具要把貼圖畫進 canvas 再匯出，還需允許 `GET`（`AllowedMethods: GET, PUT`），否則 canvas 會被汙染無法存檔。
 - Google OAuth 用戶端加入正式網域的 callback。
 - `.env`：設定 `GRAFANA_ADMIN_PASSWORD`（正式環境 Grafana 關閉匿名登入，且只綁 127.0.0.1，從外部用 SSH tunnel 連）。
 

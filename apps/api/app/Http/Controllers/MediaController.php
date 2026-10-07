@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\MediaResource;
+use App\Http\Resources\PublicUserResource;
 use App\Jobs\ProcessMedia;
 use App\Models\Fursona;
 use App\Models\Media;
 use App\Services\MediaStorage;
+use App\Services\Visibility;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -62,6 +64,8 @@ class MediaController extends Controller
             'credit_name' => ['nullable', 'string', 'max:80'],
             'credit_url' => ['nullable', 'url', 'max:300'],
             'visibility_override' => ['nullable', Rule::in(Fursona::allowedVisibilities())],
+            // Phase 2 FR-B8.4：換獸頭工具輸出標記來源（只有 flag 開啟時接受）
+            'origin' => ['sometimes', Rule::in(config('pawfit.features.head_sticker') ? Media::ORIGINS : ['upload'])],
         ], [
             'kind.required' => __('messages.media.kind_required'),
             'is_nsfw.required' => __('messages.media.is_nsfw_required'),
@@ -94,6 +98,7 @@ class MediaController extends Controller
             'credit_name' => $data['credit_name'] ?? null,
             'credit_url' => $data['credit_url'] ?? null,
             'visibility_override' => $data['visibility_override'] ?? null,
+            'origin' => $data['origin'] ?? 'upload',
             'sort_order' => ((int) $fursona->media()->max('sort_order')) + 1,
             'status' => 'processing',
         ]);
@@ -114,11 +119,52 @@ class MediaController extends Controller
             'credit_name' => ['sometimes', 'nullable', 'string', 'max:80'],
             'credit_url' => ['sometimes', 'nullable', 'url', 'max:300'],
             'visibility_override' => ['sometimes', 'nullable', Rule::in(Fursona::allowedVisibilities())],
+            'is_head_sticker' => ['sometimes', 'boolean'],
         ]);
+
+        // FR-B8.2：貼圖素材只允許 2D 且 SFW（改成 NSFW 或非 2D 時自動取消標記）
+        $kind = $data['kind'] ?? $media->kind;
+        $nsfw = $data['is_nsfw'] ?? $media->is_nsfw;
+        if (! empty($data['is_head_sticker'])) {
+            if (! config('pawfit.features.head_sticker')) {
+                throw ValidationException::withMessages(['is_head_sticker' => __('messages.media.sticker_disabled')]);
+            }
+            if ($kind !== 'art2d' || $nsfw) {
+                throw ValidationException::withMessages(['is_head_sticker' => __('messages.media.sticker_requires_sfw_art2d')]);
+            }
+        } elseif (! array_key_exists('is_head_sticker', $data) && $media->is_head_sticker && ($kind !== 'art2d' || $nsfw)) {
+            $data['is_head_sticker'] = false;
+        }
 
         $media->fill($data)->save();
 
         return new MediaResource($media->fresh());
+    }
+
+    /**
+     * GET /api/media/stickers：換獸頭工具可用的貼圖素材（FR-B8.2／B8.3）。
+     * 自己的全部 + 好友的（該素材對好友可見：public／friends；含獸設與單圖隱私），一律 SFW、active。
+     */
+    public function stickers(Request $request, Visibility $visibility): JsonResponse
+    {
+        $me = $request->user();
+        $friendIds = $me->friendIds();
+
+        $rows = Media::with(['fursona.owner', 'owner'])
+            ->where('is_head_sticker', true)->where('status', 'active')->where('kind', 'art2d')->where('is_nsfw', false)
+            ->where(fn ($q) => $q->where('owner_id', $me->id)->orWhereIn('owner_id', $friendIds))
+            ->orderBy('owner_id')->orderBy('sort_order')
+            ->get()
+            ->filter(fn (Media $m) => $m->owner_id === $me->id || $visibility->mediaState($me, $m) === 'show')
+            ->values();
+
+        return response()->json([
+            'mine' => MediaResource::collection($rows->where('owner_id', $me->id)->values()),
+            'friends' => $rows->where('owner_id', '!=', $me->id)->groupBy('owner_id')->map(fn ($group) => [
+                'user' => new PublicUserResource($group->first()->owner),
+                'media' => MediaResource::collection($group->values()),
+            ])->values(),
+        ]);
     }
 
     public function destroy(Request $request, Media $media): JsonResponse

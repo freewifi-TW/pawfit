@@ -3,6 +3,7 @@
 defineProps<{ active: 'friends' | 'explore' }>()
 const { t } = useI18n()
 const { me } = useAuth()
+const { features } = useFeatures()
 </script>
 
 <template>
@@ -40,6 +41,14 @@ const { me } = useAuth()
         style="margin-left:8px"
       >
         ＋ {{ t('feed.newPost') }}
+      </NuxtLink>
+      <NuxtLink
+        v-if="me?.is_onboarded && features.head_sticker"
+        class="btn sm"
+        to="/post/new/head-sticker"
+        :title="t('headsticker.subtitle')"
+      >
+        🐾 {{ t('headsticker.title') }}
       </NuxtLink>
     </nav>
   </div>

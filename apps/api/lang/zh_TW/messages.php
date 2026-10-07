@@ -37,6 +37,8 @@ return [
         'already_confirmed' => '這個檔案已經確認過了。',
         'upload_not_found' => '找不到上傳的檔案，請重新上傳。',
         'file_exceeds_limit' => '檔案超過 :max MB。',
+        'sticker_disabled' => '換獸頭功能尚未開放。',
+        'sticker_requires_sfw_art2d' => '頭像貼圖素材必須是 SFW 的 2D 圖。',
     ],
 
     'friends' => [

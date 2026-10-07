@@ -46,6 +46,8 @@
       "submitCount": "Upload {n}"
     },
     "edit": {
+      "headSticker": "Use as a head sticker (for head swap)",
+      "headStickerHint": "A transparent PNG of the head works best; only SFW 2D images are allowed. Friends can use stickers you mark that are visible to them.",
       "title": "Edit image",
       "processingNote": "This image is still processing, but you can edit its details now.",
       "caption": "Caption",

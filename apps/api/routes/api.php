@@ -64,6 +64,7 @@ Route::middleware(['auth:sanctum', 'not-banned', 'onboarded'])->group(function (
     Route::post('media/presign', [MediaController::class, 'presign'])->middleware('throttle:presign');
     Route::post('media/confirm', [MediaController::class, 'confirm']);
     Route::post('media/abandon', [MediaController::class, 'abandon']);
+    Route::get('media/stickers', [MediaController::class, 'stickers'])->middleware('feature:head_sticker');
     Route::patch('media/{media}', [MediaController::class, 'update']);
     Route::delete('media/{media}', [MediaController::class, 'destroy']);
 

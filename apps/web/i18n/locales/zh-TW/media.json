@@ -46,6 +46,8 @@
       "submitCount": "上傳 {n} 張"
     },
     "edit": {
+      "headSticker": "作為頭像貼圖素材（換獸頭用）",
+      "headStickerHint": "去背的獸頭 PNG 最合適；只允許 SFW 的 2D 圖。好友也能在換獸頭工具中使用你標記、且對他們可見的素材。",
       "title": "編輯圖片",
       "processingNote": "這張圖還在處理中，仍可先編輯資料。",
       "caption": "說明文字",
