@@ -1,0 +1,57 @@
+{
+  "friends": {
+    "title": "Friends",
+    "subtitle": "Friends can see fursonas and images you set to \"friends only\"",
+    "disabled": "Friends are not available yet",
+    "add": {
+      "title": "Add a friend",
+      "placeholder": "Their Pawfit ID",
+      "submit": "Send request",
+      "hint": "You become friends once they accept. If they already sent you a request, you become friends right away."
+    },
+    "tabs": {
+      "friends": "Friends",
+      "requests": "Requests",
+      "blocked": "Blocked"
+    },
+    "since": "since {date}",
+    "remove": "Remove friend",
+    "removeConfirm": "Yes, remove",
+    "incoming": "Waiting for my reply",
+    "outgoing": "Sent by me",
+    "accept": "Accept",
+    "decline": "Decline",
+    "cancel": "Cancel request",
+    "pending": "Pending",
+    "unblock": "Unblock",
+    "blockedNote": "Blocking hides profiles, fursonas and images in both directions and removes any existing friendship. Unblocking does not restore the friendship.",
+    "empty": {
+      "friends": "No friends yet. Enter someone's Pawfit ID to send a request.",
+      "incoming": "No pending requests",
+      "outgoing": "No outgoing requests",
+      "blocked": "Nobody blocked"
+    },
+    "notify": {
+      "sent": "Request sent to {'@'}{id}",
+      "nowFriends": "You and {'@'}{id} are now friends",
+      "accepted": "Accepted {'@'}{id}'s request",
+      "declined": "Request declined",
+      "cancelled": "Request cancelled",
+      "removed": "Removed {'@'}{id} from friends",
+      "blocked": "Blocked {'@'}{id}",
+      "unblocked": "Unblocked {'@'}{id}",
+      "failed": "Action failed"
+    },
+    "profile": {
+      "addFriend": "+ Add friend",
+      "pendingOut": "Request sent",
+      "cancel": "Cancel request",
+      "acceptRequest": "Accept request",
+      "friends": "✓ Friends",
+      "remove": "Remove friend",
+      "block": "Block",
+      "blockConfirm": "Yes, block",
+      "blockHint": "Blocking hides each other's content in both directions"
+    }
+  }
+}

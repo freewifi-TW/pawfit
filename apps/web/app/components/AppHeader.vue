@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const { me, isAdmin, logout } = useAuth()
+const { friends: friendsEnabled } = useFeatures()
 const menuOpen = ref(false)
 </script>
 
@@ -18,6 +19,12 @@ const menuOpen = ref(false)
           </NuxtLink>
           <NuxtLink :to="`/u/${me.pawfit_id}`">
             {{ t('common.nav.profile') }}
+          </NuxtLink>
+          <NuxtLink
+            v-if="friendsEnabled"
+            to="/friends"
+          >
+            {{ t('common.nav.friends') }}
           </NuxtLink>
           <NuxtLink to="/settings">
             {{ t('common.nav.settings') }}

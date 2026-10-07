@@ -4,7 +4,8 @@ export default defineNuxtPlugin(async () => {
   if (useRequestURL().pathname.startsWith('/embed/')) return
 
   const { fetchMe, loaded } = useAuth()
+  const { fetchFeatures } = useFeatures()
   if (import.meta.server || !loaded.value) {
-    await fetchMe()
+    await Promise.all([fetchMe(), fetchFeatures()])
   }
 })

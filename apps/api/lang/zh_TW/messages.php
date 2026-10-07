@@ -39,6 +39,15 @@ return [
         'file_exceeds_limit' => '檔案超過 :max MB。',
     ],
 
+    'friends' => [
+        'user_not_found' => '找不到這個 Pawfit ID。',
+        'self' => '不能對自己做這個操作。',
+        'already_friends' => '你們已經是好友了。',
+        'already_requested' => '邀請已送出，等待對方回應。',
+        'cannot_accept_own' => '這是你送出的邀請，要等對方接受。',
+        'use_remove' => '已是好友，請改用解除好友。',
+    ],
+
     'commission' => [
         'media_required' => '請至少選一張參考圖。',
         'too_many_media' => '參考圖最多 :max 張。',

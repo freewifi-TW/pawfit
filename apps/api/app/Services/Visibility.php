@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Block;
 use App\Models\CommissionKit;
 use App\Models\Fursona;
 use App\Models\Media;
 use App\Models\ShareLink;
 use App\Models\User;
+use ArrayObject;
 use Illuminate\Support\Collection;
 
 /**
@@ -24,6 +26,51 @@ use Illuminate\Support\Collection;
  */
 class Visibility
 {
+    /**
+     * viewer × owner 的關係快取，掛在目前的 Request 上：
+     * 同一請求內重複查同一擁有者不再打資料庫；且不會跨請求殘留
+     * （Laravel 會把 controller 實例快取在 Route 上，Octane／測試中多個請求共用同一個 service 實例）。
+     */
+    private function relationMemo(): ArrayObject
+    {
+        $attrs = app('request')->attributes;
+        if (! $attrs->has('_visibility_relations')) {
+            $attrs->set('_visibility_relations', new ArrayObject);
+        }
+
+        return $attrs->get('_visibility_relations');
+    }
+
+    /**
+     * 瀏覽者與內容擁有者的關係（Phase 2 §2.2）：
+     *   blocked → 任一方封鎖另一方（互不可見）；friend → 已接受的好友。
+     * 訪客或本人一律 blocked=false、friend=false。
+     *
+     * @return array{blocked: bool, friend: bool}
+     */
+    public function relation(?User $viewer, string $ownerId): array
+    {
+        if ($viewer === null || $viewer->id === $ownerId) {
+            return ['blocked' => false, 'friend' => false];
+        }
+        $memo = $this->relationMemo();
+        $key = $viewer->id.'|'.$ownerId;
+        if (! isset($memo[$key])) {
+            $memo[$key] = [
+                'blocked' => Block::eitherWay($viewer->id, $ownerId),
+                'friend' => $viewer->isFriendsWith($ownerId),
+            ];
+        }
+
+        return $memo[$key];
+    }
+
+    /** 封鎖判斷只存在這裡（Phase 2 R-4）：任一方封鎖 → 對方的主頁、獸設、圖片一律視為不存在。 */
+    public function isBlockedBetween(?User $viewer, string $ownerId): bool
+    {
+        return $this->relation($viewer, $ownerId)['blocked'];
+    }
+
     public function isOwner(?User $viewer, Fursona|Media $subject): bool
     {
         return $viewer !== null && $viewer->id === $subject->owner_id;
@@ -62,7 +109,10 @@ class Visibility
         if ($fursona->isRemoved() || $fursona->owner->is_banned) {
             return null;
         }
-        if (! $this->passesVisibility($fursona->visibility, $fursona, $link)) {
+        if ($this->isBlockedBetween($viewer, $fursona->owner_id)) {
+            return null;
+        }
+        if (! $this->passesVisibility($fursona->visibility, $fursona, $link, $viewer)) {
             return null;
         }
 
@@ -79,7 +129,7 @@ class Visibility
         if ($fursonaState === null || ! $media->isActive()) {
             return null;
         }
-        if (! $this->passesVisibility($media->effectiveVisibility(), $fursona, $link)) {
+        if (! $this->passesVisibility($media->effectiveVisibility(), $fursona, $link, $viewer)) {
             return null;
         }
         if ($media->isNsfwContent()) {
@@ -102,7 +152,7 @@ class Visibility
             if ($state === null) {
                 // 只有「因 NSFW 而被隱藏」才計數：隱私不符的不提示，避免洩漏存在
                 if ($m->isActive() && $m->isNsfwContent()
-                    && $this->passesVisibility($m->effectiveVisibility(), $m->fursona, $link)) {
+                    && $this->passesVisibility($m->effectiveVisibility(), $m->fursona, $link, $viewer)) {
                     $hiddenNsfw++;
                 }
 
@@ -165,12 +215,14 @@ class Visibility
         return $media->isNsfwContent() ? $this->nsfwState($viewer) : 'show';
     }
 
-    private function passesVisibility(string $visibility, Fursona $fursona, ?ShareLink $link): bool
+    private function passesVisibility(string $visibility, Fursona $fursona, ?ShareLink $link, ?User $viewer = null): bool
     {
         return match ($visibility) {
             'public' => true,
             'unlisted' => $this->linkGrants($link, $fursona),
-            default => false, // private（以及未來未知值一律拒絕）
+            // 限好友（Phase 2 FR-B2）：需登入且為已接受的好友；分享連結不放行，訪客視同 private
+            'friends' => $this->relation($viewer, $fursona->owner_id)['friend'],
+            default => false, // private（以及未知值一律拒絕）
         };
     }
 }

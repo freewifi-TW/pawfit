@@ -8,7 +8,8 @@ import type { ReportReason, Visibility } from '~/types/api'
 export const VISIBILITY_PILL: Record<Visibility, string> = {
   public: 'ok',
   unlisted: 'warn',
-  private: 'danger'
+  private: 'danger',
+  friends: 'accent'
 }
 
 export const REASON_PILL: Record<ReportReason, string> = {

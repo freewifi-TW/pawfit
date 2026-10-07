@@ -1,6 +1,6 @@
 // 與 apps/api 的 Resources 對齊
 
-export type Visibility = 'public' | 'unlisted' | 'private'
+export type Visibility = 'public' | 'unlisted' | 'private' | 'friends'
 export type NsfwPref = 'hide' | 'blur' | 'show'
 export type MediaKind = 'art2d' | 'model3d' | 'photo'
 export type MediaStatus = 'processing' | 'active' | 'removed' | 'failed'
@@ -122,6 +122,24 @@ export interface ProfilePage {
   fursonas: Fursona[]
   stats: { public_count: number, total_count: number | null }
   embed_enabled: boolean
+  /** Phase 2 M1：登入者與這位用戶的關係；好友功能關閉、訪客或本人為 null */
+  relation: { status: 'none' | 'friends' | 'pending_out' | 'pending_in', friendship_id: string | null, blocked_by_me: boolean } | null
+}
+
+/* ---- 好友（Phase 2 FR-B1） ---- */
+
+export interface FriendEntry {
+  friendship_id: string
+  user: PublicUser
+  created_at: string
+  accepted_at?: string
+}
+
+export interface FriendsPage {
+  friends: FriendEntry[]
+  incoming: FriendEntry[]
+  outgoing: FriendEntry[]
+  blocked: Array<{ user: PublicUser, created_at: string }>
 }
 
 /* ---- 委託需求單（FR-6，M7） ---- */

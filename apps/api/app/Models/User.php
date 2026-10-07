@@ -51,6 +51,27 @@ class User extends Authenticatable
         return $this->belongsTo(Media::class, 'avatar_media_id');
     }
 
+    /** 與某用戶是否為已接受的好友。 */
+    public function isFriendsWith(string $userId): bool
+    {
+        return Friendship::between($this->id, $userId)?->isAccepted() ?? false;
+    }
+
+    /** 好友 id 清單（河道查詢用）。 */
+    public function friendIds(): array
+    {
+        return Friendship::involving($this->id)->accepted()->get()
+            ->map(fn (Friendship $f) => $f->otherId($this->id))->all();
+    }
+
+    /** 我封鎖的 + 封鎖我的（查詢層排除用）。 */
+    public function blockedEitherWayIds(): array
+    {
+        return Block::where('blocker_id', $this->id)->pluck('blocked_id')
+            ->merge(Block::where('blocked_id', $this->id)->pluck('blocker_id'))
+            ->unique()->values()->all();
+    }
+
     public function isAdmin(): bool
     {
         return in_array(strtolower((string) $this->email), config('pawfit.admin_emails', []), true);

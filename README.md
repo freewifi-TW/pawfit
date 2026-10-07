@@ -30,6 +30,18 @@ Same-domain 路由，前後端共用 cookie（Sanctum stateful），沒有 CORS 
 
 尚未拍板／未做：Pawfit ID 更名（R-2，目前鎖定不可改）、帳號刪除與資料匯出、Postgres 自動備份排程（SASD §2.5）、條款文字定稿（R-5）。
 
+## Phase 2 功能狀態
+
+| 里程碑 | 內容 | flag | 狀態 |
+|---|---|---|---|
+| M1 好友 | 邀請／接受／解除、封鎖（雙向互不可見）、`friends` 隱私值（獸設與單圖）、分享頁對 friends 的處理、`/friends` 頁與主頁按鈕 | `FEATURE_FRIENDS` | ✅ |
+| M2 發文 | 貼文 CRUD、母標籤繼承、credit 沿用、NSFW 鎖定 | `FEATURE_FEED` | 🔲 |
+| M3 河道與互動 | 雙軌河道、標籤篩選、讚、留言 | `FEATURE_FEED` | 🔲 |
+| M4 治理強化 | 檢舉擴充、自動降能見度、後台貼文操作 | `FEATURE_FEED` | 🔲 |
+| M5 換獸頭貼圖 | 瀏覽器端人臉偵測＋貼圖發文 | `FEATURE_HEAD_STICKER` | 🔲 |
+
+flag 全部在 `apps/api/.env`（程式先部署、功能再啟用）；前端由 `GET /api/features` 取得，關閉時相關頁面與按鈕不出現、API 回 404。封鎖與好友的可見性判斷只在 `Visibility::relation()`（同一請求內快取在 Request attributes 上）。
+
 ## 開發環境
 
 需求：Docker Desktop（WSL2 後端）。本機不需安裝 Node、PHP 或 Composer。

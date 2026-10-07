@@ -14,7 +14,7 @@ export const SUPPORTED_LOCALES = [
 
 export const DEFAULT_LOCALE = 'zh-TW'
 
-const NAMESPACES = ['common', 'enums', 'home', 'auth', 'dashboard', 'fursona', 'media', 'share', 'profile', 'settings', 'admin', 'legal', 'embed', 'commission']
+const NAMESPACES = ['common', 'enums', 'home', 'auth', 'dashboard', 'fursona', 'media', 'share', 'profile', 'settings', 'admin', 'legal', 'embed', 'commission', 'friends']
 
 export default defineNuxtConfig({
   modules: [

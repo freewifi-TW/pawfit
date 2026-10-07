@@ -42,6 +42,47 @@ useHead(() => ({
 }))
 
 const reporting = ref(false)
+
+/* ---- Phase 2 M1：加好友／封鎖（只在好友功能啟用且登入時顯示） ---- */
+const api2 = useApi()
+const { friends: friendsEnabled } = useFeatures()
+const { me } = useAuth()
+const relation = computed(() => page.value?.relation ?? null)
+const busy = ref(false)
+const confirmBlock = ref(false)
+const confirmRemove = ref(false)
+
+async function social(fn: () => Promise<unknown>, okMsg: string) {
+  busy.value = true
+  try {
+    await fn()
+    await refreshNuxtData(`profile-${pawfitId}`)
+    notify.ok(okMsg)
+  } catch (e) {
+    const err = apiError(e)
+    notify.err(t('friends.notify.failed'), Object.values(err.errors)[0] || err.message)
+  } finally {
+    busy.value = false
+    confirmBlock.value = false
+    confirmRemove.value = false
+  }
+}
+const addFriend = () => social(() => api2('/friends/requests', { method: 'POST', body: { pawfit_id: user.value.pawfit_id } }), t('friends.notify.sent', { id: user.value.pawfit_id }))
+const cancelRequest = () => social(() => api2(`/friends/requests/${relation.value?.friendship_id}`, { method: 'DELETE' }), t('friends.notify.cancelled'))
+const acceptRequest = () => social(() => api2(`/friends/requests/${relation.value?.friendship_id}/accept`, { method: 'POST' }), t('friends.notify.accepted', { id: user.value.pawfit_id }))
+const removeFriend = () => social(() => api2(`/friends/${user.value.id}`, { method: 'DELETE' }), t('friends.notify.removed', { id: user.value.pawfit_id }))
+async function block() {
+  busy.value = true
+  try {
+    await api2(`/blocks/${user.value.id}`, { method: 'POST' })
+    notify.ok(t('friends.notify.blocked', { id: user.value.pawfit_id }))
+    await navigateTo('/friends')
+  } catch (e) {
+    notify.err(t('friends.notify.failed'), apiError(e).message)
+    busy.value = false
+    confirmBlock.value = false
+  }
+}
 </script>
 
 <template>
@@ -80,13 +121,84 @@ const reporting = ref(false)
           {{ t('profile.actions.manage') }}
         </NuxtLink>
         <template v-else>
-          <button
+          <template v-if="friendsEnabled && me && relation">
+            <button
+              v-if="relation.status === 'none'"
+              class="btn primary"
+              type="button"
+              :disabled="busy"
+              @click="addFriend"
+            >
+              {{ t('friends.profile.addFriend') }}
+            </button>
+            <template v-else-if="relation.status === 'pending_out'">
+              <span class="pill warn">{{ t('friends.profile.pendingOut') }}</span>
+              <button
+                class="btn sm ghost"
+                type="button"
+                :disabled="busy"
+                @click="cancelRequest"
+              >
+                {{ t('friends.profile.cancel') }}
+              </button>
+            </template>
+            <button
+              v-else-if="relation.status === 'pending_in'"
+              class="btn primary"
+              type="button"
+              :disabled="busy"
+              @click="acceptRequest"
+            >
+              {{ t('friends.profile.acceptRequest') }}
+            </button>
+            <template v-else>
+              <span class="pill ok">{{ t('friends.profile.friends') }}</span>
+              <button
+                v-if="!confirmRemove"
+                class="btn sm ghost"
+                type="button"
+                :disabled="busy"
+                @click="confirmRemove = true"
+              >
+                {{ t('friends.profile.remove') }}
+              </button>
+              <button
+                v-else
+                class="btn sm danger"
+                type="button"
+                :disabled="busy"
+                @click="removeFriend"
+              >
+                {{ t('friends.removeConfirm') }}
+              </button>
+            </template>
+            <button
+              v-if="!confirmBlock"
+              class="btn ghost sm"
+              type="button"
+              :title="t('friends.profile.blockHint')"
+              :disabled="busy"
+              @click="confirmBlock = true"
+            >
+              {{ t('friends.profile.block') }}
+            </button>
+            <button
+              v-else
+              class="btn sm danger"
+              type="button"
+              :disabled="busy"
+              @click="block"
+            >
+              {{ t('friends.profile.blockConfirm') }}
+            </button>
+          </template>
+          <NuxtLink
+            v-else-if="friendsEnabled && !me"
             class="btn"
-            type="button"
-            @click="notify.info(t('profile.actions.friendsSoon'))"
+            to="/login"
           >
-            {{ t('profile.actions.addFriend') }}
-          </button>
+            {{ t('friends.profile.addFriend') }}
+          </NuxtLink>
           <button
             class="btn ghost sm"
             type="button"

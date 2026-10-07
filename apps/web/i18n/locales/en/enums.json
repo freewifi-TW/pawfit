@@ -1,6 +1,7 @@
 {
   "enums": {
     "visibility": {
+      "friends": "Friends only",
       "public": "Public",
       "unlisted": "Link only",
       "private": "Private"

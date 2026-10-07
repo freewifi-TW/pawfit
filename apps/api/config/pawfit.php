@@ -19,7 +19,9 @@ return [
     'features' => [
         // 本機沒有 Google OAuth 憑證時，允許用 email 直接登入（僅 local 環境生效）
         'dev_login' => (bool) env('FEATURE_DEV_LOGIN', false),
-        // 後續 phase 的 flag 預留
+        // Phase 2 M1：好友與封鎖、限好友隱私（SASD Phase 2 FR-B1、FR-B2）
+        'friends' => (bool) env('FEATURE_FRIENDS', false),
+        // Phase 2 M2–M4：發文、河道、互動、治理強化
         'feed' => (bool) env('FEATURE_FEED', false),
         // M7 委託需求單的 LLM 潤飾（FR-6.7）：純文字模型改寫語氣與翻譯；預設關，開啟前需先接供應商
         'brief_llm' => (bool) env('FEATURE_BRIEF_LLM', false),

@@ -43,6 +43,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('presign', fn (Request $r) => Limit::perMinute(60)->by($r->user()?->id ?: $r->ip()));
         RateLimiter::for('reports', fn (Request $r) => Limit::perHour(10)->by($r->user()?->id ?: $r->ip()));
         RateLimiter::for('public', fn (Request $r) => Limit::perMinute(120)->by($r->ip()));
+        // Phase 2 社群操作（邀請、封鎖、讚、留言）：以使用者計
+        RateLimiter::for('social', fn (Request $r) => Limit::perMinute(60)->by($r->user()?->id ?: $r->ip()));
         // 公開 JSON API 與嵌入（FR-7.5）：匿名、以 IP 計
         RateLimiter::for('public_api', fn (Request $r) => Limit::perMinute((int) config('pawfit.embed.rate_per_minute'))->by($r->ip()));
     }

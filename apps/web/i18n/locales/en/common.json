@@ -2,6 +2,7 @@
   "common": {
     "brand": "Pawfit",
     "nav": {
+      "friends": "Friends",
       "home": "Home",
       "dashboard": "My Fursonas",
       "profile": "Profile",

@@ -1,0 +1,57 @@
+{
+  "friends": {
+    "title": "好友",
+    "subtitle": "好友可以看到你設為「限好友」的獸設與圖片",
+    "disabled": "好友功能尚未開放",
+    "add": {
+      "title": "加好友",
+      "placeholder": "對方的 Pawfit ID",
+      "submit": "送出邀請",
+      "hint": "對方接受後才會成為好友。若對方也邀請過你，會直接成為好友。"
+    },
+    "tabs": {
+      "friends": "好友",
+      "requests": "邀請",
+      "blocked": "封鎖"
+    },
+    "since": "{date} 起",
+    "remove": "解除好友",
+    "removeConfirm": "確定解除",
+    "incoming": "等待我回應",
+    "outgoing": "我送出的",
+    "accept": "接受",
+    "decline": "拒絕",
+    "cancel": "取消邀請",
+    "pending": "等待回應",
+    "unblock": "解除封鎖",
+    "blockedNote": "封鎖後雙方互相看不到主頁、獸設與圖片，既有好友關係會被解除。解除封鎖不會自動恢復好友。",
+    "empty": {
+      "friends": "還沒有好友。輸入對方的 Pawfit ID 送出邀請吧。",
+      "incoming": "沒有待處理的邀請",
+      "outgoing": "沒有送出中的邀請",
+      "blocked": "沒有封鎖任何人"
+    },
+    "notify": {
+      "sent": "已送出邀請給 {'@'}{id}",
+      "nowFriends": "你和 {'@'}{id} 已成為好友",
+      "accepted": "已接受 {'@'}{id} 的邀請",
+      "declined": "已拒絕邀請",
+      "cancelled": "已取消邀請",
+      "removed": "已解除與 {'@'}{id} 的好友關係",
+      "blocked": "已封鎖 {'@'}{id}",
+      "unblocked": "已解除封鎖 {'@'}{id}",
+      "failed": "操作失敗"
+    },
+    "profile": {
+      "addFriend": "＋ 加好友",
+      "pendingOut": "邀請已送出",
+      "cancel": "取消邀請",
+      "acceptRequest": "接受邀請",
+      "friends": "✓ 好友",
+      "remove": "解除好友",
+      "block": "封鎖",
+      "blockConfirm": "確定封鎖",
+      "blockHint": "封鎖後雙方互相看不到對方的內容"
+    }
+  }
+}

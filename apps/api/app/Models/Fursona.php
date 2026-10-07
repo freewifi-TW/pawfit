@@ -13,7 +13,13 @@ class Fursona extends Model
 {
     use HasFactory, HasUuids;
 
-    public const VISIBILITIES = ['public', 'unlisted', 'private']; // Phase 2 增列 friends
+    public const VISIBILITIES = ['public', 'unlisted', 'private', 'friends'];
+
+    /** 目前可選的隱私值：friends 只在 Phase 2 好友功能啟用時開放（既有資料不自動變更，FR-B2.3）。 */
+    public static function allowedVisibilities(): array
+    {
+        return config('pawfit.features.friends') ? self::VISIBILITIES : ['public', 'unlisted', 'private'];
+    }
 
     protected $fillable = [
         'owner_id', 'name', 'species', 'bio', 'tags', 'palette',

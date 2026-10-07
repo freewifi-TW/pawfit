@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureFeature;
 use App\Http\Middleware\EnsureNotBanned;
 use App\Http\Middleware\EnsureOnboarded;
 use App\Http\Middleware\RequestLogging;
@@ -33,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'onboarded' => EnsureOnboarded::class,
             'not-banned' => EnsureNotBanned::class,
+            'feature' => EnsureFeature::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

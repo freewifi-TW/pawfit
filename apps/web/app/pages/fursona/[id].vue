@@ -178,8 +178,11 @@ async function destroy() {
   }
 }
 
+const { friends: friendsEnabled } = useFeatures()
+// 限好友（Phase 2 FR-B2）只在好友功能啟用時可選
+const visibilityChoices = computed<Visibility[]>(() => friendsEnabled.value ? ['public', 'friends', 'unlisted', 'private'] : ['public', 'unlisted', 'private'])
 const visibilityOptions = computed<Array<{ value: Visibility, title: string, hint: string }>>(() =>
-  (['public', 'unlisted', 'private'] as Visibility[]).map(value => ({
+  visibilityChoices.value.map(value => ({
     value,
     title: visibilityLabel(value),
     hint: t(`fursona.privacy.hints.${value}`)
@@ -492,7 +495,10 @@ const visibilityOptions = computed<Array<{ value: Visibility, title: string, hin
               >
               <span><b>{{ o.title }}</b><small>{{ o.hint }}</small></span>
             </label>
-            <label class="radio disabled">
+            <label
+              v-if="!friendsEnabled"
+              class="radio disabled"
+            >
               <input
                 type="radio"
                 name="vis"

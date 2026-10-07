@@ -77,6 +77,7 @@
     "privacy": {
       "title": "Who can see this fursona",
       "hints": {
+        "friends": "Only accepted friends can see it; the share link does not work for anyone else.",
         "public": "Shown on your profile; anyone can view it.",
         "unlisted": "Only people with the link can view it. Hidden from your profile and search.",
         "private": "Only you can see it. The share link is disabled automatically."

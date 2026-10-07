@@ -61,7 +61,7 @@ class MediaController extends Controller
             'caption' => ['nullable', 'string', 'max:200'],
             'credit_name' => ['nullable', 'string', 'max:80'],
             'credit_url' => ['nullable', 'url', 'max:300'],
-            'visibility_override' => ['nullable', Rule::in(Fursona::VISIBILITIES)],
+            'visibility_override' => ['nullable', Rule::in(Fursona::allowedVisibilities())],
         ], [
             'kind.required' => __('messages.media.kind_required'),
             'is_nsfw.required' => __('messages.media.is_nsfw_required'),
@@ -113,7 +113,7 @@ class MediaController extends Controller
             'caption' => ['sometimes', 'nullable', 'string', 'max:200'],
             'credit_name' => ['sometimes', 'nullable', 'string', 'max:80'],
             'credit_url' => ['sometimes', 'nullable', 'url', 'max:300'],
-            'visibility_override' => ['sometimes', 'nullable', Rule::in(Fursona::VISIBILITIES)],
+            'visibility_override' => ['sometimes', 'nullable', Rule::in(Fursona::allowedVisibilities())],
         ]);
 
         $media->fill($data)->save();

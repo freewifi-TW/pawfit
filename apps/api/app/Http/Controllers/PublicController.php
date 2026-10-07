@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\FursonaResource;
 use App\Http\Resources\MediaResource;
 use App\Http\Resources\PublicUserResource;
+use App\Models\Friendship;
 use App\Models\Fursona;
 use App\Models\Media;
 use App\Models\ShareLink;
@@ -51,6 +52,23 @@ class PublicController extends Controller
         ]);
     }
 
+    /** @return array{status: string, friendship_id: string|null, blocked_by_me: bool}|null */
+    private function relationPayload(?User $viewer, User $target): ?array
+    {
+        if (! config('pawfit.features.friends') || $viewer === null || $viewer->id === $target->id) {
+            return null;
+        }
+        $f = Friendship::between($viewer->id, $target->id);
+        $status = match (true) {
+            $f === null => 'none',
+            $f->isAccepted() => 'friends',
+            $f->requested_by === $viewer->id => 'pending_out',
+            default => 'pending_in',
+        };
+
+        return ['status' => $status, 'friendship_id' => $f?->id, 'blocked_by_me' => false];
+    }
+
     /** GET /api/users/{pawfitId} */
     public function profile(Request $request, string $pawfitId): JsonResponse
     {
@@ -59,11 +77,14 @@ class PublicController extends Controller
 
         $viewer = $request->user('sanctum');
         $isOwner = $viewer?->id === $user->id;
+        // 封鎖：任一方封鎖另一方 → 主頁視為不存在（Phase 2 §2.2）
+        abort_if($this->visibility->isBlockedBetween($viewer, $user->id), 404);
 
         $fursonas = $user->fursonas()
             ->with(['avatarMedia', 'owner', 'media' => fn ($q) => $q->where('status', 'active')])
             ->withCount(['media' => fn ($q) => $q->where('status', 'active')])
-            ->where('visibility', 'public')
+            // 個人主頁列出公開獸設；好友另可看到限好友的（FR-B2）
+            ->whereIn('visibility', $this->visibility->relation($viewer, $user->id)['friend'] ? ['public', 'friends'] : ['public'])
             ->orderByDesc('is_representative')->orderBy('created_at')
             ->get()
             ->filter(fn (Fursona $f) => $this->visibility->fursonaState($viewer, $f) !== null)
@@ -86,6 +107,8 @@ class PublicController extends Controller
                 'public_count' => $fursonas->count(),
                 'total_count' => $isOwner ? $user->fursonas()->count() : null,
             ],
+            // Phase 2 M1：瀏覽者與這位用戶的關係（加好友／封鎖按鈕用）
+            'relation' => $this->relationPayload($viewer, $user),
         ]);
     }
 }

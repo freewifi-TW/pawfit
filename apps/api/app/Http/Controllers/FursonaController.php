@@ -116,7 +116,7 @@ class FursonaController extends Controller
             'palette.*.hex' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'palette.*.name' => ['nullable', 'string', 'max:40'],
             'palette.*.note' => ['nullable', 'string', 'max:80'],
-            'visibility' => ['sometimes', Rule::in(Fursona::VISIBILITIES)],
+            'visibility' => ['sometimes', Rule::in(Fursona::allowedVisibilities())],
             'is_nsfw' => ['sometimes', 'boolean'],
             'is_representative' => ['sometimes', 'boolean'],
             'avatar_media_id' => ['sometimes', 'nullable', 'uuid'],

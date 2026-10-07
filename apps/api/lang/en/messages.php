@@ -39,6 +39,15 @@ return [
         'file_exceeds_limit' => 'The file exceeds :max MB.',
     ],
 
+    'friends' => [
+        'user_not_found' => 'No user with that Pawfit ID.',
+        'self' => 'You cannot do that to yourself.',
+        'already_friends' => 'You are already friends.',
+        'already_requested' => 'Request already sent, waiting for a reply.',
+        'cannot_accept_own' => 'You sent this request; the other person has to accept it.',
+        'use_remove' => 'Already friends; use remove friend instead.',
+    ],
+
     'commission' => [
         'media_required' => 'Pick at least one reference image.',
         'too_many_media' => 'At most :max reference images.',

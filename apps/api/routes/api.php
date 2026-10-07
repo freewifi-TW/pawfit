@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommissionKitController;
 use App\Http\Controllers\CommissionPageController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\FursonaController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MeController;
@@ -28,6 +29,10 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('dev-login', [AuthController::class, 'devLogin']);
     Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 });
+
+// 前端用的 feature flag 清單（公開、可快取）
+Route::get('features', fn () => response()->json(config('pawfit.features'))
+    ->setPublic()->setMaxAge(60));
 
 /*
  |------------------------------------------------------------------
@@ -60,6 +65,17 @@ Route::middleware(['auth:sanctum', 'not-banned', 'onboarded'])->group(function (
     Route::delete('media/{media}', [MediaController::class, 'destroy']);
 
     Route::post('reports', [ReportController::class, 'store'])->middleware('throttle:reports');
+
+    // Phase 2 M1：好友與封鎖（FR-B1）
+    Route::middleware(['feature:friends', 'throttle:social'])->group(function () {
+        Route::get('friends', [FriendController::class, 'index']);
+        Route::post('friends/requests', [FriendController::class, 'request']);
+        Route::post('friends/requests/{friendship}/accept', [FriendController::class, 'accept']);
+        Route::delete('friends/requests/{friendship}', [FriendController::class, 'cancel']);
+        Route::delete('friends/{user}', [FriendController::class, 'remove']);
+        Route::post('blocks/{user}', [FriendController::class, 'block']);
+        Route::delete('blocks/{user}', [FriendController::class, 'unblock']);
+    });
 
     // 委託需求單（M7，FR-6）
     Route::get('commission-kits', [CommissionKitController::class, 'index']);

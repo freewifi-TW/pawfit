@@ -12,7 +12,8 @@ const { t } = useI18n()
 const { kindLabelLong, visibilityLabel } = useLabels()
 
 const KINDS: MediaKind[] = ['art2d', 'model3d', 'photo']
-const VISIBILITIES: Visibility[] = ['public', 'unlisted', 'private']
+const { friends: friendsEnabled } = useFeatures()
+const VISIBILITIES = computed<Visibility[]>(() => friendsEnabled.value ? ['public', 'friends', 'unlisted', 'private'] : ['public', 'unlisted', 'private'])
 
 const form = reactive({
   caption: '',

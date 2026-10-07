@@ -1,6 +1,7 @@
 {
   "enums": {
     "visibility": {
+      "friends": "限好友",
       "public": "公開",
       "unlisted": "連結可見",
       "private": "私人"
